@@ -36,8 +36,13 @@ const questions = [
   },
   {
     type: 'input',
-    name: 'websiteUrl',
-    message: 'Link to your Personal Website (if different):',
+    name: 'liveAppUrl',
+    message: 'Link to your Live Production App:',
+  },
+  {
+    type: 'input',
+    name: 'cvUrl',
+    message: 'Link to your CV (Google Drive/PDF):',
   },
   {
     type: 'input',
@@ -60,8 +65,10 @@ const questions = [
 inquirer.prompt(questions).then((answers) => {
   console.log("\nGenerating your files...\n");
 
+  // Format WhatsApp number (remove +, spaces, dashes)
+  const whatsAppNumber = answers.phone.replace(/[^0-9]/g, '');
+
   // 1. Generate vCard Content
-  // vCard 3.0 allows multiple URL properties. We add them if they exist.
   let vCardContent = `BEGIN:VCARD
 VERSION:3.0
 FN:${answers.fullName}
@@ -70,7 +77,8 @@ TEL;TYPE=CELL:${answers.phone}
 EMAIL:${answers.email}`;
 
   if (answers.portfolioUrl) vCardContent += `\nURL;TYPE=PORTFOLIO:${answers.portfolioUrl}`;
-  if (answers.websiteUrl) vCardContent += `\nURL;TYPE=WEBSITE:${answers.websiteUrl}`;
+  if (answers.liveAppUrl) vCardContent += `\nURL;TYPE=WEBSITE:${answers.liveAppUrl}`;
+  if (answers.cvUrl) vCardContent += `\nURL;TYPE=CV:${answers.cvUrl}`;
 
   vCardContent += `\nEND:VCARD`;
 
@@ -78,7 +86,6 @@ EMAIL:${answers.email}`;
   console.log("✅ contact.vcf created.");
 
   // 2. Generate HTML Landing Page
-  // Using a clean, modern, dark-themed CSS directly in the file
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -94,6 +101,8 @@ EMAIL:${answers.email}`;
             --text-secondary: #b3b3b3;
             --accent: #3498db;
             --btn-hover: #2980b9;
+            --whatsapp-color: #25D366;
+            --whatsapp-hover: #128C7E;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -119,17 +128,13 @@ EMAIL:${answers.email}`;
         .avatar {
             width: 120px;
             height: 120px;
-            background-color: var(--accent);
             border-radius: 50%;
             margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
+            display: block;
+            object-fit: cover;
             border: 4px solid var(--card-bg);
             box-shadow: 0 0 0 4px var(--accent);
+            background-color: var(--card-bg);
         }
         h1 { margin: 10px 0 5px; font-size: 24px; }
         p.title { color: var(--text-secondary); margin: 0 0 30px; font-size: 16px; }
@@ -161,6 +166,15 @@ EMAIL:${answers.email}`;
         .btn.primary:hover {
             background-color: var(--btn-hover);
         }
+        .btn.whatsapp {
+            background-color: transparent;
+            border-color: var(--whatsapp-color);
+            color: var(--whatsapp-color);
+        }
+        .btn.whatsapp:hover {
+            background-color: var(--whatsapp-color);
+            color: white;
+        }
         .footer {
             margin-top: 30px;
             font-size: 12px;
@@ -171,10 +185,8 @@ EMAIL:${answers.email}`;
 <body>
 
     <div class="container">
-        <!-- Initials as Avatar -->
-        <div class="avatar">
-            ${answers.fullName.split(' ').map(n => n[0]).join('')}
-        </div>
+        <!-- Profile Picture: Expected to be in the same folder -->
+        <img src="profile_pic.png" alt="${answers.fullName}" class="avatar">
 
         <h1>${answers.fullName}</h1>
         <p class="title">${answers.jobTitle}</p>
@@ -182,7 +194,8 @@ EMAIL:${answers.email}`;
         <!-- Main Content -->
         
         ${answers.portfolioUrl ? `<a href="${answers.portfolioUrl}" class="btn" target="_blank">🎨 View Portfolio</a>` : ''}
-        ${answers.websiteUrl ? `<a href="${answers.websiteUrl}" class="btn" target="_blank">🌐 Personal Website</a>` : ''}
+        ${answers.cvUrl ? `<a href="${answers.cvUrl}" class="btn" target="_blank">📄 View CV</a>` : ''}
+        ${answers.liveAppUrl ? `<a href="${answers.liveAppUrl}" class="btn" target="_blank">🚀 Live Production App</a>` : ''}
         ${answers.githubUrl ? `<a href="${answers.githubUrl}" class="btn" target="_blank">💻 GitHub Profile</a>` : ''}
         ${answers.linkedinUrl ? `<a href="${answers.linkedinUrl}" class="btn" target="_blank">🔗 LinkedIn</a>` : ''}
         
@@ -190,6 +203,7 @@ EMAIL:${answers.email}`;
 
         <a href="contact.vcf" class="btn primary">📞 Save Contact Info</a>
         <a href="tel:${answers.phone}" class="btn">Call Me</a>
+        <a href="https://wa.me/${whatsAppNumber}" class="btn whatsapp" target="_blank">💬 WhatsApp Me</a>
 
         <div class="footer">
             Generated with Personal Hub Generator

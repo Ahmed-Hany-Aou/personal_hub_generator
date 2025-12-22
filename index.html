@@ -13,6 +13,8 @@
             --text-secondary: #b3b3b3;
             --accent: #3498db;
             --btn-hover: #2980b9;
+            --whatsapp-color: #25D366;
+            --whatsapp-hover: #128C7E;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,17 +40,13 @@
         .avatar {
             width: 120px;
             height: 120px;
-            background-color: var(--accent);
             border-radius: 50%;
             margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
+            display: block;
+            object-fit: cover;
             border: 4px solid var(--card-bg);
             box-shadow: 0 0 0 4px var(--accent);
+            background-color: var(--card-bg);
         }
         h1 { margin: 10px 0 5px; font-size: 24px; }
         p.title { color: var(--text-secondary); margin: 0 0 30px; font-size: 16px; }
@@ -80,6 +78,15 @@
         .btn.primary:hover {
             background-color: var(--btn-hover);
         }
+        .btn.whatsapp {
+            background-color: transparent;
+            border-color: var(--whatsapp-color);
+            color: var(--whatsapp-color);
+        }
+        .btn.whatsapp:hover {
+            background-color: var(--whatsapp-color);
+            color: white;
+        }
         .footer {
             margin-top: 30px;
             font-size: 12px;
@@ -90,10 +97,8 @@
 <body>
 
     <div class="container">
-        <!-- Initials as Avatar -->
-        <div class="avatar">
-            AH
-        </div>
+        <!-- Profile Picture: Expected to be in the same folder -->
+        <img src="profile_pic.png" alt="Ahmed Hany" class="avatar">
 
         <h1>Ahmed Hany</h1>
         <p class="title">Software Engineer</p>
@@ -101,7 +106,8 @@
         <!-- Main Content -->
         
         <a href="https://ahmed-hany-aou.github.io/" class="btn" target="_blank">🎨 View Portfolio</a>
-        <a href="https://wadha.up.railway.app/" class="btn" target="_blank">🌐 Personal Website</a>
+        <a href="https://drive.google.com/file/d/1ripteWlYwTANr5v7NJY0_QlntIG1AtGl/view?usp=drivesdk" class="btn" target="_blank">📄 View CV</a>
+        <a href="https://wadha.up.railway.app/" class="btn" target="_blank">🚀 Live Production App</a>
         <a href="https://github.com/Ahmed-Hany-Aou" class="btn" target="_blank">💻 GitHub Profile</a>
         <a href="https://www.linkedin.com/in/ahmed-hany-aou/" class="btn" target="_blank">🔗 LinkedIn</a>
         
@@ -109,6 +115,7 @@
 
         <a href="contact.vcf" class="btn primary">📞 Save Contact Info</a>
         <a href="tel:+20 1065232774" class="btn">Call Me</a>
+        <a href="https://wa.me/201065232774" class="btn whatsapp" target="_blank">💬 WhatsApp Me</a>
 
         <div class="footer">
             Generated with Personal Hub Generator
