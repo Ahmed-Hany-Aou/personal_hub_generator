@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import qr from 'qr-image';
 import fs from 'fs';
+import { Jimp } from 'jimp';
 
 console.log("Welcome to the Personal Hub Generator!");
 console.log("Let's build your digital business card.");
@@ -59,10 +60,23 @@ const questions = [
     name: 'baseUrl',
     message: 'FINAL STEP: Where will you host this? (Base URL)\n This is the URL the QR code will point to.',
     validate: (input) => input.startsWith('http') ? true : 'Please enter a valid URL starting with http:// or https://'
+  },
+  {
+    type: 'confirm',
+    name: 'addOverlay',
+    message: 'Do you want to overlay the QR code onto "bussniees card.png"?',
+    default: true
+  },
+  {
+    type: 'list',
+    name: 'qrPosition',
+    message: 'Where should the QR Code be placed on the card?',
+    choices: ['Center', 'Bottom Right', 'Bottom Left', 'Top Right', 'Top Left'],
+    when: (answers) => answers.addOverlay
   }
 ];
 
-inquirer.prompt(questions).then((answers) => {
+inquirer.prompt(questions).then(async (answers) => {
   console.log("\nGenerating your files...\n");
 
   // Format WhatsApp number (remove +, spaces, dashes)
@@ -218,15 +232,66 @@ EMAIL:${answers.email}`;
   console.log("✅ index.html created.");
 
   // 3. Generate QR Code
-  // The QR code simply points to the user's hosting URL
   const qr_svg = qr.image(answers.baseUrl, { type: 'png' });
-  qr_svg.pipe(fs.createWriteStream('qr_code.png'));
-  console.log(`✅ qr_code.png created (pointing to ${answers.baseUrl})`);
+  const qrStream = fs.createWriteStream('qr_code.png');
+  qr_svg.pipe(qrStream);
 
-  console.log("\n------------------------------------------------");
-  console.log("🎉 SUCCESS! Your Digital Business Card is ready.");
-  console.log("------------------------------------------------");
-  console.log("Next Steps:");
-  console.log("1. Host 'index.html' and 'contact.vcf' at your URL: " + answers.baseUrl);
-  console.log("2. Print or show 'qr_code.png' to people.");
+  qrStream.on('finish', async () => {
+    console.log(`✅ qr_code.png created (pointing to ${answers.baseUrl})`);
+
+    // 4. Overlay QR on Business Card (if selected)
+    if (answers.addOverlay) {
+      try {
+        console.log("...Processing Business Card image...");
+        const cardDesign = await Jimp.read('bussniees card.png');
+        const qrImage = await Jimp.read('qr_code.png');
+
+        // Resize QR code (adjust size as needed, e.g., 250x250)
+        qrImage.resize({ w: 250, h: 250 });
+
+        let x = 0;
+        let y = 0;
+        const padding = 50;
+
+        switch (answers.qrPosition) {
+          case 'Center':
+            x = (cardDesign.bitmap.width / 2) - (qrImage.bitmap.width / 2);
+            y = (cardDesign.bitmap.height / 2) - (qrImage.bitmap.height / 2);
+            break;
+          case 'Bottom Right':
+            x = cardDesign.bitmap.width - qrImage.bitmap.width - padding;
+            y = cardDesign.bitmap.height - qrImage.bitmap.height - padding;
+            break;
+          case 'Bottom Left':
+            x = padding;
+            y = cardDesign.bitmap.height - qrImage.bitmap.height - padding;
+            break;
+          case 'Top Right':
+            x = cardDesign.bitmap.width - qrImage.bitmap.width - padding;
+            y = padding;
+            break;
+          case 'Top Left':
+            x = padding;
+            y = padding;
+            break;
+        }
+
+        cardDesign.composite(qrImage, x, y);
+        await cardDesign.write('final_card_with_qr.png');
+        console.log(`✅ final_card_with_qr.png created! This is your printable card.`);
+      } catch (error) {
+        console.error("❌ Error processing image:", error);
+        console.log("Make sure 'bussniees card.png' exists in the same folder!");
+      }
+    }
+
+    console.log("\n------------------------------------------------");
+    console.log("🎉 SUCCESS! Your Digital Business Card is ready.");
+    console.log("------------------------------------------------");
+    console.log("Next Steps:");
+    console.log("1. Host 'index.html', 'contact.vcf' & 'profile_pic.png' at your URL: " + answers.baseUrl);
+    console.log("2. Use 'final_card_with_qr.png' for printing or sharing.");
+  });
+
 });
+
