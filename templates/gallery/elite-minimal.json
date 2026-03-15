@@ -1,0 +1,23 @@
+{
+  "name": "Elite Minimal",
+  "description": "Clean, high-contrast design for modern professionals.",
+  "config": {
+    "accentColor": "#ffffff",
+    "theme": "zen",
+    "landingPage": {
+      "theme": "zen",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=EM", "name": "{{fullName}}", "jobTitle": "{{jobTitle}}" } },
+        { "type": "link-item", "data": { "url": "https://linkedin.com", "label": "Professional Profile" } },
+        { "type": "footer", "data": { "footerText": "Built with Elite Studio" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 100, "y": 100, "style": { "size": 64, "color": "white" } },
+        { "type": "text", "content": "{{jobTitle}}", "x": 100, "y": 180, "style": { "size": 32, "color": "white" } },
+        { "type": "qr", "x": 750, "y": 300, "size": 200 }
+      ]
+    }
+  }
+}

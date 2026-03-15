@@ -501,6 +501,23 @@ app.get('/api/gallery', (req, res) => {
     res.json(published);
 });
 
+// --- TEMPLATE GALLERY API ---
+const GALLERY_TEMPLATES_DIR = path.join(__dirname, 'templates', 'gallery');
+app.get('/api/templates', (req, res) => {
+    if (!fs.existsSync(GALLERY_TEMPLATES_DIR)) return res.json([]);
+    const files = fs.readdirSync(GALLERY_TEMPLATES_DIR).filter(f => f.endsWith('.json'));
+    const templates = files.map(f => {
+        const data = JSON.parse(fs.readFileSync(path.join(GALLERY_TEMPLATES_DIR, f), 'utf8'));
+        return {
+            id: path.parse(f).name,
+            name: data.name,
+            description: data.description,
+            config: data.config
+        };
+    });
+    res.json(templates);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`\n------------------------------------------------`);

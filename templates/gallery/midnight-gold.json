@@ -1,0 +1,23 @@
+{
+  "name": "Midnight Gold",
+  "description": "Elegant luxury with deep blues and golden accents.",
+  "config": {
+    "accentColor": "#fbbf24",
+    "theme": "glass",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=Gold", "name": "{{fullName}}", "jobTitle": "Executive Director" } },
+        { "type": "cta-button", "data": { "label": "Book a Consultation", "url": "#", "style": "pulse", "color": "#fbbf24" } },
+        { "type": "footer", "data": { "footerText": "EST. 2024" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 80, "y": 80, "style": { "size": 64, "color": "white" } },
+        { "type": "text", "content": "EXECUTIVE", "x": 80, "y": 160, "style": { "size": 32, "color": "white" } },
+        { "type": "qr", "x": 700, "y": 300, "size": 250 }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Corporate Pro",
+  "description": "Trustworthy and established blue-themed professional design.",
+  "config": {
+    "accentColor": "#1e40af",
+    "theme": "glass",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=CP", "name": "{{fullName}}", "jobTitle": "{{jobTitle}}" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Services" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Team" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Contact" } },
+        { "type": "footer", "data": { "footerText": "Official Professional Hub" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 50, "y": 250, "style": { "size": 72, "color": "white" } },
+        { "type": "qr", "x": 750, "y": 200, "size": 200 }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Creative Portfolio",
+  "description": "Vibrant and dynamic design for artists and creators.",
+  "config": {
+    "accentColor": "#ec4899",
+    "theme": "glass",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/avataaars/svg?seed=Creative", "name": "{{fullName}}", "jobTitle": "Multi-disciplinary Artist" } },
+        { "type": "social-icons", "data": { "links": [{ "url": "#", "label": "Instagram" }, { "url": "#", "label": "Behance" }, { "url": "#", "label": "Dribbble" }] } },
+        { "type": "link-item", "data": { "url": "#", "label": "View Portfolio" } },
+        { "type": "footer", "data": { "footerText": "Stay Creative." } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "CREATIVE", "x": 50, "y": 50, "style": { "size": 120, "color": "white" } },
+        { "type": "text", "content": "{{fullName}}", "x": 50, "y": 500, "style": { "size": 48, "color": "white" } },
+        { "type": "qr", "x": 800, "y": 50, "size": 150 }
+      ]
+    }
+  }
+}

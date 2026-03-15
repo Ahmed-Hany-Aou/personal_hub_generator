@@ -1,0 +1,23 @@
+{
+  "name": "Stealth Noir",
+  "description": "Sophisticated monochrome design for a premium, understated look.",
+  "config": {
+    "accentColor": "#333333",
+    "theme": "noir",
+    "landingPage": {
+      "theme": "noir",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=SN&backgroundColor=000000", "name": "{{fullName}}", "jobTitle": "{{jobTitle}}" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Case Studies" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Experience" } },
+        { "type": "footer", "data": { "footerText": "Confidential & Proprietary" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 400, "y": 250, "style": { "size": 64, "color": "white" } },
+        { "type": "qr", "x": 425, "y": 350, "size": 150 }
+      ]
+    }
+  }
+}

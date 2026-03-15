@@ -1,0 +1,22 @@
+{
+  "name": "Soft Pastel",
+  "description": "Gentle colors and rounded aesthetics for a friendly vibe.",
+  "config": {
+    "accentColor": "#fda4af",
+    "theme": "glass",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/lorelei/svg?seed=Pastel", "name": "{{fullName}}", "jobTitle": "UX/UI Designer" } },
+        { "type": "social-icons", "data": { "links": [{ "url": "#", "label": "Twitter" }] } },
+        { "type": "footer", "data": { "footerText": "Designed with love." } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 100, "y": 250, "style": { "size": 64, "color": "white" } },
+        { "type": "qr", "x": 750, "y": 200, "size": 200 }
+      ]
+    }
+  }
+}
