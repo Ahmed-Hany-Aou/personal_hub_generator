@@ -1,0 +1,24 @@
+{
+  "name": "Cyber Neon",
+  "description": "Futuristic aesthetic with glowing accents and sharp lines.",
+  "config": {
+    "accentColor": "#00ffcc",
+    "theme": "cyber",
+    "landingPage": {
+      "theme": "cyber",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/bottts/svg?seed=Cyber", "name": "{{fullName}}", "jobTitle": "CYBER_ARCHITECT" } },
+        { "type": "cta-button", "data": { "label": "INITIATE CONTACT", "url": "#", "style": "pulse", "color": "#00ffcc" } },
+        { "type": "social-icons", "data": { "links": [{ "url": "https://github.com", "label": "GITHUB" }, { "url": "https://twitter.com", "label": "TWITTER" }] } },
+        { "type": "footer", "data": { "footerText": "// END_OF_TRANSMISSION" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "SYSTEM_ADMIN", "x": 50, "y": 50, "style": { "size": 32, "color": "white" } },
+        { "type": "text", "content": "{{fullName}}", "x": 50, "y": 120, "style": { "size": 80, "color": "white" } },
+        { "type": "qr", "x": 700, "y": 100, "size": 250 }
+      ]
+    }
+  }
+}

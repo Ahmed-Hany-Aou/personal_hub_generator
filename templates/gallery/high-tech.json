@@ -1,0 +1,24 @@
+{
+  "name": "High Tech",
+  "description": "Data-driven design for engineers and tech enthusiasts.",
+  "config": {
+    "accentColor": "#38bdf8",
+    "theme": "cyber",
+    "landingPage": {
+      "theme": "cyber",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Tech", "name": "{{fullName}}", "jobTitle": "Senior Lead Engineer" } },
+        { "type": "link-item", "data": { "url": "#", "label": "View Stack" } },
+        { "type": "link-item", "data": { "url": "#", "label": "Open Source" } },
+        { "type": "footer", "data": { "footerText": "01101000 01101001" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "DEV_MODE", "x": 800, "y": 20, "style": { "size": 32, "color": "white" } },
+        { "type": "text", "content": "{{fullName}}", "x": 50, "y": 50, "style": { "size": 64, "color": "white" } },
+        { "type": "qr", "x": 50, "y": 300, "size": 250 }
+      ]
+    }
+  }
+}

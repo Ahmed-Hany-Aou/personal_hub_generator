@@ -216,6 +216,7 @@
             <p style="font-size: 0.75rem; color: var(--text-dim);">Production Hardened v2</p>
             <div class="tab-nav">
                 <div class="tab active" data-panel="landing">Landing Page</div>
+                <div class="tab" data-panel="templates">Templates</div>
                 <div class="tab" data-panel="pages">Pages</div>
                 <div class="tab" data-panel="seo">SEO & Sharing</div>
                 <div class="tab" data-panel="assets">Assets</div>
@@ -327,6 +328,17 @@
                     <label>Library</label>
                     <div id="asset-gallery" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
                         <!-- JS injected assets -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE GALLERY PANEL -->
+            <div class="panel" id="panel-templates">
+                <div class="control-group">
+                    <label>Design Templates</label>
+                    <p style="font-size:0.65rem; opacity:0.6; margin-bottom:10px;">Choose a base design to jumpstart your hub. Your identity info will be preserved.</p>
+                    <div id="template-gallery-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <!-- JS injected templates -->
                     </div>
                 </div>
             </div>
@@ -1301,6 +1313,95 @@
         });
 
         // --- PUBLIC GALLERY ---
+        async function loadTemplateGallery() {
+            const response = await fetch('/api/templates');
+            const templates = await response.json();
+            const list = document.getElementById('template-gallery-list');
+            list.innerHTML = '';
+
+            templates.forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'btn-generate';
+                item.style.background = 'rgba(255,255,255,0.05)';
+                item.style.padding = '12px';
+                item.style.textAlign = 'left';
+                item.style.display = 'flex';
+                item.style.flexDirection = 'column';
+                item.style.gap = '4px';
+                item.style.cursor = 'pointer';
+
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-weight: 600; color: var(--primary);">${t.name}</div>
+                        <div style="font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1);">${t.config.theme.toUpperCase()}</div>
+                    </div>
+                    <div style="font-size: 0.7rem; opacity: 0.7;">${t.description}</div>
+                `;
+
+                item.onclick = () => applyTemplate(t.config);
+                list.appendChild(item);
+            });
+        }
+
+        window.applyTemplate = function(templateConfig) {
+            if (!confirm("Apply this template? Current design structure will be replaced, but your name and title will be kept.")) return;
+
+            pushHistory();
+
+            // Deep clone template config
+            const newConfig = JSON.parse(JSON.stringify(templateConfig));
+
+            // Helper to replace placeholders in string
+            const replacePlaceholders = (str) => {
+                if (typeof str !== 'string') return str;
+                return str.replace(/{{fullName}}/g, state.fullName)
+                          .replace(/{{jobTitle}}/g, state.jobTitle);
+            };
+
+            // Recursive placeholder replacement in components
+            const processData = (obj) => {
+                for (let key in obj) {
+                    if (typeof obj[key] === 'string') {
+                        obj[key] = replacePlaceholders(obj[key]);
+                    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        processData(obj[key]);
+                    }
+                }
+            };
+
+            if (newConfig.landingPage && newConfig.landingPage.components) {
+                newConfig.landingPage.components.forEach(comp => processData(comp.data));
+            }
+            if (newConfig.printableCard && newConfig.printableCard.layers) {
+                newConfig.printableCard.layers.forEach(layer => {
+                    if (layer.content) layer.content = replacePlaceholders(layer.content);
+                });
+            }
+
+            // Merge into state
+            state.accentColor = newConfig.accentColor || state.accentColor;
+            state.theme = newConfig.theme || state.theme;
+
+            // If template provides a full landingPage, replace the active one
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (activePage && newConfig.landingPage) {
+                activePage.theme = newConfig.landingPage.theme || activePage.theme;
+                activePage.components = newConfig.landingPage.components;
+            }
+
+            if (newConfig.printableCard) {
+                state.printableCard = newConfig.printableCard;
+            }
+
+            syncUiFromState();
+            if (canvas) syncCanvasFromState();
+            renderComponentList();
+            triggerPreviewUpdate();
+
+            alert("Template Applied!");
+            document.querySelector('[data-panel="landing"]').click();
+        };
+
         async function loadPublicGallery() {
             const response = await fetch('/api/gallery');
             const designs = await response.json();
@@ -1358,6 +1459,7 @@
         loadDesignList();
         loadAssets();
         loadPublicGallery();
+        loadTemplateGallery();
         updateHistoryButtons();
         renderPreview();
         renderPageList();

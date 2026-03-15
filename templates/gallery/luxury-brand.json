@@ -1,0 +1,22 @@
+{
+  "name": "Luxury Brand",
+  "description": "High-end aesthetic for fashion and lifestyle brands.",
+  "config": {
+    "accentColor": "#ffffff",
+    "theme": "noir",
+    "landingPage": {
+      "theme": "noir",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=Luxury", "name": "{{fullName}}", "jobTitle": "Creative Director" } },
+        { "type": "link-item", "data": { "url": "#", "label": "The Collection" } },
+        { "type": "footer", "data": { "footerText": "PARIS | MILAN | LONDON" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 300, "y": 100, "style": { "size": 72, "color": "white" } },
+        { "type": "qr", "x": 425, "y": 400, "size": 150 }
+      ]
+    }
+  }
+}

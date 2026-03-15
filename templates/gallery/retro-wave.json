@@ -1,0 +1,22 @@
+{
+  "name": "Retro Wave",
+  "description": "80s inspired neon and synthwave vibes.",
+  "config": {
+    "accentColor": "#f472b6",
+    "theme": "cyber",
+    "landingPage": {
+      "theme": "cyber",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/avataaars/svg?seed=Retro", "name": "{{fullName}}", "jobTitle": "SYNTH ENTHUSIAST" } },
+        { "type": "cta-button", "data": { "label": "GET IN THE GROOVE", "url": "#", "style": "pulse", "color": "#f472b6" } },
+        { "type": "footer", "data": { "footerText": "© 1984" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 100, "y": 100, "style": { "size": 96, "color": "white" } },
+        { "type": "qr", "x": 750, "y": 350, "size": 200 }
+      ]
+    }
+  }
+}

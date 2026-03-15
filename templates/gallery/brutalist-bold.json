@@ -1,0 +1,23 @@
+{
+  "name": "Brutalist Bold",
+  "description": "Raw, honest, and unapologetically loud typography.",
+  "config": {
+    "accentColor": "#fbbf24",
+    "theme": "zen",
+    "landingPage": {
+      "theme": "zen",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=BB", "name": "{{fullName}}", "jobTitle": "STRATEGIST" } },
+        { "type": "link-item", "data": { "url": "#", "label": "THE WORK" } },
+        { "type": "link-item", "data": { "url": "#", "label": "THE VISION" } },
+        { "type": "footer", "data": { "footerText": "NO NONSENSE" } }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 20, "y": 20, "style": { "size": 96, "color": "white" } },
+        { "type": "qr", "x": 20, "y": 380, "size": 200 }
+      ]
+    }
+  }
+}
