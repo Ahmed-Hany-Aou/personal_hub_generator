@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Studio | Elite Design Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- TABS --- */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tab {
+            font-size: 0.70rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 5px 4px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .tab:hover { color: white; }
+        .tab.active {
+            color: white;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 350px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .editor-panels {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .control-group {
+            margin-bottom: 2rem;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-generate {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* --- MAIN PREVIEW --- */
+        .preview-area {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-container {
+            flex: 1;
+            background: black;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .preview-overlay.loading {
+            opacity: 1;
+        }
+
+        .ai-burst {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            border: none;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ai-burst:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px #a855f7;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h1 style="margin: 0; flex: 1; font-size: 1.4rem;">Creative Studio</h1>
+                <div style="display: flex; gap: 4px; background: var(--glass); padding: 4px; border-radius: 8px;">
+                    <button id="btnUndo" title="Undo (Ctrl+Z)" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.1rem; padding: 4px; border-radius: 4px; transition: background 0.2s;">↩️</button>
+                    <button id="btnRedo" title="Redo (Ctrl+Y)" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.1rem; padding: 4px; border-radius: 4px; transition: background 0.2s;">↪️</button>
+                </div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-dim);">Production Hardened v2</p>
+            <div class="tab-nav">
+                <div class="tab active" data-panel="landing">Landing Page</div>
+                <div class="tab" data-panel="pages">Pages</div>
+                <div class="tab" data-panel="seo">SEO & Sharing</div>
+                <div class="tab" data-panel="assets">Assets</div>
+                <div class="tab" data-panel="gallery">Gallery</div>
+                <div class="tab" data-panel="card">Card Design</div>
+            </div>
+        </div>
+        
+        <div class="editor-panels">
+            <!-- LANDING PAGE PANEL -->
+            <div class="panel active" id="panel-landing">
+                <div class="control-group">
+                    <label>Design Structure</label>
+                    <div id="component-list" style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- JS injected components -->
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem;" onclick="addComponent('profile')">+ Profile</button>
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem;" onclick="addComponent('link-item')">+ Link</button>
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem;" onclick="addComponent('social-icons')">+ Socials</button>
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem;" onclick="addComponent('footer')">+ Footer</button>
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem; color: #4ade80;" onclick="addComponent('cta-button')">🚀 + CTA</button>
+                        <button class="btn-generate" style="background: var(--glass); font-size: 0.7rem; color: #facc15;" onclick="addComponent('lead-form')">📝 + Lead Form</button>
+                    </div>
+                </div>
+
+                <div id="active-component-editor" class="control-group" style="display: none; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+                    <label id="editor-label">Edit Component</label>
+                    <div id="editor-fields"></div>
+                </div>
+
+                <div class="control-group">
+                    <label>Global Branding</label>
+                    <input type="text" id="fullName" placeholder="Full Name" value="Ahmed Hany">
+                    <input type="text" id="jobTitle" placeholder="Job Title" value="Lead Designer">
+                    <label>Theme & Accents</label>
+                    <input type="color" id="accentColor" value="#6366f1" style="height: 50px;">
+                    <select id="theme">
+                        <option value="glass">💎 Glassmorphism (Vibrant)</option>
+                        <option value="noir">🌑 Stealth Noir (Monochrome)</option>
+                        <option value="cyber">⚡ Neon Cyber (Futuristic)</option>
+                        <option value="zen">🍃 Minimalist Zen (Clean)</option>
+                    </select>
+                    <label style="margin-top: 1rem; color: #4ade80;">🔗 Global Lead Webhook (Expert)</label>
+                    <input type="url" id="globalLeadWebhook" placeholder="https://hooks.zapier.com/..." style="font-size: 0.7rem; color: #4ade80; border-color: rgba(74, 222, 128, 0.2);">
+                </div>
+
+                <div class="control-group" id="ai-insights-panel" style="background: rgba(168, 85, 247, 0.05); padding: 1rem; border-radius: 12px; border: 1px dashed rgba(168, 85, 247, 0.3);">
+                    <label style="color: #a855f7;">🤖 AI Smart Insights</label>
+                    <div id="insights-list" style="font-size: 0.75rem; color: var(--text-dim); display: flex; flex-direction: column; gap: 8px;">
+                        Analyzing your design for growth...
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGES PANEL -->
+            <div class="panel" id="panel-pages">
+                <div class="control-group">
+                    <label>Manage Pages</label>
+                    <p style="font-size:0.65rem; opacity:0.6; margin-bottom:10px;">Create and organize your hub's sub-pages.</p>
+                    <div id="page-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- JS injected pages -->
+                    </div>
+                    <button class="btn-generate" style="margin-top: 15px; border: 1px dashed var(--primary);" onclick="addPage()">+ Create New Page</button>
+                </div>
+            </div>
+
+            <!-- SEO PANEL -->
+            <div class="panel" id="panel-seo">
+                <div class="control-group">
+                    <label>Meta Intelligence</label>
+                    <p style="font-size:0.65rem; opacity:0.6; margin-bottom:10px;">Customize how your brand appears in search engines and social shares.</p>
+                    
+                    <label>Page Title</label>
+                    <input type="text" id="seo-title" placeholder="Meta Title">
+                    
+                    <label>Description</label>
+                    <textarea id="seo-description" placeholder="Short bio for social sharing..." style="width:100%; height:80px; background:var(--glass); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:10px; font-family:inherit; font-size:0.8rem;"></textarea>
+                    
+                    <label>Social Image (OG)</label>
+                    <div style="display:flex; gap:10px;">
+                         <input type="text" id="seo-ogImage" placeholder="Image URL (or use Assets)" readonly>
+                         <button class="btn-generate" style="width:auto; padding:0 10px; font-size:0.7rem;" onclick="document.querySelector('[data-panel=assets]').click()">📸</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Social Preview (LinkedIn/WhatsApp)</label>
+                    <div id="social-preview-card" style="background:#fff; color:#000; border-radius:8px; overflow:hidden; border:1px solid #ddd; margin-top:10px;">
+                        <div id="sp-image" style="height:120px; background:#f0f2f5 center/cover;"></div>
+                        <div style="padding:10px;">
+                            <div id="sp-site" style="font-size:0.65rem; text-transform:uppercase; color:#65676b; margin-bottom:2px;">LOCALHOST</div>
+                            <div id="sp-title" style="font-size:0.85rem; font-weight:700; color:#1c1e21; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ahmed Hany | Pro Hub</div>
+                            <div id="sp-desc" style="font-size:0.75rem; color:#65676b; line-height:1.2; height:2.4em; overflow:hidden;">Personal portfolio and links of Ahmed Hany...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ASSET GALLERY PANEL -->
+            <div class="panel" id="panel-assets">
+                <div class="control-group">
+                    <label>Upload New Asset</label>
+                    <input type="file" id="assetUpload" style="display: none;">
+                    <button class="btn-generate" onclick="document.getElementById('assetUpload').click()">📁 Choose File...</button>
+                    <p style="font-size: 0.6rem; margin-top: 5px; opacity: 0.6;">Supports PNG, JPG (Max 5MB)</p>
+                </div>
+                <div class="control-group">
+                    <label>Library</label>
+                    <div id="asset-gallery" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <!-- JS injected assets -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- PUBLIC GALLERY PANEL -->
+            <div class="panel" id="panel-gallery">
+                <div class="control-group">
+                    <label>Public Designs</label>
+                    <div id="public-gallery-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <!-- JS injected public designs -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD EDITOR PANEL -->
+            <div class="panel" id="panel-card">
+                <div class="control-group">
+                    <label>Card Elements</label>
+                    <button class="btn-generate" style="background: var(--glass); margin-bottom: 0.5rem;" id="btnAddText">Add Text</button>
+                    <button class="btn-generate" style="background: var(--glass); margin-bottom: 0.5rem;" id="btnAddImage">Add Image</button>
+                </div>
+                <div class="control-group">
+                    <label>Element Properties</label>
+                    <div id="element-props" style="font-size: 0.8rem; color: var(--text-dim);">Select an element to edit</div>
+                </div>
+            </div>
+
+            <div class="control-group" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                <label>Design Management</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem;">
+                    <button class="btn-generate" style="background: #22c55e;" id="btnSave">Save Design</button>
+                    <button class="btn-generate" style="background: var(--primary);" id="btnPublish">🚀 Publish</button>
+                </div>
+                <select id="designList">
+                    <option value="">-- Load Saved Design --</option>
+                </select>
+            </div>
+
+            <button class="btn-generate" id="btnExport" style="margin-top: 1rem;">🚀 Export Production Suite</button>
+        </div>
+    </aside>
+
+    <main class="preview-area">
+        <header class="preview-header">
+            <div>
+                <span style="color: var(--text-dim); font-size: 0.8rem;" id="preview-title">Live Preview</span>
+                <span id="status-tag" style="margin-left: 10px; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(34, 197, 94, 0.2); color: #4ade80;">Synced</span>
+            </div>
+        </header>
+
+        <!-- LANDING PREVIEW -->
+        <div class="preview-container active-preview" id="preview-landing">
+            <iframe id="preview-frame"></iframe>
+            <div class="preview-overlay" id="loader">
+                <div class="spinner">Rendering...</div>
+            </div>
+        </div>
+
+        <!-- CARD CANVAS -->
+        <div class="preview-container" id="preview-card" style="display:none; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+            <canvas id="card-canvas"></canvas>
+        </div>
+    </main>
+
+    <script>
+        // --- STUDIO STATE ENGINE ---
+        const state = {
+            fullName: 'Ahmed Hany',
+            jobTitle: 'Lead Designer',
+            accentColor: '#6366f1',
+            theme: 'glass',
+            pages: [
+                {
+                    slug: 'index',
+                    name: 'Home',
+                    components: [
+                        { type: 'profile', data: { profileImage: 'https://api.dicebear.com/7.x/initials/svg?seed=AH', name: 'Ahmed Hany', jobTitle: 'Lead Designer' } },
+                        { type: 'link-item', data: { url: 'https://github.com/Ahmed-Hany-Aou', label: '🚀 My GitHub' } },
+                        { type: 'social-icons', data: { links: [{ url: 'https://github.com/ahmedhany', label: 'GitHub' }] } },
+                        { type: 'footer', data: { footerText: 'Elite Design Suite' } }
+                    ]
+                }
+            ],
+            activePageSlug: 'index',
+            globalLeadWebhook: '',
+            seo: {
+                title: 'Ahmed Hany | Pro Hub',
+                description: 'Personal portfolio and links of Ahmed Hany, Lead Designer.',
+                ogImage: ''
+            },
+            printableCard: {
+                layers: [
+                    { type: 'text', content: 'Ahmed Hany', x: 80, y: 150, style: { size: 64, color: 'white' } },
+                    { type: 'qr', x: 680, y: 150, size: 300 }
+                ]
+            }
+        };
+
+        const config = {
+            debounceTime: 500,
+            previewUrl: '/api/preview'
+        };
+
+        const historyStack = [];
+        const redoStack = [];
+        let debounceTimer;
+        let previewAbortController;
+        let canvas;
+        let isNavigatingHistory = false;
+
+        function pushHistory() {
+            if (isNavigatingHistory) return;
+            historyStack.push(JSON.stringify(state));
+            if (historyStack.length > 50) historyStack.shift();
+            redoStack.length = 0; // Clear redo on new action
+            updateHistoryButtons();
+        }
+
+        function updateHistoryButtons() {
+            document.getElementById('btnUndo').style.opacity = historyStack.length > 0 ? 1 : 0.3;
+            document.getElementById('btnRedo').style.opacity = redoStack.length > 0 ? 1 : 0.3;
+        }
+
+        window.undo = function() {
+            if (historyStack.length === 0) return;
+            redoStack.push(JSON.stringify(state));
+            const prevState = JSON.parse(historyStack.pop());
+            applyState(prevState);
+            updateHistoryButtons();
+        };
+
+        window.redo = function() {
+            if (redoStack.length === 0) return;
+            historyStack.push(JSON.stringify(state));
+            const nextState = JSON.parse(redoStack.pop());
+            applyState(nextState);
+            updateHistoryButtons();
+        };
+
+        function applyState(newState) {
+            isNavigatingHistory = true;
+            Object.assign(state, newState);
+            
+            // Sync UI inputs
+            syncUiFromState();
+            
+            if (canvas) syncCanvasFromState();
+            renderComponentList();
+            triggerPreviewUpdate();
+            
+            setTimeout(() => isNavigatingHistory = false, 100);
+        }
+
+        function syncUiFromState() {
+            Object.keys(state).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = state[key];
+            });
+            
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            const themeEl = document.getElementById('theme');
+            if (themeEl && activePage) themeEl.value = activePage.theme || 'glass';
+
+            // Sync SEO fields
+            document.getElementById('seo-title').value = state.seo.title;
+            document.getElementById('seo-description').value = state.seo.description;
+            document.getElementById('seo-ogImage').value = state.seo.ogImage;
+            
+            const webhookEl = document.getElementById('globalLeadWebhook');
+            if (webhookEl) webhookEl.value = state.globalLeadWebhook || '';
+
+            updateSocialPreview();
+        }
+
+        function syncStateFromUi() {
+            state.fullName = document.getElementById('fullName').value;
+            state.jobTitle = document.getElementById('jobTitle').value;
+            state.accentColor = document.getElementById('accentColor').value;
+            state.globalLeadWebhook = document.getElementById('globalLeadWebhook').value;
+            
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (activePage) {
+                activePage.theme = document.getElementById('theme').value;
+            }
+            
+            state.seo.title = document.getElementById('seo-title').value;
+            state.seo.description = document.getElementById('seo-description').value;
+            state.seo.ogImage = document.getElementById('seo-ogImage').value;
+            
+            updateSocialPreview();
+        }
+
+        function updateSocialPreview() {
+            const spTitle = document.getElementById('sp-title');
+            const spDesc = document.getElementById('sp-desc');
+            const spImg = document.getElementById('sp-image');
+            
+            if (spTitle) spTitle.textContent = state.seo.title || 'Studio Design';
+            if (spDesc) spDesc.textContent = state.seo.description || 'No description provided.';
+            if (spImg) {
+                const img = state.seo.ogImage || 'https://api.dicebear.com/7.x/initials/svg?seed=SEO';
+                spImg.style.backgroundImage = `url(${img})`;
+            }
+            const siteEl = document.getElementById('sp-site');
+            if (siteEl) siteEl.textContent = window.location.hostname.toUpperCase();
+        }
+
+        document.getElementById('btnUndo').onclick = undo;
+        document.getElementById('btnRedo').onclick = redo;
+
+        // --- COMPONENT ORCHESTRATOR ---
+        function renderComponentList() {
+            const list = document.getElementById('component-list');
+            list.innerHTML = '';
+            
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (!activePage) return;
+
+            activePage.components.forEach((comp, index) => {
+                const item = document.createElement('div');
+                item.className = 'btn-generate';
+                item.style.background = 'rgba(255,255,255,0.05)';
+                item.style.padding = '10px';
+                item.style.fontSize = '0.8rem';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.cursor = 'pointer';
+                
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="opacity: 0.5; font-size: 0.7rem;">#${index+1}</span>
+                        <span>${comp.type.toUpperCase()}</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="moveComponent(${index}, -1); event.stopPropagation()" style="background:none; border:none; color:white; cursor:pointer">▲</button>
+                        <button onclick="moveComponent(${index}, 1); event.stopPropagation()" style="background:none; border:none; color:white; cursor:pointer">▼</button>
+                        <button onclick="removeComponent(${index}); event.stopPropagation()" style="background:none; border:none; color:#ef4444; cursor:pointer">✕</button>
+                    </div>
+                `;
+                
+                item.onclick = () => showComponentEditor(index);
+                if (state.activeComponentIndex === index) {
+                    item.style.border = '2px solid var(--primary)';
+                    item.style.background = 'rgba(99, 102, 241, 0.1)';
+                }
+                list.appendChild(item);
+            });
+        }
+
+        window.addComponent = function(type) {
+            pushHistory();
+            const defaults = {
+                'profile': { profileImage: 'https://api.dicebear.com/7.x/initials/svg?seed=user', name: state.fullName, jobTitle: state.jobTitle },
+                'link-item': { url: 'https://github.com', label: '🚀 My Link' },
+                'social-icons': { links: [{ url: '#', label: 'Social' }] },
+                'footer': { footerText: state.fullName + ' Hub' },
+                'cta-button': { label: 'Contact Me', url: '#', style: 'pulse', color: '#6366f1' },
+                'lead-form': { title: 'Contact', successMessage: 'Sent!', fields: ['Email'], webhookUrl: '' }
+            };
+            
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (activePage) {
+                activePage.components.push({ type, data: defaults[type] || {} });
+                renderComponentList();
+                triggerPreviewUpdate();
+            }
+        };
+
+        window.removeComponent = function(index) {
+            pushHistory();
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (activePage) {
+                activePage.components.splice(index, 1);
+                state.activeComponentIndex = null;
+                renderComponentList();
+                triggerPreviewUpdate();
+                document.getElementById('active-component-editor').style.display = 'none';
+            }
+        };
+
+        window.moveComponent = function(index, dir) {
+            pushHistory();
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (!activePage) return;
+            const newIndex = index + dir;
+            if (newIndex < 0 || newIndex >= activePage.components.length) return;
+            
+            const [moved] = activePage.components.splice(index, 1);
+            activePage.components.splice(newIndex, 0, moved);
+            state.activeComponentIndex = newIndex;
+            renderComponentList();
+            triggerPreviewUpdate();
+        };
+
+        function showComponentEditor(index) {
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (!activePage) return;
+            state.activeComponentIndex = index;
+            const comp = activePage.components[index];
+            const editorData = comp.data;
+            const editor = document.getElementById('active-component-editor');
+            const fields = document.getElementById('editor-fields');
+            
+            editor.style.display = 'block';
+            editor.style.background = 'rgba(99, 102, 241, 0.05)';
+            editor.style.border = '1px solid var(--primary)';
+            
+            document.getElementById('editor-label').innerHTML = `⚙️ Editing <b>${comp.type.toUpperCase()}</b>`;
+            fields.innerHTML = '';
+
+            const createField = (key, val, parentObj = editorData) => {
+                const group = document.createElement('div');
+                group.style.marginBottom = '1rem';
+                
+                const label = document.createElement('label');
+                label.textContent = key.replace(/([A-Z])/g, ' $1').toLowerCase();
+                label.style.fontSize = '0.6rem';
+                label.style.opacity = '0.6';
+                group.appendChild(label);
+
+                if (Array.isArray(val)) {
+                    // Array/List support (for social links)
+                    val.forEach((item, i) => {
+                        const itemContainer = document.createElement('div');
+                        itemContainer.style = "margin-left: 10px; border-left: 2px solid var(--glass-border); padding-left: 10px; margin-top: 10px; position: relative;";
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '✕';
+                        removeBtn.style = "position:absolute; right:0; top:0; background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.6rem;";
+                        removeBtn.onclick = () => {
+                            pushHistory();
+                            val.splice(i, 1);
+                            showComponentEditor(index); // Refresh editor
+                            triggerPreviewUpdate();
+                        };
+                        itemContainer.appendChild(removeBtn);
+
+                        Object.keys(item).forEach(subKey => createField(subKey, item[subKey], item));
+                        group.appendChild(itemContainer);
+                    });
+
+                    const addBtn = document.createElement('button');
+                    addBtn.textContent = `+ Add ${key.slice(0,-1)}`;
+                    addBtn.className = 'btn-generate';
+                    addBtn.style = "font-size: 0.6rem; padding: 5px; margin-top: 5px; background: var(--glass);";
+                    addBtn.onclick = () => {
+                        pushHistory();
+                        // Smart default: copy the last item or use empty strings
+                        const proto = val.length > 0 ? { ...val[val.length-1] } : { url: '#', label: 'New' };
+                        val.push(proto);
+                        showComponentEditor(index); // Refresh editor
+                        triggerPreviewUpdate();
+                    };
+                    group.appendChild(addBtn);
+                } else if (typeof val === 'string') {
+                    const input = document.createElement('input');
+                    input.name = key;
+                    input.value = val;
+                    input.oninput = (e) => {
+                        parentObj[key] = e.target.value;
+                        triggerPreviewUpdate();
+                    };
+                    group.appendChild(input);
+                }
+                fields.appendChild(group);
+            };
+
+            Object.keys(editorData).forEach(key => createField(key, editorData[key]));
+            
+            state.activeComponentIndex = index;
+            renderComponentList();
+
+            // Auto-scroll to editor
+            editor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // --- TAB SWITCHING ---
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const panelId = tab.dataset.panel;
+                if (!panelId) return;
+                
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                const panel = document.getElementById(`panel-${panelId}`);
+                if (panel) panel.classList.add('active');
+                tab.classList.add('active');
+                
+                // Hide/Show preview areas
+                const isCard = panelId === 'card';
+                document.getElementById('preview-landing').style.display = isCard ? 'none' : 'block';
+                document.getElementById('preview-card').style.display = isCard ? 'flex' : 'none';
+                document.getElementById('preview-title').textContent = isCard ? 'Business Card Designer (Interactive)' : 'Landing Page Preview';
+
+                if (panelId === 'card' && !canvas) initCanvas(); // Changed target to panelId
+            });
+        });
+
+        // --- FABRIC CANVAS INIT ---
+        function initCanvas() {
+            canvas = new fabric.Canvas('card-canvas', {
+                width: 1050,
+                height: 600,
+                backgroundColor: '#0f172a'
+            });
+
+            // Handle scale down for UI
+            const wrapper = document.getElementById('preview-card');
+            const scale = Math.min((wrapper.clientWidth - 40) / 1050, (wrapper.clientHeight - 40) / 600);
+            canvas.setZoom(scale);
+            canvas.setWidth(1050 * scale);
+            canvas.setHeight(600 * scale);
+
+            syncCanvasFromState();
+
+            // Bidirectional Sync: Canvas -> State
+            canvas.on('object:modified', syncStateFromCanvas);
+            canvas.on('object:added', syncStateFromCanvas);
+            canvas.on('selection:created', (e) => showElementProperties(e.selected[0]));
+            canvas.on('selection:updated', (e) => showElementProperties(e.selected[0]));
+            canvas.on('selection:cleared', () => {
+                document.getElementById('element-props').innerHTML = 'Select an element to edit';
+            });
+        }
+
+        function showElementProperties(obj) {
+            const props = document.getElementById('element-props');
+            props.innerHTML = '';
+            
+            if (obj.type === 'i-text' || obj.type === 'text') {
+                const group = document.createElement('div');
+                group.innerHTML = `
+                    <label style="font-size:0.6rem; opacity:0.6;">Text Content</label>
+                    <input type="text" value="${obj.text}" oninput="updateCanvasObject('text', this.value)">
+                    <label style="font-size:0.6rem; opacity:0.6;">Font Size</label>
+                    <input type="number" value="${obj.fontSize}" oninput="updateCanvasObject('fontSize', parseInt(this.value))">
+                    <label style="font-size:0.6rem; opacity:0.6;">Color</label>
+                    <input type="color" value="${obj.fill}" oninput="updateCanvasObject('fill', this.value)">
+                `;
+                props.appendChild(group);
+            } else if (obj.type === 'image') {
+                const group = document.createElement('div');
+                group.innerHTML = `
+                    <label style="font-size:0.6rem; opacity:0.6;">Scale</label>
+                    <input type="range" min="0.1" max="2" step="0.1" value="${obj.scaleX}" oninput="updateCanvasObject('scaleX', parseFloat(this.value)); updateCanvasObject('scaleY', parseFloat(this.value))">
+                    <label style="font-size:0.6rem; opacity:0.6;">Image Source</label>
+                    <input type="text" value="${obj.getSrc()}" oninput="updateCanvasObject('src', this.value)">
+                `;
+                props.appendChild(group);
+            }
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '🗑️ Delete Element';
+            delBtn.className = 'btn-generate';
+            delBtn.style = "margin-top:10px; background:#ef4444; font-size:0.7rem; padding:8px;";
+            delBtn.onclick = () => {
+                canvas.remove(obj);
+                canvas.discardActiveObject();
+                canvas.requestRenderAll();
+                syncStateFromCanvas();
+            };
+            props.appendChild(delBtn);
+        }
+
+        window.updateCanvasObject = function(key, val) {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            if (key === 'src' && obj.type === 'image') {
+                obj.setSrc(val, () => canvas.renderAll());
+            } else {
+                obj.set(key, val);
+            }
+            canvas.requestRenderAll();
+            syncStateFromCanvas();
+        };
+
+        function syncCanvasFromState() {
+            canvas.clear();
+            canvas.backgroundColor = '#0f172a';
+            
+            state.printableCard.layers.forEach(layer => {
+                if (layer.type === 'text') {
+                    const text = new fabric.IText(layer.content, {
+                        left: layer.x,
+                        top: layer.y,
+                        fontSize: layer.style.size || 64,
+                        fill: layer.style.color || 'white',
+                        fontFamily: 'Outfit',
+                        data: { type: 'text' }
+                    });
+                    canvas.add(text);
+                } else if (layer.type === 'qr') {
+                    const qrRect = new fabric.Rect({
+                        left: layer.x,
+                        top: layer.y,
+                        width: layer.size || 200,
+                        height: layer.size || 200,
+                        fill: 'white',
+                        rx: 10, ry: 10,
+                        data: { type: 'qr' }
+                    });
+                    canvas.add(qrRect);
+                } else if (layer.type === 'image') {
+                    fabric.Image.fromURL(layer.url, (img) => {
+                        img.set({
+                            left: layer.x,
+                            top: layer.y,
+                            scaleX: layer.scale || 1,
+                            scaleY: layer.scale || 1,
+                            data: { type: 'image' }
+                        });
+                        canvas.add(img);
+                        canvas.renderAll();
+                    });
+                }
+            });
+            canvas.renderAll();
+        }
+
+        function syncStateFromCanvas() {
+            const layers = canvas.getObjects().map(obj => {
+                if (obj.type === 'i-text') {
+                    return {
+                        type: 'text',
+                        content: obj.text,
+                        x: obj.left,
+                        y: obj.top,
+                        style: { size: obj.fontSize, color: obj.fill === 'white' ? 'white' : 'black' }
+                    };
+                } else if (obj.type === 'rect' && obj.data?.type === 'qr') {
+                    return {
+                        type: 'qr',
+                        x: obj.left,
+                        y: obj.top,
+                        size: obj.width * obj.scaleX
+                    };
+                } else if (obj.type === 'image' && obj.data?.type === 'image') {
+                    return {
+                        type: 'image',
+                        url: obj.getSrc(),
+                        x: obj.left,
+                        y: obj.top,
+                        scale: obj.scaleX
+                    };
+                }
+            }).filter(Boolean);
+
+            state.printableCard.layers = layers;
+            console.log("State updated from canvas", state.printableCard.layers);
+        }
+
+        // --- ASSET LIBRARY ---
+        async function loadAssets() {
+            const response = await fetch('/api/assets');
+            const assets = await response.json();
+            const gallery = document.getElementById('asset-gallery');
+            gallery.innerHTML = '';
+            
+            assets.forEach(asset => {
+                const item = document.createElement('div');
+                item.className = 'btn-generate';
+                item.style.background = 'rgba(255,255,255,0.05)';
+                item.style.padding = '5px';
+                item.style.display = 'flex';
+                item.style.flexDirection = 'column';
+                item.style.alignItems = 'center';
+                item.style.gap = '5px';
+                item.style.cursor = 'pointer';
+                
+                item.innerHTML = `
+                    <div style="position:relative; width:100%;">
+                        <img src="${asset.url}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+                        <button class="ai-burst" title="Magic Palette" onclick="event.stopPropagation(); suggestPalette('${asset.url}')">✨</button>
+                    </div>
+                    <span style="font-size: 0.6rem; word-break: break-all; text-align: center;">${asset.name}</span>
+                `;
+                
+                item.onclick = () => {
+                    let editor = document.getElementById('active-component-editor');
+                    
+                    // PARTY MODE: Auto-select profile if nothing is active and user clicks an asset
+                    if (state.activeComponentIndex === undefined || state.activeComponentIndex === null || state.activeComponentIndex === -1) {
+                         const profileIndex = state.pages.find(p => p.slug === state.activePageSlug)?.components.findIndex(c => c.type === 'profile');
+                         if (profileIndex !== -1 && profileIndex !== undefined) showComponentEditor(profileIndex);
+                    }
+
+                    if (editor.style.display === 'block') {
+                        const fields = ['profileImage', 'img', 'src', 'logo', 'background'];
+                        for (const f of fields) {
+                            const input = document.querySelector(`#editor-fields input[name="${f}"]`);
+                            if (input) {
+                                pushHistory();
+                                input.value = asset.url;
+                                input.dispatchEvent(new Event('input', { bubbles: true }));
+                                input.style.outline = '4px solid #4ade80';
+                                setTimeout(() => input.style.outline = 'none', 1000);
+
+                                // AUTO-AI: If it's a profile pic, suggest colors!
+                                if (f === 'profileImage') {
+                                    suggestPalette(asset.url);
+                                }
+                                return;
+                            }
+                        }
+                    }
+
+                    // SEO PANEL: Asset injection
+                    if (document.getElementById('panel-seo').classList.contains('active')) {
+                        pushHistory();
+                        state.seo.ogImage = asset.url;
+                        document.getElementById('seo-ogImage').value = asset.url;
+                        updateSocialPreview();
+                        return;
+                    }
+                    alert(`Selected: ${asset.name}\nNow click an image field in the editor to apply!`);
+                };
+                gallery.appendChild(item);
+            });
+        }
+
+        async function suggestPalette(assetUrl) {
+            const status = document.getElementById('status-tag');
+            status.textContent = 'AI Thinking...';
+            status.style.background = 'rgba(168, 85, 247, 0.2)';
+            status.style.color = '#a855f7';
+
+            try {
+                const response = await fetch('/api/ai/suggest-palette', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ assetUrl })
+                });
+                const palette = await response.json();
+                
+                if (palette.primary) {
+                    pushHistory();
+                    state.accentColor = palette.primary;
+                    document.getElementById('accentColor').value = palette.primary;
+                    
+                    const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+                    if (palette.theme && activePage) {
+                        activePage.theme = palette.theme;
+                        document.getElementById('theme').value = palette.theme;
+                    }
+                    
+                    triggerPreviewUpdate();
+                    console.log("AI Suggested Palette Apply", palette);
+                }
+            } catch (err) {
+                console.error("AI Palette Suggestion failed", err);
+            } finally {
+                status.textContent = 'Synced';
+                status.style.background = 'rgba(34, 197, 94, 0.2)';
+                status.style.color = '#4ade80';
+            }
+        }
+
+        document.getElementById('assetUpload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('asset', file);
+            
+            const btn = document.querySelector('[onclick*="assetUpload"]');
+            btn.textContent = '⏳ Uploading...';
+            
+            try {
+                const response = await fetch('/api/assets/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    alert("Asset Uploaded!");
+                    loadAssets();
+                }
+            } finally {
+                btn.textContent = '📁 Choose File...';
+            }
+        });
+
+        // --- OBSERVER PATTERN ---
+        function updateState(key, value) {
+            pushHistory();
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (key === 'theme' && activePage) {
+                activePage.theme = value;
+            } else if (['accentColor', 'fullName', 'jobTitle'].includes(key)) {
+                state[key] = value;
+            }
+            triggerPreviewUpdate();
+        }
+
+        function triggerPreviewUpdate() {
+            document.getElementById('status-tag').textContent = 'Syncing...';
+            document.getElementById('status-tag').style.background = 'rgba(234, 179, 8, 0.2)';
+            document.getElementById('status-tag').style.color = '#facc15';
+
+            clearTimeout(debounceTimer);
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            
+            debounceTimer = setTimeout(async () => {
+                const payload = {
+                    advancedConfig: {
+                        fullName: state.fullName,
+                        jobTitle: state.jobTitle,
+                        accentColor: state.accentColor,
+                        landingPage: activePage, // Send only active page for preview
+                        seo: state.seo
+                    }
+                };
+                await renderPreview(payload);
+                runSmartInsights();
+            }, config.debounceTime);
+        }
+
+        function runSmartInsights() {
+            const list = document.getElementById('insights-list');
+            const insights = [];
+            
+            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+            if (!activePage) return;
+
+            const linkCount = activePage.components.filter(c => c.type === 'link-item').length;
+            const hasCta = activePage.components.some(c => c.type === 'cta-button');
+            const hasForm = activePage.components.some(c => c.type === 'lead-form');
+
+            if (linkCount > 4) {
+                insights.push("💡 <b>Conversion Tip</b>: You have many links. Consider using a <b>Lead Form</b> to capture visitor data directly.");
+            }
+            if (!hasCta && !hasForm) {
+                insights.push("🚀 <b>Growth Tip</b>: Add a <b>Pulse CTA</b> to guide your visitors toward a specific action.");
+            }
+            if (state.fullName === 'Ahmed Hany' && state.jobTitle === 'Lead Designer') {
+                insights.push("👤 <b>Identity Tip</b>: Don't forget to personalize your Global Branding fields!");
+            }
+            
+            if (insights.length === 0) {
+                insights.push("✅ Your design looks optimized for growth!");
+            }
+
+            list.innerHTML = insights.map(txt => `<div style="line-height:1.4;">${txt}</div>`).join('');
+        }
+
+        // --- PAGE MANAGER ---
+        function renderPageList() {
+            const list = document.getElementById('page-list');
+            if (!list) return;
+            list.innerHTML = '';
+            
+            state.pages.forEach(page => {
+                const item = document.createElement('div');
+                item.className = 'btn-generate';
+                item.style.background = page.slug === state.activePageSlug ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.05)';
+                item.style.padding = '10px';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.marginBottom = '5px';
+                
+                item.innerHTML = `
+                    <div onclick="switchPage('${page.slug}')" style="flex:1; cursor:pointer;">
+                        <span style="font-weight:600;">${page.name}</span>
+                        <div style="font-size:0.6rem; opacity:0.5;">/${page.slug}</div>
+                    </div>
+                    ${page.slug !== 'index' ? `<button onclick="deletePage('${page.slug}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.2rem;">&times;</button>` : ''}
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function switchPage(slug) {
+            pushHistory();
+            state.activePageSlug = slug;
+            state.activeComponentIndex = null;
+            document.getElementById('active-component-editor').style.display = 'none';
+            syncUiFromState();
+            renderComponentList();
+            renderPageList();
+            triggerPreviewUpdate();
+            
+            // Auto switch back to Landing Page tab for editing
+            const landingTab = document.querySelector('[data-panel="landing"]');
+            if (landingTab) landingTab.click();
+        }
+
+        function addPage() {
+            const name = prompt("Enter page name (e.g., 'About Me'):");
+            if (!name) return;
+            const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            
+            if (state.pages.find(p => p.slug === slug)) {
+                alert("A page with this slug already exists!");
+                return;
+            }
+
+            pushHistory();
+            state.pages.push({
+                slug: slug,
+                name: name,
+                theme: 'glass',
+                components: [
+                    { type: 'profile', data: { profileImage: 'https://api.dicebear.com/7.x/initials/svg?seed=' + slug, name: state.fullName, jobTitle: state.jobTitle } },
+                    { type: 'footer', data: { footerText: state.fullName + ' Hub' } }
+                ]
+            });
+            renderPageList();
+            switchPage(slug);
+        }
+
+        function deletePage(slug) {
+            if (slug === 'index') return;
+            if (!confirm(`Delete page /${slug}?`)) return;
+            
+            pushHistory();
+            state.pages = state.pages.filter(p => p.slug !== slug);
+            if (state.activePageSlug === slug) state.activePageSlug = 'index';
+            
+            renderPageList();
+            syncUiFromState();
+            renderComponentList();
+            triggerPreviewUpdate();
+        }
+
+        async function renderPreview() {
+            if (previewAbortController) previewAbortController.abort();
+            previewAbortController = new AbortController();
+
+            try {
+                const response = await fetch(config.previewUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ advancedConfig: state }),
+                    signal: previewAbortController.signal
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const iframe = document.getElementById('preview-frame');
+                    iframe.srcdoc = html;
+                    
+                    document.getElementById('status-tag').textContent = 'Synced';
+                    document.getElementById('status-tag').style.background = 'rgba(34, 197, 94, 0.2)';
+                    document.getElementById('status-tag').style.color = '#4ade80';
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error("Preview failed", err);
+            }
+        }
+
+        // --- EVENT BINDING ---
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', (e) => {
+                updateState(e.target.id, e.target.value);
+            });
+        });
+
+        // --- CARD INTERACTION ---
+        document.getElementById('btnAddText').addEventListener('click', () => {
+            const text = new fabric.IText('New Text', {
+                left: 100, top: 100, fontSize: 32, fill: 'white', fontFamily: 'Outfit'
+            });
+            canvas.add(text);
+        });
+
+        document.getElementById('btnAddImage').addEventListener('click', () => {
+             fabric.Image.fromURL('https://api.dicebear.com/7.x/shapes/svg?seed=Card', (img) => {
+                img.set({ left: 100, top: 100, scaleX: 0.5, scaleY: 0.5, data: { type: 'image' } });
+                canvas.add(img);
+                canvas.setActiveObject(img);
+            });
+        });
+
+        // --- EXPORT logic ---
+        document.getElementById('btnExport').addEventListener('click', async () => {
+            const btn = document.getElementById('btnExport');
+            btn.textContent = '📦 Packaging...';
+            
+            const payload = {
+                advancedConfig: {
+                    fullName: state.fullName,
+                    jobTitle: state.jobTitle,
+                    accentColor: state.accentColor,
+                    pages: state.pages,
+                    printableCard: state.printableCard,
+                    seo: state.seo
+                }
+            };
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Elite_Studio_Suite.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                }
+            } catch (err) {
+                console.error("Export failed", err);
+            } finally {
+                btn.textContent = '🚀 Export Production Suite';
+            }
+        });
+
+        // --- PERSISTENCE ---
+        let currentDesignId = null;
+
+        async function loadDesignList() {
+            const response = await fetch('/api/designs');
+            const designs = await response.json();
+            const select = document.getElementById('designList');
+            select.innerHTML = '<option value="">-- Load Saved Design --</option>';
+            designs.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = `${d.fullName} (${new Date(d.lastModified).toLocaleDateString()})`;
+                select.appendChild(opt);
+            });
+        }
+
+        document.getElementById('btnSave').addEventListener('click', async () => {
+            const btn = document.getElementById('btnSave');
+            btn.textContent = 'Saving...';
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: currentDesignId, config: state })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    currentDesignId = result.id;
+                    alert("Design Saved!");
+                    loadDesignList();
+                }
+            } finally {
+                btn.textContent = 'Save Design';
+            }
+        });
+
+        document.getElementById('designList').addEventListener('change', async (e) => {
+            const id = e.target.value;
+            if (!id) return;
+            const response = await fetch(`/api/designs/${id}`);
+            const data = await response.json();
+            if (response.ok) {
+                Object.assign(state, data.config);
+                currentDesignId = data.id;
+                
+                // Sync UI inputs
+                Object.keys(state).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = state[key];
+                });
+
+                if (canvas) syncCanvasFromState();
+                renderPreview();
+                alert("Design Loaded!");
+            }
+        });
+
+        // --- PUBLIC GALLERY ---
+        async function loadPublicGallery() {
+            const response = await fetch('/api/gallery');
+            const designs = await response.json();
+            const list = document.getElementById('public-gallery-list');
+            list.innerHTML = '';
+            
+            designs.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'btn-generate';
+                item.style.background = 'rgba(255,255,255,0.05)';
+                item.style.padding = '10px';
+                item.style.textAlign = 'left';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: 600;">${d.fullName}</div>
+                        <div style="font-size: 0.6rem; opacity: 0.6;">${new Date(d.lastModified).toLocaleDateString()}</div>
+                    </div>
+                    <button class="btn-generate" style="width: auto; padding: 5px 10px; font-size: 0.7rem;" onclick="cloneDesign('${d.id}')">Clone</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.cloneDesign = async function(id) {
+            const response = await fetch(`/api/designs/${id}`);
+            const data = await response.json();
+            if (response.ok) {
+                pushHistory();
+                Object.assign(state, data.config);
+                currentDesignId = null; // New design for this user
+                syncUiFromState();
+                if (canvas) syncCanvasFromState();
+                renderComponentList();
+                renderPreview();
+                alert("Design cloned to your studio!");
+            }
+        };
+
+        document.getElementById('btnPublish').addEventListener('click', async () => {
+            if (!currentDesignId) return alert("Save your design first!");
+            const response = await fetch(`/api/designs/${currentDesignId}/publish`, { method: 'POST' });
+            const result = await response.json();
+            if (response.ok) {
+                alert(`Published! URL: ${result.url}`);
+                window.open(result.url, '_blank');
+            }
+        });
+
+        // Init
+        renderComponentList();
+        loadDesignList();
+        loadAssets();
+        loadPublicGallery();
+        updateHistoryButtons();
+        renderPreview();
+        renderPageList();
+        // Initialize SEO previews
+        updateSocialPreview();
+
+        // Specific listeners for SEO inputs to trigger preview
+        ['seo-title', 'seo-description', 'seo-ogImage'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => {
+                    syncStateFromUi();
+                    triggerPreviewUpdate();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

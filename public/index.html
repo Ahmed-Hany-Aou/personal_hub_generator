@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMAD ELITE | Digital Suite Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #6366f1;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar / Info */
+        .sidebar {
+            width: 300px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin: 0;
+        }
+
+        .logo-text span { color: var(--accent); }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 60px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        p.subtitle { color: var(--text-dim); margin-bottom: 40px; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .input-group.full { grid-column: span 2; }
+
+        label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        input, select {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: var(--accent); outline: none; }
+
+        .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 16px;
+            cursor: pointer;
+            margin-top: 40px;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.4);
+        }
+
+        #status {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <h2 class="logo-text">BMAD<span>ELITE</span></h2>
+            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-top: 20px;">
+                Welcome to the SaaS Edition of the Personal Hub Generator. Professional branding, delivered in seconds.
+            </p>
+        </div>
+        <div style="font-size: 11px; color: #475569;">
+            &copy; 2026 BMAD DESIGN CORE
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Digital Suite <span>Dashboard</span></h1>
+        <p class="subtitle">Complete the form below to generate your Elite Hub and Business Card.</p>
+
+        <form id="generatorForm" enctype="multipart/form-data">
+            <div class="form-grid">
+                <!-- DESIGN STYLE -->
+                <div class="input-group">
+                    <label>Web Design Style</label>
+                    <select name="designStyle">
+                        <option value="elite-glass">💎 Elite Glassmorphism</option>
+                        <option value="elite-minimal">🔳 Minimalist Pro</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Accent Color</label>
+                    <input type="color" name="accentColor" value="#6366f1" style="height: 50px; padding: 5px;">
+                </div>
+                <div class="input-group">
+                    <label>Card Layout</label>
+                    <select name="cardLayout">
+                        <option value="standard">📇 Standard Pro</option>
+                        <option value="vertical">📐 Modern Vertical</option>
+                        <option value="qr-only">🔳 QR-Centric</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Visual Effects</label>
+                    <select name="visualEffect">
+                        <option value="static">🌑 Static Depth</option>
+                        <option value="bloom">🌸 Animated Bloom</option>
+                        <option value="particles">✨ Particle Drift</option>
+                    </select>
+                </div>
+
+                <!-- PERSONAL INFO -->
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullName" placeholder="Ahmed Hany" required>
+                </div>
+                <div class="input-group">
+                    <label>Job Title</label>
+                    <input type="text" name="jobTitle" placeholder="Software Engineer" required>
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" placeholder="+20 123 456 789" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="ahmed@example.com" required>
+                </div>
+
+                <!-- LINKS -->
+                <div class="input-group full">
+                    <label>Portfolio / Website URL</label>
+                    <input type="url" name="portfolioUrl" placeholder="https://ahmed-hany.github.io/">
+                </div>
+                <div class="input-group">
+                    <label>GitHub Link</label>
+                    <input type="url" name="githubUrl" placeholder="https://github.com/...">
+                </div>
+                <div class="input-group">
+                    <label>LinkedIn Link</label>
+                    <input type="url" name="linkedinUrl" placeholder="https://linkedin.com/in/...">
+                </div>
+                <div class="input-group">
+                    <label>CV Link</label>
+                    <input type="url" name="cvUrl" placeholder="https://ahmed-hany-aou.github.io/resume.pdf">
+                </div>
+                <div class="input-group">
+                    <label>Production App Link</label>
+                    <input type="url" name="productionAppUrl" placeholder="https://ahmed-hany-aou.github.io/app">
+                </div>
+
+                <!-- ASSETS -->
+                <div class="input-group">
+                    <label>Profile Picture</label>
+                    <input type="file" name="profilePic" accept="image/*" required>
+                </div>
+                <div class="input-group">
+                    <label>Company Logo (Optional)</label>
+                    <input type="file" name="companyLogo" accept="image/*">
+                </div>
+            </div>
+
+            <button type="submit" class="generate-btn">GENERATE MY ELITE SUITE</button>
+        </form>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('generatorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            status.innerText = "🧙 BMad Master: Initiating Elite Generation...";
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    status.innerText = "✅ Success! Downloading your ZIP package...";
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "Elite_Digital_Suite.zip";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    const error = await response.json();
+                    status.innerText = "❌ Error: " + (error.message || "Generation failed.");
+                }
+            } catch (err) {
+                status.innerText = "❌ Connection Error: Could not reach BMad Master.";
+            }
+        });
+    </script>
+</body>
+</html>

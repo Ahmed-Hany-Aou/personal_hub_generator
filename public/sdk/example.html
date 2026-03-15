@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite SDK Example | 3rd Party Integration</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f4f4f5; padding: 50px; }
+        .integration-box { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 800px;
+            margin: auto;
+        }
+        #hub-preview {
+            margin-top: 30px;
+            border: 1px dashed #ccc;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; font-size: 0.8rem; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="integration-box">
+        <h1>SDK Integration Demo</h1>
+        <p>This page demonstrates how a 3rd-party SaaS app can use the <b>Elite Hub SDK</b> to embed our designer engine.</p>
+        
+        <pre>
+const sdk = new EliteHub('elite-dev-123');
+sdk.embed(document.getElementById('hub-preview'), {
+    fullName: "SDK User",
+    activePageSlug: "index",
+    pages: [{ 
+        slug: "index", 
+        name: "Home", 
+        theme: "cyber",
+        components: [...] 
+    }]
+});
+        </pre>
+
+        <div id="hub-preview">
+            <!-- Hub will be injected here -->
+            <p style="padding: 100px; text-align: center; color: #888;">Click "Run Demo" to initialize...</p>
+        </div>
+
+        <button onclick="runDemo()" style="margin-top: 20px; padding: 12px 24px; border-radius: 8px; border: none; background: #6366f1; color: white; cursor: pointer; font-weight: bold;">
+            🚀 Run SDK Demo
+        </button>
+    </div>
+
+    <script src="elite-hub.js"></script>
+    <script>
+        const sdk = new EliteHub('elite-dev-123');
+
+        async function runDemo() {
+            const container = document.getElementById('hub-preview');
+            
+            await sdk.embed(container, {
+                fullName: "Sarah Connor",
+                jobTitle: "Resistance Leader",
+                accentColor: "#facc15",
+                activePageSlug: "index",
+                pages: [
+                    {
+                        slug: "index",
+                        name: "Home",
+                        theme: "cyber",
+                        components: [
+                            { type: "profile", data: { name: "Sarah Connor", jobTitle: "Resistance Leader", profileImage: "https://api.dicebear.com/7.x/pixel-art/svg?seed=sarah" } },
+                            { type: "link-item", data: { url: "https://example.com", label: "Sector 7 Dossier" } },
+                            { type: "cta-button", data: { label: "Contact Intelligence", url: "https://example.com", style: "pulse", color: "#facc15" } }
+                        ]
+                    }
+                ]
+            });
+        }
+    </script>
+</body>
+</html>

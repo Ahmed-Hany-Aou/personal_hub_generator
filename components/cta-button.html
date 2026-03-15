@@ -1,0 +1,83 @@
+<div class="cta-container" style="margin: 2rem 0; text-align: center;">
+    <a href="{{url}}" class="cta-button {{style}}"
+        style="background: {{color}}; display: inline-block; padding: 1.2rem 2.5rem; border-radius: 50px; text-decoration: none; color: white; font-weight: 700; font-size: 1.1rem; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.1);"
+        onclick="trackClick('{{designId}}', 'cta_click', { label: '{{label}}' })">
+        {{label}}
+    </a>
+</div>
+
+<style>
+    .cta-container {
+        margin: 2rem 0;
+        text-align: center;
+        animation: slideUp 0.8s 0.8s both;
+    }
+    .cta-button {
+        background: {{color}};
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        padding: 1.2rem 2.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border: none;
+        cursor: pointer;
+    }
+    .cta-button.pulse {
+        animation: pulse-animation 2s infinite;
+    }
+
+    .cta-button.outline {
+        background: transparent !important;
+
+        border: 2px solid {
+                {
+                color
+            }
+        }
+
+        ;
+
+        color: {
+                {
+                color
+            }
+        }
+
+        ;
+    }
+
+    .cta-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes pulse-animation {
+        0% {
+            box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 20px rgba(99, 102, 241, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+        }
+    }
+</style>
+
+<script>
+    function trackClick(designId, type, details) {
+        fetch('/api/analytics/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ designId, type, details })
+        });
+    }
+</script>

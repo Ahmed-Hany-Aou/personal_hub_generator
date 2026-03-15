@@ -1,19 +1,20 @@
 {
+  "name": "bmad-elite-saas",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
   "dependencies": {
-    "@inquirer/input": "^2.1.7",
+    "adm-zip": "^0.5.12",
+    "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "inquirer": "^9.2.16",
     "jimp": "^1.6.0",
-    "qr-image": "^3.2.0"
+    "multer": "^1.4.5-lts.1",
+    "qr-image": "^3.2.0",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
   },
-  "name": "2.4-qr-code-project",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+    "start": "node server.js"
+  }
 }

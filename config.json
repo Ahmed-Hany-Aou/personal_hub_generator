@@ -1,0 +1,17 @@
+{
+  "designStyle": "elite-glass",
+  "cardTheme": "glass",
+  "accentColor": "#6366f1",
+  "fullName": "Ahmed Hany",
+  "jobTitle": "Software Engineer",
+  "phone": "+20 1065232774",
+  "email": "ahmed.hany.boshra@gmail.com",
+  "portfolioUrl": "https://ahmed-hany-aou.github.io/",
+  "githubUrl": "https://github.com/ahmed-hany-aou",
+  "linkedinUrl": "https://linkedin.com/in/ahmed-hany-aou",
+  "cvUrl": "https://ahmed-hany-aou.github.io/resume.pdf",
+  "productionAppUrl": "https://ahmed-hany-aou.github.io/app",
+  "baseUrl": "https://ahmed-hany-aou.github.io/card/index",
+  "cardLayout": "standard",
+  "visualEffect": "bloom"
+}

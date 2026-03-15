@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- META_TAGS -->
+    <style>
+        :root {
+            --primary: {{accentColor}};
+            --bg: #fafafa;
+            --text: #1a1a1a;
+            --text-dim: #777777;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'DM Serif Display', 'Playfair Display', serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .card {
+            padding: 80px 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: softFadeIn 3s ease-out;
+        }
+
+        @keyframes softFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 40px;
+            filter: sepia(0.2) contrast(0.9);
+            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            filter: sepia(0);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .job-title {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 300;
+            font-style: italic;
+            margin: 20px 0 60px;
+        }
+
+        .link-item {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 400;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: softFadeIn 1s both;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .link-item:hover {
+            color: var(--primary);
+            padding-left: 20px;
+            border-bottom-color: var(--primary);
+        }
+
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .social-icon {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .social-icon:hover {
+            color: var(--text);
+            letter-spacing: 4px;
+        }
+
+        .footer {
+            margin-top: 80px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="card">
+        {{components}}
+    </div>
+</body>
+</html>

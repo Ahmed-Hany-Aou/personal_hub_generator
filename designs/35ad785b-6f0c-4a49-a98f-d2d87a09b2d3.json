@@ -1,0 +1,76 @@
+{
+  "id": "35ad785b-6f0c-4a49-a98f-d2d87a09b2d3",
+  "lastModified": "2026-03-14T22:36:56.752Z",
+  "config": {
+    "fullName": "Ahmed hany boshra",
+    "jobTitle": "Software Engineerss",
+    "accentColor": "#2dd100",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        {
+          "type": "profile",
+          "data": {
+            "name": "Ahmed hany ",
+            "title": "Software Engineers",
+            "profileImage": "4e565549-589a-4164-bff2-2fc5a94b7977.PNG"
+          }
+        },
+        {
+          "type": "social-icons",
+          "data": {
+            "links": []
+          }
+        },
+        {
+          "type": "link-item",
+          "data": {
+            "url": "#",
+            "label": "New Link"
+          }
+        },
+        {
+          "type": "footer",
+          "data": {
+            "footerText": "Custom Footer"
+          }
+        },
+        {
+          "type": "link-item",
+          "data": {
+            "url": "#",
+            "label": "New Link"
+          }
+        },
+        {
+          "type": "link-item",
+          "data": {
+            "url": "#",
+            "label": "New Link"
+          }
+        }
+      ]
+    },
+    "printableCard": {
+      "layers": [
+        {
+          "type": "text",
+          "content": "Ahmed Hany",
+          "x": 63.99064999538649,
+          "y": 119.06118210255696,
+          "style": {
+            "size": 64,
+            "color": "white"
+          }
+        },
+        {
+          "type": "qr",
+          "x": 680,
+          "y": 150,
+          "size": 300
+        }
+      ]
+    }
+  },
+  "published": true
+}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- META_TAGS -->
+    <style>
+        :root {
+            --primary: {{accentColor}};
+            --bg: #000000;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --border: rgba(255, 255, 255, 0.15);
+            --text: #ffffff;
+            --text-dim: #888888;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .smoke-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(20,20,20,0), rgba(0,0,0,1));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .smoke-particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.05;
+            z-index: 0;
+            animation: drift var(--duration) infinite linear;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, -50px) scale(1.2); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .card {
+            position: relative;
+            z-index: 2;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 0; /* Sharp noir look */
+            padding: 60px;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+            animation: fadeIn 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(1.05); filter: brightness(0); }
+            to { opacity: 1; transform: scale(1); filter: brightness(1); }
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 0;
+            object-fit: cover;
+            filter: grayscale(1);
+            border: 1px solid var(--border);
+            padding: 5px;
+            background: black;
+            transition: all 0.5s ease;
+            margin-bottom: 30px;
+        }
+
+        .avatar:hover {
+            filter: grayscale(0);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 200;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin: 0;
+            color: white;
+        }
+
+        .job-title {
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 15px 0 40px;
+        }
+
+        .links-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            padding: 18px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s both;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .link-item:hover::before {
+            left: 100%;
+        }
+
+        .link-item:hover {
+            background: white;
+            color: black;
+            border-color: white;
+            transform: scale(1.02);
+        }
+
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .social-icon {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .social-icon:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.5rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="smoke-overlay"></div>
+    <div class="smoke-particle" style="top:20%; left:10%; width:400px; height:400px; animation-duration: 20s;"></div>
+    <div class="smoke-particle" style="top:70%; left:80%; width:500px; height:500px; animation-duration: 25s;"></div>
+
+    <div class="card">
+        {{components}}
+    </div>
+</body>
+</html>

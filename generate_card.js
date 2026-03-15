@@ -1,12 +1,43 @@
 import inquirer from 'inquirer';
 import qr from 'qr-image';
 import fs from 'fs';
-import { Jimp } from 'jimp';
+import { Jimp, loadFont } from 'jimp';
+import { SANS_64_WHITE, SANS_64_BLACK, SANS_32_BLACK, SANS_32_WHITE } from 'jimp/fonts';
 
-console.log("Welcome to the Personal Hub Generator!");
-console.log("Let's build your digital business card.");
+console.log("\n------------------------------------------------");
+console.log("🧙 BMAD ELITE: Personal Hub & Card Generator");
+console.log("------------------------------------------------\n");
 
 const questions = [
+  {
+    type: 'list',
+    name: 'designStyle',
+    message: 'Select your Elite WEB Design Style:',
+    choices: [
+      { name: '💎 Elite Glassmorphism', value: 'elite-glass' },
+      { name: '🔳 Minimalist Pro', value: 'elite-minimal' }
+    ]
+  },
+  {
+    type: 'list',
+    name: 'cardTheme',
+    message: 'Select your Elite BUSINESS CARD Theme:',
+    choices: [
+      { name: '🌌 Midnight Glass (Dark & Futuristic)', value: 'glass' },
+      { name: '⚪ Professional Clean (White & Bold)', value: 'clean' }
+    ]
+  },
+  {
+    type: 'list',
+    name: 'accentColor',
+    message: 'Select your Elite Accent Color:',
+    choices: [
+      { name: '🟣 Royal Indigo', value: '#6366f1' },
+      { name: '🟡 Prestige Gold', value: '#d4af37' },
+      { name: '🟢 Emerald Success', value: '#10b981' },
+      { name: '🔴 Ruby Professional', value: '#e11d48' }
+    ]
+  },
   {
     type: 'input',
     name: 'fullName',
@@ -22,214 +53,92 @@ const questions = [
   {
     type: 'input',
     name: 'phone',
-    message: 'What is your Phone Number (International Format)?',
+    message: 'Phone Number (International):',
     default: '+20 123 456 789'
   },
   {
     type: 'input',
     name: 'email',
-    message: 'What is your Email Address?'
+    message: 'Email Address:'
   },
   {
     type: 'input',
     name: 'portfolioUrl',
-    message: 'Link to your Portfolio (e.g. Behance, Dribbble, Custom Site):',
-  },
-  {
-    type: 'input',
-    name: 'liveAppUrl',
-    message: 'Link to your Live Production App:',
-  },
-  {
-    type: 'input',
-    name: 'cvUrl',
-    message: 'Link to your CV (Google Drive/PDF):',
+    message: 'Portfolio URL:',
   },
   {
     type: 'input',
     name: 'githubUrl',
-    message: 'Link to your GitHub:',
+    message: 'GitHub URL:',
   },
   {
     type: 'input',
     name: 'linkedinUrl',
-    message: 'Link to your LinkedIn:',
+    message: 'LinkedIn URL:',
   },
   {
     type: 'input',
     name: 'baseUrl',
-    message: 'FINAL STEP: Where will you host this? (Base URL)\n This is the URL the QR code will point to.',
-    validate: (input) => input.startsWith('http') ? true : 'Please enter a valid URL starting with http:// or https://'
-  },
-  {
-    type: 'confirm',
-    name: 'addOverlay',
-    message: 'Do you want to overlay the QR code onto "bussniees card.png"?',
-    default: true
-  },
-  {
-    type: 'list',
-    name: 'qrPosition',
-    message: 'Where should the QR Code be placed on the card?',
-    choices: ['Center', 'Bottom Right', 'Bottom Left', 'Top Right', 'Top Left'],
-    when: (answers) => answers.addOverlay
+    message: 'Base URL (for QR code):',
+    validate: (input) => input.startsWith('http') ? true : 'Invalid URL.'
   }
 ];
 
+// Helper to replace template variables
+function renderTemplate(template, data) {
+  let result = template;
+  for (const key in data) {
+    if (typeof data[key] === 'string') {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      result = result.replace(regex, data[key]);
+    }
+  }
+  const linksRegex = /{{#links}}([\s\S]*?){{\/links}}/;
+  const match = result.match(linksRegex);
+  if (match) {
+    const linkTemplate = match[1];
+    const renderedLinks = data.links.map(link => {
+      return linkTemplate.replace(/{{url}}/g, link.url).replace(/{{label}}/g, link.label);
+    }).join('\n');
+    result = result.replace(linksRegex, renderedLinks);
+  }
+  return result;
+}
+
+// Helper to convert hex string to Jimp color number
+function hexToJimpColor(hex) {
+  return parseInt(hex.replace('#', '') + 'ff', 16);
+}
+
 inquirer.prompt(questions).then(async (answers) => {
-  console.log("\nGenerating your files...\n");
+  console.log("\n📋 Ops Director: Initializing Elite Production Workflow...");
 
-  // Format WhatsApp number (remove +, spaces, dashes)
   const whatsAppNumber = answers.phone.replace(/[^0-9]/g, '');
-
-  // 1. Generate vCard Content
-  let vCardContent = `BEGIN:VCARD
+  const accentHex = hexToJimpColor(answers.accentColor);
+  
+  // 1. Generate vCard
+  const vCardContent = `BEGIN:VCARD
 VERSION:3.0
 FN:${answers.fullName}
 TITLE:${answers.jobTitle}
 TEL;TYPE=CELL:${answers.phone}
-EMAIL:${answers.email}`;
-
-  if (answers.portfolioUrl) vCardContent += `\nURL;TYPE=PORTFOLIO:${answers.portfolioUrl}`;
-  if (answers.liveAppUrl) vCardContent += `\nURL;TYPE=WEBSITE:${answers.liveAppUrl}`;
-  if (answers.cvUrl) vCardContent += `\nURL;TYPE=CV:${answers.cvUrl}`;
-
-  vCardContent += `\nEND:VCARD`;
-
+EMAIL:${answers.email}
+END:VCARD`;
   fs.writeFileSync('contact.vcf', vCardContent);
-  console.log("✅ contact.vcf created.");
+  console.log("✅ Ops Director: vCard finalized.");
 
-  // 2. Generate HTML Landing Page
-  const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${answers.fullName} - Digital Card</title>
-    <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --accent: #3498db;
-            --btn-hover: #2980b9;
-            --whatsapp-color: #25D366;
-            --whatsapp-hover: #128C7E;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: block;
-            object-fit: cover;
-            border: 4px solid var(--card-bg);
-            box-shadow: 0 0 0 4px var(--accent);
-            background-color: var(--card-bg);
-        }
-        h1 { margin: 10px 0 5px; font-size: 24px; }
-        p.title { color: var(--text-secondary); margin: 0 0 30px; font-size: 16px; }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px 0;
-            margin-bottom: 15px;
-            background-color: var(--card-bg);
-            border: 2px solid var(--accent);
-            color: var(--text-primary);
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        .btn:hover {
-            background-color: var(--accent);
-            color: white;
-            transform: translateY(-2px);
-        }
-        .btn.primary {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-        }
-        .btn.primary:hover {
-            background-color: var(--btn-hover);
-        }
-        .btn.whatsapp {
-            background-color: transparent;
-            border-color: var(--whatsapp-color);
-            color: var(--whatsapp-color);
-        }
-        .btn.whatsapp:hover {
-            background-color: var(--whatsapp-color);
-            color: white;
-        }
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
+  // 2. Generate Elite HTML
+  console.log(`🎨 Creative Director: Styling your Personal Hub...`);
+  const links = [];
+  if (answers.portfolioUrl) links.push({ url: answers.portfolioUrl, label: '🎨 Portfolio' });
+  if (answers.githubUrl) links.push({ url: answers.githubUrl, label: '💻 GitHub' });
+  if (answers.linkedinUrl) links.push({ url: answers.linkedinUrl, label: '🔗 LinkedIn' });
 
-    <div class="container">
-        <!-- Profile Picture: Expected to be in the same folder -->
-        <img src="profile_pic.png" alt="${answers.fullName}" class="avatar">
-
-        <h1>${answers.fullName}</h1>
-        <p class="title">${answers.jobTitle}</p>
-
-        <!-- Main Content -->
-        
-        ${answers.portfolioUrl ? `<a href="${answers.portfolioUrl}" class="btn" target="_blank">🎨 View Portfolio</a>` : ''}
-        ${answers.cvUrl ? `<a href="${answers.cvUrl}" class="btn" target="_blank">📄 View CV</a>` : ''}
-        ${answers.liveAppUrl ? `<a href="${answers.liveAppUrl}" class="btn" target="_blank">🚀 Live Production App</a>` : ''}
-        ${answers.githubUrl ? `<a href="${answers.githubUrl}" class="btn" target="_blank">💻 GitHub Profile</a>` : ''}
-        ${answers.linkedinUrl ? `<a href="${answers.linkedinUrl}" class="btn" target="_blank">🔗 LinkedIn</a>` : ''}
-        
-        <hr style="border-color: #444; margin: 25px 0;">
-
-        <a href="contact.vcf" class="btn primary">📞 Save Contact Info</a>
-        <a href="tel:${answers.phone}" class="btn">Call Me</a>
-        <a href="https://wa.me/${whatsAppNumber}" class="btn whatsapp" target="_blank">💬 WhatsApp Me</a>
-
-        <div class="footer">
-            Generated with Personal Hub Generator
-        </div>
-    </div>
-
-</body>
-</html>
-`;
-
+  const templatePath = `./templates/${answers.designStyle}.html`;
+  const templateSource = fs.readFileSync(templatePath, 'utf8');
+  const htmlContent = renderTemplate(templateSource, { ...answers, whatsAppNumber, links });
   fs.writeFileSync('index.html', htmlContent);
-  console.log("✅ index.html created.");
+  console.log("✅ Creative Director: Elite Home Page created.");
 
   // 3. Generate QR Code
   const qr_svg = qr.image(answers.baseUrl, { type: 'png' });
@@ -237,61 +146,47 @@ EMAIL:${answers.email}`;
   qr_svg.pipe(qrStream);
 
   qrStream.on('finish', async () => {
-    console.log(`✅ qr_code.png created (pointing to ${answers.baseUrl})`);
+    console.log("✅ Ops Director: QR Code generated.");
 
-    // 4. Overlay QR on Business Card (if selected)
-    if (answers.addOverlay) {
-      try {
-        console.log("...Processing Business Card image...");
-        const cardDesign = await Jimp.read('bussniees card.png');
-        const qrImage = await Jimp.read('qr_code.png');
+    // 4. DYNAMIC CARD ENGINE
+    console.log(`⚙️ Lead Developer: Constructing ${answers.cardTheme} Business Card...`);
+    
+    try {
+      const card = new Jimp({ width: 1050, height: 600, color: answers.cardTheme === 'glass' ? 0x0f172aff : 0xffffffff });
+      const qrImage = await Jimp.read('qr_code.png');
+      qrImage.resize({ w: 300, h: 300 });
 
-        // Resize QR code (adjust size as needed, e.g., 250x250)
-        qrImage.resize({ w: 250, h: 250 });
-
-        let x = 0;
-        let y = 0;
-        const padding = 50;
-
-        switch (answers.qrPosition) {
-          case 'Center':
-            x = (cardDesign.bitmap.width / 2) - (qrImage.bitmap.width / 2);
-            y = (cardDesign.bitmap.height / 2) - (qrImage.bitmap.height / 2);
-            break;
-          case 'Bottom Right':
-            x = cardDesign.bitmap.width - qrImage.bitmap.width - padding;
-            y = cardDesign.bitmap.height - qrImage.bitmap.height - padding;
-            break;
-          case 'Bottom Left':
-            x = padding;
-            y = cardDesign.bitmap.height - qrImage.bitmap.height - padding;
-            break;
-          case 'Top Right':
-            x = cardDesign.bitmap.width - qrImage.bitmap.width - padding;
-            y = padding;
-            break;
-          case 'Top Left':
-            x = padding;
-            y = padding;
-            break;
+      if (answers.cardTheme === 'glass') {
+        for (let x = 0; x < 1050; x++) {
+          for (let y = 0; y < 10; y++) {
+            card.setPixelColor(accentHex, x, y + 580);
+          }
         }
-
-        cardDesign.composite(qrImage, x, y);
-        await cardDesign.write('final_card_with_qr.png');
-        console.log(`✅ final_card_with_qr.png created! This is your printable card.`);
-      } catch (error) {
-        console.error("❌ Error processing image:", error);
-        console.log("Make sure 'bussniees card.png' exists in the same folder!");
+      } else {
+        for (let x = 0; x < 20; x++) {
+          for (let y = 0; y < 600; y++) {
+            card.setPixelColor(accentHex, x, y);
+          }
+        }
       }
+
+      const font = await loadFont(answers.cardTheme === 'glass' ? SANS_64_WHITE : SANS_64_BLACK);
+      const smallFont = await loadFont(answers.cardTheme === 'glass' ? SANS_32_WHITE : SANS_32_BLACK);
+
+      card.print({ font: font, x: 80, y: 150, text: answers.fullName });
+      card.print({ font: smallFont, x: 80, y: 230, text: answers.jobTitle.toUpperCase() });
+
+      card.composite(qrImage, 680, 150);
+
+      await card.write('final_card_with_qr.png');
+      console.log("✅ Ops Director: Unique Business Card finalized.");
+
+    } catch (err) {
+      console.error("❌ Lead Developer: Error in Dynamic Card Engine:", err);
     }
 
     console.log("\n------------------------------------------------");
-    console.log("🎉 SUCCESS! Your Digital Business Card is ready.");
+    console.log("🎉 SUCCESS! Your Elite Digital Suite is ready.");
     console.log("------------------------------------------------");
-    console.log("Next Steps:");
-    console.log("1. Host 'index.html', 'contact.vcf' & 'profile_pic.png' at your URL: " + answers.baseUrl);
-    console.log("2. Use 'final_card_with_qr.png' for printing or sharing.");
   });
-
 });
-
