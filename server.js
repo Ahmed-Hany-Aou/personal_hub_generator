@@ -493,7 +493,8 @@ app.post('/api/designs/:id/publish', (req, res) => {
 });
 
 app.get('/api/gallery', (req, res) => {
-    const files = fs.readdirSync(DESIGNS_DIR);
+    if (!fs.existsSync(DESIGNS_DIR)) return res.json([]);
+    const files = fs.readdirSync(DESIGNS_DIR).filter(f => f.endsWith('.json'));
     const published = files
         .map(f => JSON.parse(fs.readFileSync(path.join(DESIGNS_DIR, f), 'utf8')))
         .filter(d => d.published)
