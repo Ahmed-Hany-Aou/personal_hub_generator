@@ -1040,16 +1040,11 @@
             document.getElementById('status-tag').style.color = '#facc15';
 
             clearTimeout(debounceTimer);
-            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
             
             debounceTimer = setTimeout(async () => {
                 const payload = {
                     advancedConfig: {
-                        fullName: state.fullName,
-                        jobTitle: state.jobTitle,
-                        accentColor: state.accentColor,
-                        landingPage: activePage, // Send only active page for preview
-                        seo: state.seo
+                        ...state
                     }
                 };
                 await renderPreview(payload);
@@ -1165,7 +1160,7 @@
             triggerPreviewUpdate();
         }
 
-        async function renderPreview() {
+        async function renderPreview(payload) {
             if (previewAbortController) previewAbortController.abort();
             previewAbortController = new AbortController();
 
@@ -1173,7 +1168,7 @@
                 const response = await fetch(config.previewUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ advancedConfig: state }),
+                    body: JSON.stringify(payload || { advancedConfig: state }),
                     signal: previewAbortController.signal
                 });
 

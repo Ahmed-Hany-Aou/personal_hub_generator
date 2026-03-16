@@ -89,7 +89,7 @@ export const AdvancedConfigSchema = z.object({
     })).default([]),
 
     activePageSlug: z.string().default('index'),
-    globalLeadWebhook: z.string().url().optional(),
+    globalLeadWebhook: z.string().url().optional().or(z.literal('')),
 
     seo: z.object({
         title: z.string().optional(),
