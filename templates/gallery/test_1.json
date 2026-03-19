@@ -1,0 +1,16 @@
+{
+  "name": "Legacy Test 1",
+  "description": "A legacy formatted template to test robustness.",
+  "config": {
+    "fullName": "Test User",
+    "jobTitle": "LEGACY TESTER",
+    "accentColor": "#ff00ff",
+    "landingPage": {
+      "theme": "glass",
+      "components": [
+        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=LT", "name": "Test User", "jobTitle": "LEGACY TESTER" } },
+        { "type": "link-item", "data": { "url": "https://google.com", "label": "Google" } }
+      ]
+    }
+  }
+}
