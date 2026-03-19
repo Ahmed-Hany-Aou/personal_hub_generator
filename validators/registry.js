@@ -31,6 +31,29 @@ export const ComponentSchemas = {
         successMessage: z.string().optional(),
         fields: z.array(z.string()).default(['Name', 'Email']),
         webhookUrl: z.string().url().optional()
+    }),
+    'contact-group': z.object({
+        label: z.string().optional(),
+        items: z.array(z.object({
+            type: z.string(),
+            data: z.any()
+        }))
+    }),
+    'social-links': z.object({
+        label: z.string().optional(),
+        items: z.array(z.object({
+            type: z.string(),
+            data: z.any()
+        }))
+    }),
+    'icon-card': z.object({
+        icon: z.string().optional(),
+        url: z.string().url(),
+        label: z.string().optional()
+    }),
+    'qr-display': z.object({
+        url: z.string().url(),
+        style: z.string().optional()
     })
 };
 
@@ -59,15 +82,27 @@ export const LayerSchemas = {
         x: z.number(),
         y: z.number(),
         size: z.number().optional()
+    }),
+    'contact-list': z.object({
+        type: z.literal('contact-list'),
+        x: z.number(),
+        y: z.number(),
+        items: z.array(z.string()).optional(),
+        style: z.object({
+            spacing: z.number().optional(),
+            iconColor: z.string().optional()
+        }).optional()
     })
 };
 
 // --- MAIN CONFIG SCHEMA ---
 export const AdvancedConfigSchema = z.object({
-    fullName: z.string(),
+    fullName: z.string().min(1, "Full Name is required"),
     jobTitle: z.string().optional(),
     accentColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).default('#6366f1'),
     baseUrl: z.string().url().optional(),
+    phone: z.string().optional(),
+    email: z.string().email().optional().or(z.literal('')),
     
     // DEPRECATED: Focus on state.pages
     landingPage: z.object({
@@ -79,8 +114,8 @@ export const AdvancedConfigSchema = z.object({
     }).optional(),
 
     pages: z.array(z.object({
-        slug: z.string(),
-        name: z.string(),
+        slug: z.string().min(1),
+        name: z.string().min(1),
         theme: z.string().default('glass'),
         components: z.array(z.object({
             type: z.string(),
@@ -101,7 +136,8 @@ export const AdvancedConfigSchema = z.object({
         layers: z.array(z.discriminatedUnion('type', [
             LayerSchemas.image,
             LayerSchemas.text,
-            LayerSchemas.qr
+            LayerSchemas.qr,
+            LayerSchemas['contact-list']
         ]))
     }).optional()
 });

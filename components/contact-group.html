@@ -1,0 +1,8 @@
+<div class="contact-group" style="margin-top: 1.5rem; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+    <label style="font-size: 0.7rem; color: var(--primary); font-weight: 800; letter-spacing: 0.1em; display: block; margin-bottom: 0.8rem;">{{label}}</label>
+    <div class="group-items" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {{#items}}
+            {{! Rendering nested comp happens in server via #items section logic }}
+        {{/items}}
+    </div>
+</div>

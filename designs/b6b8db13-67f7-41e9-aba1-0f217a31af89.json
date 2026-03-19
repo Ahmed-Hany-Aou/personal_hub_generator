@@ -1,0 +1,26 @@
+{
+  "id": "b6b8db13-67f7-41e9-aba1-0f217a31af89",
+  "lastModified": "2026-03-19T04:08:10.885Z",
+  "config": {
+    "fullName": "Audit Test User",
+    "jobTitle": "QC Engineer",
+    "accentColor": "#ff0000",
+    "pages": [
+      {
+        "slug": "index",
+        "name": "Home",
+        "theme": "glass",
+        "components": [
+          {
+            "type": "profile",
+            "data": {
+              "name": "Audit Test User"
+            }
+          }
+        ]
+      }
+    ],
+    "activePageSlug": "index",
+    "seo": {}
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Tech-Nexus Dark",
+  "description": "A sleek, high-tech design featuring a network node background and frosted glass elements.",
+  "config": {
+    "accentColor": "#46c2d1",
+    "theme": "noir",
+    "landingPage": {
+      "theme": "noir",
+      "components": [
+        { 
+          "type": "profile", 
+          "data": { 
+            "profileImage": "https://api.dicebear.com/7.x/avataaars/svg?seed={{fullName}}", 
+            "name": "{{fullName}}", 
+            "jobTitle": "{{title}}",
+            "company": "{{company}}"
+          } 
+        },
+        { "type": "contact-group", "data": { "label": "CONTACT", "items": [
+          { "type": "link-item", "data": { "url": "mailto:{{email}}", "label": "{{email}}" } },
+          { "type": "link-item", "data": { "url": "tel:{{phone}}", "label": "{{phone}}" } }
+        ]}},
+        { "type": "social-links", "data": { "label": "SOCIAL LINKS", "items": [
+          { "type": "icon-card", "data": { "icon": "github", "url": "https://github.com/{{github}}", "label": "{{github}}" } },
+          { "type": "icon-card", "data": { "icon": "linkedin", "url": "https://linkedin.com/in/{{linkedin}}", "label": "{{linkedin}}" } }
+        ]}},
+        { "type": "qr-display", "data": { "url": "{{portfolioUrl}}", "style": "frosted-glass" } }
+      ]
+    },
+    "printableCard": {
+      "dimensions": { "width": 1050, "height": 600, "unit": "px", "dpi": 300 },
+      "background": { "color": "#12171d", "pattern": "network-nodes" },
+      "layers": [
+        { "type": "text", "content": "{{fullName}}", "x": 80, "y": 120, "style": { "size": 72, "weight": "bold", "color": "#ffffff" } },
+        { "type": "text", "content": "{{title}}", "x": 80, "y": 200, "style": { "size": 42, "color": "#a0aab4" } },
+        { "type": "text", "content": "{{company}}", "x": 80, "y": 280, "style": { "size": 36, "weight": "bold", "color": "#46c2d1" } },
+        { "type": "contact-list", "x": 80, "y": 350, "style": { "spacing": 30, "iconColor": "#46c2d1" }, "items": ["{{email}}", "{{phone}}", "github.com/{{github}}", "linkedin.com/in/{{linkedin}}"] },
+        { "type": "qr", "content": "{{portfolioUrl}}", "x": 750, "y": 350, "size": 220, "style": { "background": "rgba(255,255,255,0.1)", "blur": 10 } }
+      ]
+    }
+  }
+}

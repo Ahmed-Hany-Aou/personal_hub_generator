@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent-color: {{accentColor}};
+        }
+
         body {
             margin: 0;
             font-family: 'Space Grotesk', sans-serif;
@@ -101,7 +105,7 @@
                 {{#links}}
                 <a href="{{url}}" class="link-btn" target="_blank">{{label}}</a>
                 {{/links}}
-                <a href="contact.vcf" class="link-btn" style="color: {{accentColor}};">↓ Download vCard</a>
+                <a href="contact.vcf" class="link-btn" style="color: var(--accent-color);">↓ Download vCard</a>
             </div>
         </div>
 

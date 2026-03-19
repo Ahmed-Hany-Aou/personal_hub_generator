@@ -12,11 +12,26 @@ import { v4 as uuidv4 } from 'uuid';
 import { AdvancedConfigSchema } from './validators/registry.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+console.log("🚀 SERVER STARTING...");
+console.log("📂 __dirname:", __dirname);
+console.log("📂 process.cwd():", process.cwd());
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 app.use(express.static('public'));
 app.use(express.json());
+
+const sectionRegex = /{{#section\s+(\w+)}}([\s\S]*?){{\/section}}/g;
+
+// Safe path.join wrapper
+const safePathJoin = (...args) => {
+    args.forEach((arg, i) => {
+        if (typeof arg !== 'string') {
+            throw new Error(`path.join argument at index ${i} must be string, received ${typeof arg} (${arg})`);
+        }
+    });
+    return path.join(...args);
+};
 
 // --- LEGACY CONVERTER ---
 function convertLegacyConfig(data) {
@@ -49,27 +64,37 @@ function convertLegacyConfig(data) {
 }
 
 // --- HELPERS ---
-// ... (renderTemplate, renderComponent, renderLayout, compositeLayers remain similar but potentially hardened)
 function renderTemplate(template, data) {
+    if (!template) return '';
     let result = template;
-    const sectionRegex = /{{#(\w+)}}([\s\S]*?){{\/\1}}/g;
-    result = result.replace(sectionRegex, (match, key, content) => {
-        if (Array.isArray(data[key])) {
-            return data[key].map(item => {
-                let subContent = content;
-                for (const k in item) {
-                    subContent = subContent.replace(new RegExp(`{{${k}}}`, 'g'), item[k]);
+    
+    // 1. Handle Blocks: {{#key}}...{{/key}} or {{#section key}}...{{/section}}
+    const blockRegex = /{{#(?:\s*section\s+)?([\w.-]+)}}([\s\S]*?){{\/(?:\s*section\s+)?(?:\1|)}}/g;
+    result = result.replace(blockRegex, (match, key, content) => {
+        const val = data[key];
+        if (Array.isArray(val)) {
+            return val.map((item, idx) => {
+                if (item && typeof item === 'object' && item.type && item.data) {
+                    return renderComponent(item.type, { ...data, ...item.data }, idx);
                 }
-                return subContent;
-            }).join('\n');
+                const context = typeof item === 'object' ? { ...data, ...item } : { ...data, self: item };
+                return renderTemplate(content, context);
+            }).join('');
+        } else if (val && typeof val === 'object') {
+            return renderTemplate(content, { ...data, ...val });
+        } else if (val) {
+            return renderTemplate(content, data);
         }
-        return data[key] ? content : '';
+        return '';
     });
-    for (const key in data) {
-        if (typeof data[key] === 'string' || typeof data[key] === 'number') {
-            result = result.replace(new RegExp(`{{${key}}}`, 'g'), data[key]);
-        }
-    }
+
+    // 2. Handle Variables: {{key}}
+    const varRegex = /{{([\w.-]+)}}/g;
+    result = result.replace(varRegex, (match, key) => {
+        const val = data[key];
+        return (typeof val === 'string' || typeof val === 'number') ? val : match;
+    });
+
     return result;
 }
 
@@ -79,12 +104,19 @@ const COMPONENT_REGISTRY = {
     'social-icons': 'components/social-icons.html',
     footer: 'components/footer.html',
     'cta-button': 'components/cta-button.html',
-    'lead-form': 'components/lead-form.html'
+    'lead-form': 'components/lead-form.html',
+    'contact-group': 'components/contact-group.html',
+    'social-links': 'components/social-links.html',
+    'icon-card': 'components/icon-card.html',
+    'qr-display': 'components/qr-display.html'
 };
 
 function renderComponent(type, data, index = 0) {
-    const templatePath = path.join(__dirname, COMPONENT_REGISTRY[type]);
-    if (!fs.existsSync(templatePath)) return `<!-- Component ${type} not found -->`;
+    if (!COMPONENT_REGISTRY[type]) {
+        return `<!-- ERROR: Component type "${type}" not registered in server.js -->`;
+    }
+    const templatePath = safePathJoin(__dirname, COMPONENT_REGISTRY[type]);
+    if (!fs.existsSync(templatePath)) return `<!-- ERROR: Template file for "${type}" not found at ${COMPONENT_REGISTRY[type]} -->`;
     const template = fs.readFileSync(templatePath, 'utf8');
     
     // Inject dynamic animation delay based on index
@@ -99,13 +131,13 @@ function renderComponent(type, data, index = 0) {
 function renderLayout(layoutConfig, sessionData) {
     const theme = layoutConfig.theme || 'glass';
     const templateFile = `base-${theme}.html`;
-    const templatePath = path.join(__dirname, 'templates', templateFile);
+    const templatePath = safePathJoin(__dirname, 'templates', templateFile);
     
     let baseTemplate;
     if (fs.existsSync(templatePath)) {
         baseTemplate = fs.readFileSync(templatePath, 'utf8');
     } else {
-        baseTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'base-glass.html'), 'utf8');
+        baseTemplate = fs.readFileSync(safePathJoin(__dirname, 'templates', 'base-glass.html'), 'utf8');
     }
 
     const componentsHtml = layoutConfig.components.map((comp, idx) => {
@@ -131,6 +163,61 @@ function renderLayout(layoutConfig, sessionData) {
         <meta property="og:type" content="website">
     `;
     html = html.replace('<!-- META_TAGS -->', metaTags);
+    
+    // Inject Party Mode Effects
+    if (sessionData.partyMode) {
+        const partyScript = `
+            <style>
+                @keyframes bmad-party-glow {
+                    0% { box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+                    50% { box-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff; }
+                    100% { box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+                }
+                .party-active .card, .party-active .link-item {
+                    animation: bmad-party-glow 2s infinite ease-in-out;
+                    border: 2px solid transparent;
+                    background-origin: border-box;
+                    background-clip: padding-box, border-box;
+                    background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+                    background-size: 200% 100%;
+                    animation: bmad-party-glow 2s infinite, party-border-flow 3s linear infinite;
+                }
+                @keyframes party-border-flow {
+                    from { background-position: 0% 0%; }
+                    to { background-position: 200% 0%; }
+                }
+                .confetti {
+                    position: fixed; top: -10px; width: 10px; height: 10px;
+                    background-color: #f0f; opacity: 0.7; z-index: 9999;
+                    pointer-events: none; animation: confetti-fall 4s linear forwards;
+                }
+                @keyframes confetti-fall {
+                    to { transform: translateY(100vh) rotate(720deg); }
+                }
+            </style>
+            <script>
+                document.body.classList.add('party-active');
+                function createConfetti() {
+                    const colors = ['#ff00ff', '#00ffff', '#ffff00', '#00ff00', '#ffffff'];
+                    for(let i=0; i<50; i++) {
+                        setTimeout(() => {
+                            const c = document.createElement('div');
+                            c.className = 'confetti';
+                            c.style.left = Math.random() * 100 + 'vw';
+                            c.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                            c.style.width = (Math.random()*8+4) + 'px';
+                            c.style.height = c.style.width;
+                            document.body.appendChild(c);
+                            setTimeout(() => c.remove(), 4000);
+                        }, i * 100);
+                    }
+                }
+                createConfetti();
+                setInterval(createConfetti, 5000);
+            </script>
+        `;
+        html = html.replace('</body>', partyScript + '</body>');
+    }
 
     return html;
 }
@@ -139,7 +226,7 @@ async function compositeLayers(card, layers, sessionDir) {
     for (const layer of layers) {
         try {
             if (layer.type === 'image') {
-                const imgPath = layer.src.startsWith('uploads') ? path.join(__dirname, layer.src) : path.join(sessionDir, layer.src);
+                const imgPath = layer.src.startsWith('uploads') ? safePathJoin(__dirname, layer.src) : safePathJoin(sessionDir, layer.src);
                 if (fs.existsSync(imgPath)) {
                     const img = await Jimp.read(imgPath);
                     if (layer.width && layer.height) img.resize({ w: layer.width, h: layer.height });
@@ -149,7 +236,7 @@ async function compositeLayers(card, layers, sessionDir) {
                 const font = await loadFont(layer.style.color === 'white' ? SANS_64_WHITE : SANS_64_BLACK);
                 card.print({ font, x: layer.x, y: layer.y, text: layer.content });
             } else if (layer.type === 'qr') {
-                const qrPath = path.join(sessionDir, 'qr_code.png');
+                const qrPath = safePathJoin(sessionDir, 'qr_code.png');
                 if (fs.existsSync(qrPath)) {
                     const qrImg = await Jimp.read(qrPath);
                     qrImg.resize({ w: layer.size || 200, h: layer.size || 200 });
@@ -169,7 +256,7 @@ app.post('/generate', upload.fields([
     { name: 'logo', maxCount: 1 }
 ]), async (req, res) => {
     const sessionId = uuidv4();
-    const sessionDir = path.join(__dirname, 'temp', `session_${sessionId}`);
+    const sessionDir = safePathJoin(__dirname, 'temp', `session_${sessionId}`);
     
     try {
         if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
@@ -185,25 +272,31 @@ app.post('/generate', upload.fields([
         if (files['profilePic'] && files['profilePic'][0]) {
             const ext = path.extname(files['profilePic'][0].originalname) || '.png';
             const uuidName = `${uuidv4()}${ext}`;
-            fs.copyFileSync(files['profilePic'][0].path, path.join(sessionDir, 'profile_pic.png'));
+            fs.copyFileSync(files['profilePic'][0].path, safePathJoin(sessionDir, 'profile_pic.png'));
             // In a real persistence layer, we'd save uuidName to the designs DB
         }
 
-        const vCardContent = `BEGIN:VCARD\nVERSION:3.0\nFN:${config.fullName}\nEND:VCARD`;
-        fs.writeFileSync(path.join(sessionDir, 'contact.vcf'), vCardContent);
+        let vCardContent = `BEGIN:VCARD\nVERSION:3.0\nFN:${config.fullName}\n`;
+        if (config.phone) vCardContent += `TEL;TYPE=WORK,VOICE:${config.phone}\n`;
+        if (config.email) vCardContent += `EMAIL;TYPE=PREF,INTERNET:${config.email}\n`;
+        vCardContent += `END:VCARD`;
+        fs.writeFileSync(safePathJoin(sessionDir, 'contact.vcf'), vCardContent);
 
-        const htmlContent = renderLayout(config.landingPage, config);
-        fs.writeFileSync(path.join(sessionDir, 'index.html'), htmlContent);
+        const activePage = config.pages.find(p => p.slug === config.activePageSlug) || config.pages[0];
+        if (!activePage) throw new Error("No pages found in configuration");
+
+        const htmlContent = renderLayout(activePage, config);
+        fs.writeFileSync(safePathJoin(sessionDir, 'index.html'), htmlContent);
 
         const qr_svg = qr.image(config.baseUrl || 'https://bmad-elite.com', { type: 'png' });
-        const qrPath = path.join(sessionDir, 'qr_code.png');
+        const qrPath = safePathJoin(sessionDir, 'qr_code.png');
         const qrStream = fs.createWriteStream(qrPath);
         qr_svg.pipe(qrStream);
         await new Promise((resolve) => qrStream.on('finish', resolve));
 
         const card = new Jimp({ width: 1050, height: 600, color: 0x0f172aff });
         await compositeLayers(card, config.printableCard.layers, sessionDir);
-        await card.write(path.join(sessionDir, 'final_card_with_qr.png'));
+        await card.write(safePathJoin(sessionDir, 'final_card_with_qr.png'));
 
         const zip = new AdmZip();
         zip.addLocalFolder(sessionDir);
@@ -268,7 +361,7 @@ app.post('/api/preview', async (req, res) => {
         res.set('Content-Type', 'text/html');
         res.send(htmlContent);
     } catch (err) {
-        const details = err.name === 'ZodError' ? err.errors : err.message;
+        const details = err.name === 'ZodError' ? err.errors : err.stack || err.message;
         res.status(400).json({ error: "Preview Failed", details });
     }
 });
@@ -454,8 +547,8 @@ function brightnessSum(rgb) { return rgb[0] + rgb[1] + rgb[2]; }
 
 app.get('/public-view.html', (req, res) => {
     const designId = req.query.id;
-    const designsDir = path.join(__dirname, 'designs');
-    const designPath = path.join(designsDir, `${designId}.json`);
+    const designsDir = safePathJoin(__dirname, 'designs');
+    const designPath = safePathJoin(designsDir, `${designId}.json`);
 
     if (!designId || !fs.existsSync(designPath)) {
         return res.status(404).send('<h1>Design Not Found</h1>');
@@ -492,6 +585,13 @@ app.post('/api/designs/:id/publish', (req, res) => {
     }
 });
 
+app.get('/api/qr', (req, res) => {
+    const url = req.query.url || 'https://bmad-elite.com';
+    const code = qr.image(url, { type: 'png', margin: 1 });
+    res.setHeader('Content-type', 'image/png');
+    code.pipe(res);
+});
+
 app.get('/api/gallery', (req, res) => {
     if (!fs.existsSync(DESIGNS_DIR)) return res.json([]);
     const files = fs.readdirSync(DESIGNS_DIR).filter(f => f.endsWith('.json'));
@@ -503,7 +603,7 @@ app.get('/api/gallery', (req, res) => {
 });
 
 // --- TEMPLATE GALLERY API ---
-const GALLERY_TEMPLATES_DIR = path.join(__dirname, 'templates', 'gallery');
+const GALLERY_TEMPLATES_DIR = safePathJoin(__dirname, 'templates', 'gallery');
 app.get('/api/templates', (req, res) => {
     if (!fs.existsSync(GALLERY_TEMPLATES_DIR)) return res.json([]);
     const files = fs.readdirSync(GALLERY_TEMPLATES_DIR).filter(f => f.endsWith('.json'));
