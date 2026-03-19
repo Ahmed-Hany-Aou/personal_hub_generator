@@ -14,7 +14,7 @@ async function testLegacyConversion() {
     };
 
     console.log("🧪 Testing Legacy Conversion...");
-    
+
     try {
         const response = await fetch('http://localhost:3000/generate', {
             method: 'POST',

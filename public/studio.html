@@ -292,7 +292,7 @@
                     </select>
                     <label style="margin-top: 1rem; color: #4ade80;">🔗 Global Lead Webhook (Expert)</label>
                     <input type="url" id="globalLeadWebhook" placeholder="https://hooks.zapier.com/..." style="font-size: 0.7rem; color: #4ade80; border-color: rgba(74, 222, 128, 0.2);">
-                    
+
                     <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,100,255,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,100,255,0.3);">
                         <label style="color: #ff69b4; margin: 0; font-weight: 600;">✨ PARTY MODE</label>
                         <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; cursor: pointer;">
@@ -801,7 +801,7 @@
             const bleed = 37.5;
             const guideColor = 'rgba(239, 68, 68, 0.5)'; // Soft Red
             const dash = [5, 5];
-            
+
             const guides = [
                 new fabric.Line([bleed, 0, bleed, 600], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash }),
                 new fabric.Line([1050 - bleed, 0, 1050 - bleed, 600], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash }),
@@ -1084,7 +1084,7 @@
                 activePage.theme = value;
             } else if (['accentColor', 'fullName', 'jobTitle', 'phone', 'email', 'partyMode'].includes(key)) {
                 state[key] = (key === 'partyMode') ? document.getElementById(key).checked : value;
-                
+
                 // Propagate to all profile components
                 if (key === 'fullName' || key === 'jobTitle') {
                     state.pages.forEach(p => {
@@ -1445,9 +1445,14 @@
                 }
             };
 
+            // Process all possible component locations
+            if (newConfig.pages && Array.isArray(newConfig.pages)) {
+                newConfig.pages.forEach(p => p.components.forEach(comp => processData(comp.data)));
+            }
             if (newConfig.landingPage && newConfig.landingPage.components) {
                 newConfig.landingPage.components.forEach(comp => processData(comp.data));
             }
+
             if (newConfig.printableCard && newConfig.printableCard.layers) {
                 newConfig.printableCard.layers.forEach(layer => {
                     if (layer.content) layer.content = replacePlaceholders(layer.content);
@@ -1458,11 +1463,16 @@
             state.accentColor = newConfig.accentColor || state.accentColor;
             state.theme = newConfig.theme || state.theme;
 
-            // If template provides a full landingPage, replace the active one
-            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
-            if (activePage && newConfig.landingPage) {
-                activePage.theme = newConfig.landingPage.theme || activePage.theme;
-                activePage.components = newConfig.landingPage.components;
+            // Handle both legacy "landingPage" and advanced "pages" structure
+            if (newConfig.pages && Array.isArray(newConfig.pages)) {
+                state.pages = newConfig.pages;
+                if (newConfig.activePageSlug) state.activePageSlug = newConfig.activePageSlug;
+            } else if (newConfig.landingPage) {
+                const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+                if (activePage) {
+                    activePage.theme = newConfig.landingPage.theme || activePage.theme;
+                    activePage.components = newConfig.landingPage.components;
+                }
             }
 
             if (newConfig.printableCard) {

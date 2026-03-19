@@ -8,7 +8,7 @@ export const ComponentSchemas = {
         profileImage: z.string().optional()
     }),
     'link-item': z.object({
-        url: z.string().url(),
+        url: z.string().url().or(z.string().regex(/^(mailto:|tel:|{{).*$/)),
         label: z.string().min(1)
     }),
     'social-icons': z.object({
@@ -22,7 +22,7 @@ export const ComponentSchemas = {
     }),
     'cta-button': z.object({
         label: z.string().min(1),
-        url: z.string().url(),
+        url: z.string().url().or(z.string().regex(/^(mailto:|tel:|{{).*$/)),
         style: z.enum(['pulse', 'solid', 'outline']).default('solid'),
         color: z.string().optional()
     }),
@@ -48,12 +48,22 @@ export const ComponentSchemas = {
     }),
     'icon-card': z.object({
         icon: z.string().optional(),
-        url: z.string().url(),
+        url: z.string().url().or(z.string().regex(/^(mailto:|tel:|{{).*$/)),
         label: z.string().optional()
     }),
     'qr-display': z.object({
-        url: z.string().url(),
+        url: z.string().url().or(z.string().regex(/{{.*}}/)),
         style: z.string().optional()
+    }),
+    'nano-profile': z.object({
+        profileImage: z.string().optional(),
+        fullName: z.string().optional(),
+        jobTitle: z.string().optional()
+    }),
+    'nano-contact-item': z.object({
+        label: z.string().optional(),
+        value: z.string().optional(),
+        icon: z.string().optional()
     })
 };
 
@@ -124,6 +134,7 @@ export const AdvancedConfigSchema = z.object({
     })).default([]),
 
     activePageSlug: z.string().default('index'),
+    partyMode: z.boolean().default(false),
     globalLeadWebhook: z.string().url().optional().or(z.literal('')),
 
     seo: z.object({
