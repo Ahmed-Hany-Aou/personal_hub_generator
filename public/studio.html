@@ -201,6 +201,34 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        @media screen and (max-width: 1024px) {
+            html body {
+                background: red !important;
+                flex-direction: column !important;
+                height: auto !important;
+                overflow-y: auto !important;
+            }
+            .sidebar {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid var(--glass-border);
+                height: auto !important;
+                min-height: 480px;
+            }
+            .preview-area {
+                padding: 1rem !important;
+                height: 700px !important;
+                flex: none !important;
+            }
+            .preview-container {
+                max-width: 100% !important;
+                height: 100% !important;
+            }
+            .tab-nav {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
@@ -252,6 +280,8 @@
                     <label>Global Branding</label>
                     <input type="text" id="fullName" placeholder="Full Name" value="Ahmed Hany">
                     <input type="text" id="jobTitle" placeholder="Job Title" value="Lead Designer">
+                    <input type="text" id="phone" placeholder="Phone" style="margin-top: 5px; color: #60a5fa; border-color: rgba(96, 165, 250, 0.2);">
+                    <input type="email" id="email" placeholder="Email" style="margin-top: 5px; color: #60a5fa; border-color: rgba(96, 165, 250, 0.2);">
                     <label>Theme & Accents</label>
                     <input type="color" id="accentColor" value="#6366f1" style="height: 50px;">
                     <select id="theme">
@@ -262,6 +292,11 @@
                     </select>
                     <label style="margin-top: 1rem; color: #4ade80;">🔗 Global Lead Webhook (Expert)</label>
                     <input type="url" id="globalLeadWebhook" placeholder="https://hooks.zapier.com/..." style="font-size: 0.7rem; color: #4ade80; border-color: rgba(74, 222, 128, 0.2);">
+
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,100,255,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,100,255,0.3);">
+                        <label style="color: #ff69b4; margin: 0; font-weight: 600;">✨ PARTY MODE</label>
+                        <input type="checkbox" id="partyMode" style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
                 </div>
 
                 <div class="control-group" id="ai-insights-panel" style="background: rgba(168, 85, 247, 0.05); padding: 1rem; border-radius: 12px; border: 1px dashed rgba(168, 85, 247, 0.3);">
@@ -408,8 +443,11 @@
         const state = {
             fullName: 'Ahmed Hany',
             jobTitle: 'Lead Designer',
+            phone: '+20 123 456 7890',
+            email: 'ahmed@example.com',
             accentColor: '#6366f1',
             theme: 'glass',
+            partyMode: false,
             pages: [
                 {
                     slug: 'index',
@@ -650,7 +688,7 @@
             document.getElementById('editor-label').innerHTML = `⚙️ Editing <b>${comp.type.toUpperCase()}</b>`;
             fields.innerHTML = '';
 
-            const createField = (key, val, parentObj = editorData) => {
+            const createField = (key, val, parentObj = editorData, container = fields) => {
                 const group = document.createElement('div');
                 group.style.marginBottom = '1rem';
                 
@@ -661,10 +699,14 @@
                 group.appendChild(label);
 
                 if (Array.isArray(val)) {
-                    // Array/List support (for social links)
+                    // Array/List support
+                    const listWrapper = document.createElement('div');
+                    listWrapper.className = 'editor-list-wrapper';
+                    group.appendChild(listWrapper);
+
                     val.forEach((item, i) => {
                         const itemContainer = document.createElement('div');
-                        itemContainer.style = "margin-left: 10px; border-left: 2px solid var(--glass-border); padding-left: 10px; margin-top: 10px; position: relative;";
+                        itemContainer.style = "margin-bottom: 10px; border-left: 2px solid var(--glass-border); padding-left: 10px; margin-top: 10px; position: relative;";
                         
                         const removeBtn = document.createElement('button');
                         removeBtn.innerHTML = '✕';
@@ -672,13 +714,13 @@
                         removeBtn.onclick = () => {
                             pushHistory();
                             val.splice(i, 1);
-                            showComponentEditor(index); // Refresh editor
+                            showComponentEditor(index);
                             triggerPreviewUpdate();
                         };
                         itemContainer.appendChild(removeBtn);
 
-                        Object.keys(item).forEach(subKey => createField(subKey, item[subKey], item));
-                        group.appendChild(itemContainer);
+                        Object.keys(item).forEach(subKey => createField(subKey, item[subKey], item, itemContainer));
+                        listWrapper.appendChild(itemContainer);
                     });
 
                     const addBtn = document.createElement('button');
@@ -687,10 +729,9 @@
                     addBtn.style = "font-size: 0.6rem; padding: 5px; margin-top: 5px; background: var(--glass);";
                     addBtn.onclick = () => {
                         pushHistory();
-                        // Smart default: copy the last item or use empty strings
                         const proto = val.length > 0 ? { ...val[val.length-1] } : { url: '#', label: 'New' };
                         val.push(proto);
-                        showComponentEditor(index); // Refresh editor
+                        showComponentEditor(index);
                         triggerPreviewUpdate();
                     };
                     group.appendChild(addBtn);
@@ -704,7 +745,7 @@
                     };
                     group.appendChild(input);
                 }
-                fields.appendChild(group);
+                container.appendChild(group);
             };
 
             Object.keys(editorData).forEach(key => createField(key, editorData[key]));
@@ -755,6 +796,19 @@
             canvas.setHeight(600 * scale);
 
             syncCanvasFromState();
+
+            // Add Bleed Guides (37.5px = 1/8" at 300 DPI)
+            const bleed = 37.5;
+            const guideColor = 'rgba(239, 68, 68, 0.5)'; // Soft Red
+            const dash = [5, 5];
+
+            const guides = [
+                new fabric.Line([bleed, 0, bleed, 600], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash }),
+                new fabric.Line([1050 - bleed, 0, 1050 - bleed, 600], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash }),
+                new fabric.Line([0, bleed, 1050, bleed], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash }),
+                new fabric.Line([0, 600 - bleed, 1050, 600 - bleed], { stroke: guideColor, selectable: false, evented: false, strokeDashArray: dash })
+            ];
+            guides.forEach(g => canvas.add(g));
 
             // Bidirectional Sync: Canvas -> State
             canvas.on('object:modified', syncStateFromCanvas);
@@ -1028,8 +1082,21 @@
             const activePage = state.pages.find(p => p.slug === state.activePageSlug);
             if (key === 'theme' && activePage) {
                 activePage.theme = value;
-            } else if (['accentColor', 'fullName', 'jobTitle'].includes(key)) {
-                state[key] = value;
+            } else if (['accentColor', 'fullName', 'jobTitle', 'phone', 'email', 'partyMode'].includes(key)) {
+                state[key] = (key === 'partyMode') ? document.getElementById(key).checked : value;
+
+                // Propagate to all profile components
+                if (key === 'fullName' || key === 'jobTitle') {
+                    state.pages.forEach(p => {
+                        p.components.forEach(c => {
+                            if (c.type === 'profile') {
+                                if (key === 'fullName') c.data.name = value;
+                                if (key === 'jobTitle') c.data.jobTitle = value;
+                            }
+                        });
+                    });
+                    renderComponentList();
+                }
             }
             triggerPreviewUpdate();
         }
@@ -1180,10 +1247,16 @@
                     document.getElementById('status-tag').textContent = 'Synced';
                     document.getElementById('status-tag').style.background = 'rgba(34, 197, 94, 0.2)';
                     document.getElementById('status-tag').style.color = '#4ade80';
+                } else {
+                    const error = await response.json();
+                    document.getElementById('status-tag').textContent = 'Sync Error: ' + (error.details || error.error);
+                    document.getElementById('status-tag').style.background = 'rgba(239, 68, 68, 0.2)';
+                    document.getElementById('status-tag').style.color = '#f87171';
                 }
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error("Preview failed", err);
+                document.getElementById('status-tag').textContent = 'Preview Failed';
             }
         }
 
@@ -1349,8 +1422,16 @@
             // Helper to replace placeholders in string
             const replacePlaceholders = (str) => {
                 if (typeof str !== 'string') return str;
-                return str.replace(/{{fullName}}/g, state.fullName)
-                          .replace(/{{jobTitle}}/g, state.jobTitle);
+                let result = str;
+                Object.keys(state).forEach(key => {
+                    const val = state[key];
+                    if (typeof val === 'string' || typeof val === 'number') {
+                        result = result.replace(new RegExp(`{{${key}}}`, 'g'), val);
+                    }
+                });
+                // Legacy compatibility for {{title}} -> jobTitle
+                result = result.replace(/{{title}}/g, state.jobTitle || '');
+                return result;
             };
 
             // Recursive placeholder replacement in components
@@ -1364,9 +1445,14 @@
                 }
             };
 
+            // Process all possible component locations
+            if (newConfig.pages && Array.isArray(newConfig.pages)) {
+                newConfig.pages.forEach(p => p.components.forEach(comp => processData(comp.data)));
+            }
             if (newConfig.landingPage && newConfig.landingPage.components) {
                 newConfig.landingPage.components.forEach(comp => processData(comp.data));
             }
+
             if (newConfig.printableCard && newConfig.printableCard.layers) {
                 newConfig.printableCard.layers.forEach(layer => {
                     if (layer.content) layer.content = replacePlaceholders(layer.content);
@@ -1377,11 +1463,16 @@
             state.accentColor = newConfig.accentColor || state.accentColor;
             state.theme = newConfig.theme || state.theme;
 
-            // If template provides a full landingPage, replace the active one
-            const activePage = state.pages.find(p => p.slug === state.activePageSlug);
-            if (activePage && newConfig.landingPage) {
-                activePage.theme = newConfig.landingPage.theme || activePage.theme;
-                activePage.components = newConfig.landingPage.components;
+            // Handle both legacy "landingPage" and advanced "pages" structure
+            if (newConfig.pages && Array.isArray(newConfig.pages)) {
+                state.pages = newConfig.pages;
+                if (newConfig.activePageSlug) state.activePageSlug = newConfig.activePageSlug;
+            } else if (newConfig.landingPage) {
+                const activePage = state.pages.find(p => p.slug === state.activePageSlug);
+                if (activePage) {
+                    activePage.theme = newConfig.landingPage.theme || activePage.theme;
+                    activePage.components = newConfig.landingPage.components;
+                }
             }
 
             if (newConfig.printableCard) {

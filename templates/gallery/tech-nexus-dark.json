@@ -1,22 +1,69 @@
 {
   "name": "Tech-Nexus Dark",
-  "description": "High-performance dark theme for tech innovators.",
+  "description": "A high-contrast, cyberpunk-inspired professional hub for developers and architects.",
   "config": {
+    "fullName": "Ahmed Hany",
+    "jobTitle": "System Architect",
     "accentColor": "#00f2ff",
     "theme": "cyber",
-    "landingPage": {
-      "theme": "cyber",
-      "components": [
-        { "type": "profile", "data": { "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=TN", "name": "{{fullName}}", "jobTitle": "SYSTEM ARCHITECT" } },
-        { "type": "link-item", "data": { "url": "#", "label": "GITHUB REPOS" } },
-        { "type": "cta-button", "data": { "url": "#", "label": "INITIATE CONTACT", "style": "pulse", "color": "#00f2ff" } },
-        { "type": "footer", "data": { "footerText": "TERMINAL_LINK_V1.0" } }
-      ]
-    },
+    "pages": [
+      {
+        "slug": "index",
+        "name": "Home",
+        "theme": "cyber",
+        "components": [
+          {
+            "type": "profile",
+            "data": {
+              "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=TN",
+              "name": "{{fullName}}",
+              "jobTitle": "{{jobTitle}}"
+            }
+          },
+          {
+            "type": "link-item",
+            "data": {
+              "url": "https://github.com",
+              "label": "GITHUB REPOS"
+            }
+          },
+          {
+            "type": "cta-button",
+            "data": {
+              "label": "INITIATE CONTACT",
+              "url": "#",
+              "style": "pulse",
+              "color": "#00f2ff"
+            }
+          },
+          {
+            "type": "footer",
+            "data": {
+              "footerText": "TERMINAL_LINK_V1.0"
+            }
+          }
+        ]
+      }
+    ],
+    "activePageSlug": "index",
     "printableCard": {
       "layers": [
-        { "type": "text", "content": "{{fullName}}", "x": 50, "y": 100, "style": { "size": 72, "color": "white" } },
-        { "type": "qr", "x": 700, "y": 100, "size": 250 }
+        {
+          "type": "text",
+          "content": "{{fullName}}",
+          "x": 80,
+          "y": 150,
+          "style": {
+            "size": 64,
+            "color": "white"
+          }
+        },
+        {
+          "type": "qr",
+          "x": 680,
+          "y": 150,
+          "size": 300
+        }
       ]
     }
   }

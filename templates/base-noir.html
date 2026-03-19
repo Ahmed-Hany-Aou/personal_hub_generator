@@ -159,25 +159,55 @@
             margin-top: 40px;
         }
 
-        .social-icon {
+        .social-icons a {
             color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            transition: 0.3s;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        .social-icon:hover {
-            color: white;
-            transform: translateY(-2px);
+        .social-icons a:hover {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        /* --- NEW COMPONENTS --- */
+        .contact-group, .social-links {
+            text-align: left;
+            animation: fadeIn 1s ease both;
+        }
+
+        .icon-card:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: var(--primary) !important;
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .qr-container {
+            transition: transform 0.3s ease;
+        }
+
+        .qr-container:hover {
+            transform: scale(1.05);
         }
 
         .footer {
             margin-top: 50px;
-            font-size: 0.5rem;
+            font-size: 0.8rem;
             color: var(--text-dim);
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 40px 20px;
+                width: 85%;
+            }
+            h1 { font-size: 1.5rem; letter-spacing: 4px; }
+            .avatar { width: 90px; height: 90px; }
+            .job-title { font-size: 0.6rem; letter-spacing: 2px; }
+            .link-item { padding: 14px; font-size: 0.7rem; }
         }
     </style>
 </head>
