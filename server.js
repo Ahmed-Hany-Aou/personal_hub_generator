@@ -92,7 +92,22 @@ function renderTemplate(template, data) {
     const varRegex = /{{([\w.-]+)}}/g;
     result = result.replace(varRegex, (match, key) => {
         const val = data[key];
-        return (typeof val === 'string' || typeof val === 'number') ? val : match;
+        if (typeof val === 'string' || typeof val === 'number') return val;
+
+        // Final fallback: recursive check in data root if nested key failed
+        const parts = key.split('.');
+        let current = data;
+        for(const part of parts) {
+            if(current && current[part] !== undefined) {
+                current = current[part];
+            } else {
+                current = undefined;
+                break;
+            }
+        }
+        if (typeof current === 'string' || typeof current === 'number') return current;
+
+        return match;
     });
 
     return result;
@@ -108,7 +123,9 @@ const COMPONENT_REGISTRY = {
     'contact-group': 'components/contact-group.html',
     'social-links': 'components/social-links.html',
     'icon-card': 'components/icon-card.html',
-    'qr-display': 'components/qr-display.html'
+    'qr-display': 'components/qr-display.html',
+    'nano-profile': 'components/nano-profile.html',
+    'nano-contact-item': 'components/nano-contact-item.html'
 };
 
 function renderComponent(type, data, index = 0) {
@@ -119,9 +136,20 @@ function renderComponent(type, data, index = 0) {
     if (!fs.existsSync(templatePath)) return `<!-- ERROR: Template file for "${type}" not found at ${COMPONENT_REGISTRY[type]} -->`;
     const template = fs.readFileSync(templatePath, 'utf8');
     
+    // Identity Preservation: Resolve {{placeholders}} in component data immediately
+    // This handles nested components where data might contain {{fullName}} strings
+    const resolvedData = { ...data };
+    Object.keys(resolvedData).forEach(key => {
+        if (typeof resolvedData[key] === 'string') {
+            resolvedData[key] = resolvedData[key].replace(/{{([\w.-]+)}}/g, (match, p1) => {
+                return data[p1] !== undefined ? data[p1] : match;
+            });
+        }
+    });
+
     // Inject dynamic animation delay based on index
     const enhancedData = { 
-        ...data, 
+        ...resolvedData,
         animationDelay: `${0.2 + (index * 0.1)}s` 
     };
     
@@ -147,9 +175,19 @@ function renderLayout(layoutConfig, sessionData) {
     }).join('\n');
     let html = baseTemplate.replace('{{components}}', componentsHtml);
     
-    // Global data replacement
-    html = html.replace(/{{fullName}}/g, sessionData.fullName || '');
-    html = html.replace(/{{jobTitle}}/g, sessionData.jobTitle || '');
+    // Global data replacement (Recursive resolution for placeholders left in components)
+    const allKeys = Object.keys(sessionData);
+    // Sort keys by length descending to avoid partial replacements (e.g., {{userEmail}} vs {{user}})
+    allKeys.sort((a, b) => b.length - a.length);
+
+    allKeys.forEach(key => {
+        const val = sessionData[key];
+        if (typeof val === 'string' || typeof val === 'number') {
+            const re = new RegExp(`{{${key}}}`, 'g');
+            html = html.replace(re, val);
+        }
+    });
+
     html = html.replace(/{{accentColor}}/g, sessionData.accentColor || '#6366f1');
     html = html.replace(/{{designId}}/g, sessionData.id || '');
     

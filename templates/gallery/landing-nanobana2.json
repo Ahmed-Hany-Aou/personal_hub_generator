@@ -1,0 +1,62 @@
+{
+  "name": "Nano Bana2 Landing Page",
+  "description": "A high-fidelity tech landing page with dark theme, teal accents, and rotating pulse animations.",
+  "collection": "nano-bana2-suite",
+  "config": {
+    "fullName": "{{fullName}}",
+    "jobTitle": "{{jobTitle}}",
+    "accentColor": "#00ffff",
+    "theme": "glass",
+    "pages": [
+      {
+        "slug": "index",
+        "name": "Home",
+        "theme": "glass",
+        "components": [
+          {
+            "type": "nano-profile",
+            "data": {
+              "profileImage": "profile_pic.png",
+              "fullName": "{{fullName}}",
+              "jobTitle": "{{jobTitle}}"
+            }
+          },
+          {
+            "type": "nano-contact-item",
+            "data": {
+              "label": "EMAIL",
+              "value": "{{userEmail}}",
+              "icon": "fas fa-envelope"
+            }
+          },
+          {
+            "type": "nano-contact-item",
+            "data": {
+              "label": "PHONE",
+              "value": "{{userPhone}}",
+              "icon": "fas fa-phone"
+            }
+          },
+          {
+            "type": "social-icons",
+            "data": {
+              "links": [
+                { "label": "@{{githubUsername}}", "url": "https://github.com/{{githubUsername}}" },
+                { "label": "@{{linkedinUsername}}", "url": "https://linkedin.com/in/{{linkedinUsername}}" }
+              ]
+            }
+          },
+          {
+            "type": "qr-display",
+            "data": {
+              "url": "{{profileUrl}}",
+              "style": "tech-pulse"
+            }
+          }
+        ]
+      }
+    ],
+    "activePageSlug": "index",
+    "customCss": ":root { --primary: #00ffff; --bg: #0a0f1e; --text: #ffffff; --text-dim: #94a3b8; --pulse-duration: 4s; } body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 1rem; } .tech-card-container { width: 100%; max-width: 440px; border: 1px solid rgba(0, 255, 255, 0.2); box-shadow: 0 0 40px rgba(0, 255, 255, 0.05); }"
+  }
+}
