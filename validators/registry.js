@@ -84,7 +84,7 @@ export const LayerSchemas = {
         y: z.number(),
         style: z.object({
             size: z.number().optional(),
-            color: z.enum(['white', 'black']).default('white')
+            color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).or(z.enum(['white', 'black'])).default('white')
         })
     }),
     qr: z.object({
@@ -113,7 +113,7 @@ export const AdvancedConfigSchema = z.object({
     baseUrl: z.string().url().optional(),
     phone: z.string().optional(),
     email: z.string().email().optional().or(z.literal('')),
-    
+
     // DEPRECATED: Focus on state.pages
     landingPage: z.object({
         theme: z.string().default('glass'),

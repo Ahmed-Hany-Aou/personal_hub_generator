@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ahmed Hany – Senior Designer | NanoBana2</title>
+  <meta name="description" content="Personal hub for Ahmed Hany, Senior Designer at NanoBana2"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root{
+      --bg-dark:#0a0610;
+      --bg-card:rgba(30,15,35,0.85);
+      --gold:#d4a853;
+      --gold-light:#f0d48a;
+      --rose:#e8457a;
+      --rose-soft:#f472b6;
+      --purple:#a855f7;
+      --purple-soft:#c084fc;
+      --text-primary:#f5f0ff;
+      --text-secondary:rgba(245,240,255,0.7);
+      --border-glow:rgba(212,168,83,0.4);
+    }
+
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg-dark);
+      color:var(--text-primary);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* === ANIMATED CIRCUIT BACKGROUND === */
+    .bg-circuits{
+      position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+    }
+    .bg-circuits::before{
+      content:'';position:absolute;inset:-50%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(168,85,247,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(232,69,122,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(212,168,83,0.04) 0%, transparent 60%);
+      animation:bgPulse 8s ease-in-out infinite;
+    }
+    @keyframes bgPulse{0%,100%{opacity:0.8;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+
+    .circuit-line{
+      position:absolute;background:var(--gold);opacity:0.06;
+    }
+    .circuit-line.h{height:1px;animation:scanH 12s linear infinite}
+    .circuit-line.v{width:1px;animation:scanV 15s linear infinite}
+    @keyframes scanH{0%{left:-10%;width:0;opacity:0}10%{opacity:0.12}50%{width:120%}90%{opacity:0.12}100%{left:110%;width:0;opacity:0}}
+    @keyframes scanV{0%{top:-10%;height:0;opacity:0}10%{opacity:0.1}50%{height:120%}90%{opacity:0.1}100%{top:110%;height:0;opacity:0}}
+
+    .glow-orb{
+      position:absolute;border-radius:50%;filter:blur(80px);opacity:0.15;
+      animation:orbFloat 10s ease-in-out infinite alternate;
+    }
+    @keyframes orbFloat{0%{transform:translate(0,0)}100%{transform:translate(30px,-40px)}}
+
+    /* === MAIN CONTAINER === */
+    .page-container{
+      position:relative;z-index:1;
+      display:flex;flex-direction:column;align-items:center;
+      min-height:100vh;padding:2rem 1rem;
+    }
+
+    /* === PHONE MOCKUP LANDING PAGE === */
+    .phone-frame{
+      width:420px;max-width:100%;
+      background:linear-gradient(145deg, #1a0e24 0%, #120a1a 40%, #1a0e24 100%);
+      border-radius:40px;
+      border:2px solid var(--border-glow);
+      box-shadow:
+        0 0 60px rgba(212,168,83,0.1),
+        0 0 120px rgba(168,85,247,0.05),
+        inset 0 0 60px rgba(0,0,0,0.5);
+      padding:1.5rem;
+      position:relative;overflow:hidden;
+    }
+    .phone-frame::before{
+      content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+      background:conic-gradient(from 0deg, transparent, rgba(212,168,83,0.03), transparent, rgba(168,85,247,0.02), transparent);
+      animation:borderRotate 20s linear infinite;
+    }
+    @keyframes borderRotate{100%{transform:rotate(360deg)}}
+
+    .phone-inner{
+      position:relative;z-index:2;
+      background:linear-gradient(160deg, rgba(45,20,55,0.9) 0%, rgba(20,10,30,0.95) 100%);
+      border-radius:28px;
+      padding:2.5rem 1.5rem;
+      border:1px solid rgba(212,168,83,0.15);
+    }
+
+    /* === CIRCUIT GRID OVERLAY === */
+    .circuit-overlay{
+      position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:28px;overflow:hidden;
+    }
+    .circuit-overlay::before{
+      content:'';position:absolute;inset:0;
+      background:
+        linear-gradient(90deg, transparent 49.5%, rgba(212,168,83,0.03) 49.5%, rgba(212,168,83,0.03) 50.5%, transparent 50.5%),
+        linear-gradient(0deg, transparent 49.5%, rgba(212,168,83,0.03) 49.5%, rgba(212,168,83,0.03) 50.5%, transparent 50.5%);
+      background-size:40px 40px;
+    }
+    .circuit-node{
+      position:absolute;width:6px;height:6px;border-radius:50%;
+      background:var(--gold);opacity:0.15;
+      animation:nodeGlow 3s ease-in-out infinite;
+    }
+    .circuit-node:nth-child(2){top:15%;left:85%;animation-delay:0.5s}
+    .circuit-node:nth-child(3){top:45%;left:10%;animation-delay:1s}
+    .circuit-node:nth-child(4){top:75%;left:90%;animation-delay:1.5s}
+    .circuit-node:nth-child(5){top:90%;left:20%;animation-delay:2s}
+    @keyframes nodeGlow{0%,100%{opacity:0.1;box-shadow:none}50%{opacity:0.4;box-shadow:0 0 12px var(--gold)}}
+
+    /* === HERO SECTION === */
+    .hero{
+      text-align:center;margin-bottom:2rem;position:relative;z-index:3;
+    }
+
+    .avatar-ring{
+      width:120px;height:120px;margin:0 auto 1.2rem;
+      border-radius:50%;
+      background:conic-gradient(from 0deg, var(--gold), var(--rose), var(--purple), var(--gold));
+      padding:3px;position:relative;
+      animation:ringRotate 6s linear infinite;
+    }
+    @keyframes ringRotate{100%{background:conic-gradient(from 360deg, var(--gold), var(--rose), var(--purple), var(--gold))}}
+
+    .avatar-ring::after{
+      content:'';position:absolute;inset:-6px;border-radius:50%;
+      border:1px solid rgba(212,168,83,0.2);
+      animation:pulseRing 2s ease-in-out infinite;
+    }
+    @keyframes pulseRing{0%,100%{transform:scale(1);opacity:0.3}50%{transform:scale(1.08);opacity:0.6}}
+
+    .avatar-inner{
+      width:100%;height:100%;border-radius:50%;
+      background:linear-gradient(135deg, #2d1438, #1a0e24);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;
+      color:var(--gold);
+      text-shadow:0 0 20px rgba(212,168,83,0.3);
+    }
+
+    .hero h1{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.8rem;font-weight:900;
+      background:linear-gradient(135deg, var(--text-primary), var(--gold-light));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:0.3rem;letter-spacing:1px;
+    }
+    .hero .title{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.85rem;font-weight:400;
+      color:var(--rose-soft);
+      text-transform:uppercase;letter-spacing:3px;
+      margin-bottom:0.2rem;
+    }
+    .hero .company{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.75rem;font-weight:700;
+      color:var(--gold);
+      text-transform:uppercase;letter-spacing:4px;
+      opacity:0.8;
+    }
+
+    /* === SECTION LABEL === */
+    .section-label{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.7rem;font-weight:700;
+      color:var(--gold);
+      text-transform:uppercase;letter-spacing:4px;
+      margin:1.8rem 0 0.8rem;
+      position:relative;z-index:3;
+      display:flex;align-items:center;gap:0.8rem;
+    }
+    .section-label::after{
+      content:'';flex:1;height:1px;
+      background:linear-gradient(90deg, var(--border-glow), transparent);
+    }
+
+    /* === CONTACT ITEMS === */
+    .contact-list{
+      display:flex;flex-direction:column;gap:0.6rem;
+      position:relative;z-index:3;
+    }
+    .contact-item{
+      display:flex;align-items:center;gap:1rem;
+      padding:0.9rem 1rem;
+      background:rgba(45,20,60,0.5);
+      border:1px solid rgba(212,168,83,0.12);
+      border-radius:14px;
+      transition:all 0.3s ease;
+      cursor:default;
+    }
+    .contact-item:hover{
+      background:rgba(60,30,80,0.6);
+      border-color:rgba(212,168,83,0.3);
+      box-shadow:0 0 20px rgba(212,168,83,0.08);
+      transform:translateX(4px);
+    }
+    .contact-icon{
+      width:38px;height:38px;border-radius:10px;
+      background:linear-gradient(135deg, rgba(212,168,83,0.15), rgba(212,168,83,0.05));
+      border:1px solid rgba(212,168,83,0.2);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1rem;flex-shrink:0;
+    }
+    .contact-detail{
+      display:flex;flex-direction:column;
+    }
+    .contact-detail .label{
+      font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;
+      color:var(--text-secondary);margin-bottom:2px;
+    }
+    .contact-detail .value{
+      font-size:0.9rem;font-weight:500;color:var(--text-primary);
+    }
+    .contact-detail a{
+      color:var(--text-primary);text-decoration:none;
+      transition:color 0.3s;
+    }
+    .contact-detail a:hover{color:var(--gold-light)}
+
+    /* === SOCIAL LINKS === */
+    .social-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;
+      position:relative;z-index:3;
+    }
+    .social-btn{
+      display:flex;align-items:center;gap:0.7rem;
+      padding:0.85rem 1rem;
+      background:rgba(45,20,60,0.5);
+      border:1px solid rgba(212,168,83,0.12);
+      border-radius:14px;
+      text-decoration:none;color:var(--text-primary);
+      transition:all 0.3s ease;
+    }
+    .social-btn:hover{
+      background:rgba(60,30,80,0.6);
+      border-color:rgba(212,168,83,0.35);
+      box-shadow:0 0 25px rgba(212,168,83,0.1);
+      transform:translateY(-2px);
+    }
+    .social-btn .social-icon{
+      width:34px;height:34px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.9rem;flex-shrink:0;
+    }
+    .social-btn.github .social-icon{
+      background:linear-gradient(135deg, rgba(168,85,247,0.2), rgba(168,85,247,0.05));
+      border:1px solid rgba(168,85,247,0.3);
+    }
+    .social-btn.linkedin .social-icon{
+      background:linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05));
+      border:1px solid rgba(59,130,246,0.3);
+    }
+    .social-info .social-name{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.6rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:1px;
+      color:var(--text-secondary);
+    }
+    .social-info .social-handle{
+      font-size:0.75rem;font-weight:500;
+    }
+
+    /* === QR CODE SECTION === */
+    .qr-section{
+      margin-top:1.8rem;text-align:center;position:relative;z-index:3;
+    }
+    .qr-container{
+      width:160px;height:160px;margin:0 auto;
+      background:rgba(30,15,40,0.8);
+      border:2px solid rgba(212,168,83,0.2);
+      border-radius:16px;
+      padding:10px;position:relative;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .qr-container::before{
+      content:'';position:absolute;inset:-8px;border-radius:20px;
+      background:conic-gradient(from 0deg, transparent, rgba(212,168,83,0.1), transparent, rgba(232,69,122,0.08), transparent);
+      animation:qrGlow 4s linear infinite;z-index:-1;
+    }
+    @keyframes qrGlow{100%{background:conic-gradient(from 360deg, transparent, rgba(212,168,83,0.1), transparent, rgba(232,69,122,0.08), transparent)}}
+
+    .qr-container canvas{border-radius:8px}
+
+    .qr-label{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.6rem;color:var(--text-secondary);
+      text-transform:uppercase;letter-spacing:3px;
+      margin-top:0.8rem;
+    }
+
+    /* === FOOTER === */
+    .page-footer{
+      text-align:center;margin-top:2.5rem;position:relative;z-index:3;
+    }
+    .page-footer .powered{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.55rem;color:rgba(212,168,83,0.3);
+      text-transform:uppercase;letter-spacing:3px;
+    }
+
+    /* === BUSINESS CARD SECTION === */
+    .card-section{
+      margin-top:3rem;position:relative;z-index:1;
+    }
+    .card-section h2{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.8rem;text-align:center;
+      color:var(--gold);text-transform:uppercase;letter-spacing:4px;
+      margin-bottom:1.5rem;
+    }
+
+    .biz-card{
+      width:500px;max-width:100%;aspect-ratio:1.78/1;
+      background:linear-gradient(145deg, #1a0e24 0%, #0d0715 40%, #1a0e24 100%);
+      border-radius:16px;position:relative;overflow:hidden;
+      border:2px solid transparent;
+      background-clip:padding-box;
+      box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(212,168,83,0.08);
+    }
+
+    /* Gold border effect */
+    .biz-card::before{
+      content:'';position:absolute;inset:-2px;border-radius:18px;
+      background:linear-gradient(135deg, var(--gold), rgba(212,168,83,0.3), var(--gold), rgba(212,168,83,0.3));
+      z-index:-1;
+    }
+
+    /* Inner gold frame */
+    .biz-card::after{
+      content:'';position:absolute;inset:8px;border-radius:10px;
+      border:1px solid rgba(212,168,83,0.15);
+      z-index:1;pointer-events:none;
+    }
+
+    .card-bg{
+      position:absolute;inset:0;overflow:hidden;
+    }
+    .card-bg::before{
+      content:'';position:absolute;
+      top:-20%;right:-10%;width:400px;height:400px;
+      background:
+        radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 60%);
+      border-radius:50%;
+    }
+    .card-bg .circuit-svg{
+      position:absolute;top:0;right:0;width:60%;height:100%;opacity:0.06;
+    }
+
+    .card-content{
+      position:relative;z-index:2;
+      display:flex;height:100%;padding:2rem;
+    }
+    .card-left{
+      flex:1;display:flex;flex-direction:column;justify-content:center;
+    }
+    .card-right{
+      width:40%;display:flex;align-items:center;justify-content:center;
+    }
+
+    .card-name{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.6rem;font-weight:900;
+      color:var(--text-primary);margin-bottom:0.2rem;
+      text-shadow:0 0 30px rgba(255,255,255,0.1);
+    }
+    .card-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.7rem;font-weight:400;
+      color:var(--rose-soft);
+      text-transform:uppercase;letter-spacing:2px;
+      margin-bottom:0.1rem;
+    }
+    .card-company{
+      font-family:'Orbitron',sans-serif;
+      font-size:0.85rem;font-weight:700;
+      color:var(--gold);
+      text-transform:uppercase;letter-spacing:2px;
+      margin-bottom:1.2rem;
+    }
+
+    .card-contact{
+      display:flex;flex-direction:column;gap:0.35rem;
+    }
+    .card-contact-item{
+      display:flex;align-items:center;gap:0.5rem;
+      font-size:0.72rem;color:var(--text-secondary);
+    }
+    .card-contact-item .ci-icon{
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(212,168,83,0.1);
+      border:1px solid rgba(212,168,83,0.2);
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.6rem;flex-shrink:0;
+    }
+
+    .card-qr{
+      width:130px;height:130px;
+      background:rgba(20,10,30,0.9);
+      border:2px solid rgba(212,168,83,0.25);
+      border-radius:12px;
+      padding:8px;position:relative;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .card-qr::before{
+      content:'';position:absolute;inset:-6px;border-radius:16px;
+      background:radial-gradient(circle, rgba(212,168,83,0.15), transparent 70%);
+      z-index:-1;
+    }
+    .card-qr canvas{border-radius:6px;}
+
+    /* === RESPONSIVE === */
+    @media(max-width:480px){
+      .phone-frame{border-radius:28px;padding:1rem}
+      .phone-inner{border-radius:20px;padding:1.8rem 1.2rem}
+      .hero h1{font-size:1.4rem}
+      .biz-card{width:100%}
+      .card-name{font-size:1.2rem}
+    }
+
+    /* === ENTRANCE ANIMATIONS === */
+    @keyframes fadeSlideUp{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .hero{animation:fadeSlideUp 0.8s ease-out}
+    .contact-list{animation:fadeSlideUp 0.8s ease-out 0.2s both}
+    .social-grid{animation:fadeSlideUp 0.8s ease-out 0.4s both}
+    .qr-section{animation:fadeSlideUp 0.8s ease-out 0.6s both}
+    .biz-card{animation:fadeSlideUp 0.8s ease-out 0.8s both}
+  </style>
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-circuits">
+  <div class="glow-orb" style="width:300px;height:300px;top:10%;left:5%;background:var(--purple)"></div>
+  <div class="glow-orb" style="width:250px;height:250px;bottom:20%;right:10%;background:var(--rose);animation-delay:3s"></div>
+  <div class="glow-orb" style="width:200px;height:200px;top:50%;left:60%;background:var(--gold);animation-delay:5s;opacity:0.08"></div>
+  <div class="circuit-line h" style="top:25%;animation-delay:0s"></div>
+  <div class="circuit-line h" style="top:55%;animation-delay:4s"></div>
+  <div class="circuit-line h" style="top:80%;animation-delay:8s"></div>
+  <div class="circuit-line v" style="left:30%;animation-delay:2s"></div>
+  <div class="circuit-line v" style="left:70%;animation-delay:6s"></div>
+</div>
+
+<div class="page-container">
+
+  <!-- ============ LANDING PAGE (Phone Mockup) ============ -->
+  <div class="phone-frame">
+    <div class="phone-inner">
+
+      <!-- Circuit overlay -->
+      <div class="circuit-overlay">
+        <div class="circuit-node" style="top:5%;left:15%"></div>
+        <div class="circuit-node"></div>
+        <div class="circuit-node"></div>
+        <div class="circuit-node"></div>
+        <div class="circuit-node"></div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="avatar-ring">
+          <div class="avatar-inner">AH</div>
+        </div>
+        <h1>Ahmed Hany</h1>
+        <div class="title">Senior Designer</div>
+        <div class="company">NanoBana2</div>
+      </div>
+
+      <!-- Contact -->
+      <div class="section-label">Contact</div>
+      <div class="contact-list">
+        <a href="mailto:ahmed@nanobana2.com" class="contact-item" style="text-decoration:none">
+          <div class="contact-icon">✉️</div>
+          <div class="contact-detail">
+            <span class="label">Email</span>
+            <span class="value">ahmed@nanobana2.com</span>
+          </div>
+        </a>
+        <a href="tel:+201234567890" class="contact-item" style="text-decoration:none">
+          <div class="contact-icon">📞</div>
+          <div class="contact-detail">
+            <span class="label">Phone</span>
+            <span class="value">+20 123 456 7890</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Social Links -->
+      <div class="section-label">Social Links</div>
+      <div class="social-grid">
+        <a href="https://github.com/Ahmed-Hany-Aou" target="_blank" class="social-btn github">
+          <div class="social-icon">🐙</div>
+          <div class="social-info">
+            <div class="social-name">GitHub</div>
+            <div class="social-handle">/Ahmed-Hany-Aou</div>
+          </div>
+        </a>
+        <a href="https://linkedin.com/in/ahmed-hany" target="_blank" class="social-btn linkedin">
+          <div class="social-icon">🔗</div>
+          <div class="social-info">
+            <div class="social-name">LinkedIn</div>
+            <div class="social-handle">/ahmed-hany</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- QR Code -->
+      <div class="qr-section">
+        <div class="qr-container">
+          <canvas id="lp-qr"></canvas>
+        </div>
+        <div class="qr-label">Scan to Connect</div>
+      </div>
+
+      <!-- Footer -->
+      <div class="page-footer">
+        <div class="powered">Elite Design Suite</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ BUSINESS CARD ============ -->
+  <div class="card-section">
+    <h2>Business Card</h2>
+    <div class="biz-card">
+      <div class="card-bg">
+        <!-- SVG Circuit Pattern -->
+        <svg class="circuit-svg" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="0" x2="50" y2="300" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="150" y1="0" x2="150" y2="300" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="250" y1="0" x2="250" y2="300" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="350" y1="0" x2="350" y2="300" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="0" y1="50" x2="400" y2="50" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="0" y1="150" x2="400" y2="150" stroke="#d4a853" stroke-width="0.5"/>
+          <line x1="0" y1="250" x2="400" y2="250" stroke="#d4a853" stroke-width="0.5"/>
+          <circle cx="50" cy="50" r="4" fill="#d4a853" opacity="0.3"/>
+          <circle cx="150" cy="150" r="4" fill="#d4a853" opacity="0.3"/>
+          <circle cx="250" cy="50" r="4" fill="#d4a853" opacity="0.3"/>
+          <circle cx="350" cy="250" r="4" fill="#d4a853" opacity="0.3"/>
+          <circle cx="50" cy="250" r="4" fill="#d4a853" opacity="0.3"/>
+          <path d="M50 50 L150 50 L150 150" stroke="#d4a853" stroke-width="1" opacity="0.2"/>
+          <path d="M250 50 L350 50 L350 150 L250 150" stroke="#d4a853" stroke-width="1" opacity="0.2"/>
+          <path d="M150 250 L250 250 L250 150" stroke="#d4a853" stroke-width="1" opacity="0.15"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <div class="card-left">
+          <div class="card-name">Ahmed Hany</div>
+          <div class="card-title">Senior Designer</div>
+          <div class="card-company">NanoBana2</div>
+          <div class="card-contact">
+            <div class="card-contact-item">
+              <span class="ci-icon">✉️</span>
+              <span>ahmed@nanobana2.com</span>
+            </div>
+            <div class="card-contact-item">
+              <span class="ci-icon">📞</span>
+              <span>+20 123 456 7890</span>
+            </div>
+            <div class="card-contact-item">
+              <span class="ci-icon">🐙</span>
+              <span>Ahmed-Hany-Aou</span>
+            </div>
+            <div class="card-contact-item">
+              <span class="ci-icon">🔗</span>
+              <span>ahmed-hany</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-qr">
+            <canvas id="card-qr"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- QR Code Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+  const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:Ahmed Hany
+TITLE:Senior Designer
+ORG:NanoBana2
+EMAIL:ahmed@nanobana2.com
+TEL:+201234567890
+URL:https://github.com/Ahmed-Hany-Aou
+END:VCARD`;
+
+  const qrOpts = {
+    width: 140,
+    margin: 0,
+    color: { dark: '#d4a853', light: '#0d0715' },
+    errorCorrectionLevel: 'M'
+  };
+
+  if (typeof QRCode !== 'undefined') {
+    QRCode.toCanvas(document.getElementById('lp-qr'), vCardData, qrOpts);
+    QRCode.toCanvas(document.getElementById('card-qr'), vCardData, { ...qrOpts, width: 114 });
+  }
+</script>
+</body>
+</html>

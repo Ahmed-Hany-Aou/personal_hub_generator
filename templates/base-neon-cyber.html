@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- META_TAGS -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: {{accentColor}};
+            --bg: #0a0f16;
+            --slate-950: #020617;
+            --cyan-400: #22d3ee;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- AMBIENT GLOW --- */
+        .glow-blob {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--cyan-400), transparent 70%);
+            filter: blur(100px);
+            opacity: 0.1;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { top: -200px; left: -200px; animation: float 20s infinite alternate; }
+        .glow-2 { bottom: -200px; right: -200px; animation: float 25s infinite alternate-reverse; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        /* --- GRID BACKGROUND --- */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- CARD STYLING --- */
+        .card {
+            background: rgba(10, 15, 22, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            padding: 3rem;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(34, 211, 238, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 25px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--cyan-400), transparent, var(--cyan-400));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+        }
+
+        .neon-accent {
+            color: var(--cyan-400);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        /* --- CIRCUIT BOARD SVG --- */
+        .circuit-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- SCANLINES / NOISE --- */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        /* --- COMPONENTS CONTAINER --- */
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 2rem 1.5rem; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+
+    <main class="card">
+        <svg class="circuit-overlay" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 100h50l20-20h100M400 200h-50l-20 20h-100M0 400h150l30 30h100M400 500h-200l-30-30h-100" stroke="var(--cyan-400)" stroke-width="1" fill="none" opacity="0.5"/>
+            <circle cx="170" cy="80" r="3" fill="var(--cyan-400)"/>
+            <circle cx="230" cy="220" r="3" fill="var(--cyan-400)"/>
+            <circle cx="280" cy="430" r="3" fill="var(--cyan-400)"/>
+            <circle cx="70" cy="470" r="3" fill="var(--cyan-400)"/>
+        </svg>
+        <div class="content-container">
+            {{components}}
+        </div>
+    </main>
+</body>
+</html>

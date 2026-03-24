@@ -229,6 +229,69 @@
                 flex-wrap: wrap;
             }
         }
+
+        /* --- HARDWARE MOCKUP --- */
+        .phone-mockup {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            border: 10px solid #1e293b;
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8), 0 0 20px var(--primary);
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .phone-mockup::before { /* Notch / Dynamic Island */
+            content: '';
+            position: absolute;
+            top: 10px; left: 50%;
+            transform: translateX(-50%);
+            width: 80px; height: 25px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 50;
+        }
+
+        .view-controls {
+            display: flex;
+            background: var(--glass);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            gap: 4px;
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 50px;
+        }
+
+        .preview-grid.split {
+            grid-template-columns: 1fr 1fr;
+        }
     </style>
 </head>
 <body>
@@ -245,6 +308,8 @@
             <div class="tab-nav">
                 <div class="tab active" data-panel="landing">Landing Page</div>
                 <div class="tab" data-panel="templates">Templates</div>
+                <div class="tab" data-panel="lp-builder" style="color: #a78bfa;">🎨 LP Builder</div>
+                <div class="tab" data-panel="card-builder" style="color: #f472b6;">💳 Card Builder</div>
                 <div class="tab" data-panel="pages">Pages</div>
                 <div class="tab" data-panel="seo">SEO & Sharing</div>
                 <div class="tab" data-panel="assets">Assets</div>
@@ -286,8 +351,9 @@
                     <input type="color" id="accentColor" value="#6366f1" style="height: 50px;">
                     <select id="theme">
                         <option value="glass">💎 Glassmorphism (Vibrant)</option>
+                        <option value="neon-cyber">⚡ Neon Cyber (Cyberpunk)</option>
                         <option value="noir">🌑 Stealth Noir (Monochrome)</option>
-                        <option value="cyber">⚡ Neon Cyber (Futuristic)</option>
+                        <option value="cyber">☣️ Classic Cyber (Glitch)</option>
                         <option value="zen">🍃 Minimalist Zen (Clean)</option>
                     </select>
                     <label style="margin-top: 1rem; color: #4ade80;">🔗 Global Lead Webhook (Expert)</label>
@@ -378,6 +444,62 @@
                 </div>
             </div>
 
+            <!-- LP BUILDER PANEL -->
+            <div class="panel" id="panel-lp-builder">
+                <div class="control-group">
+                    <label style="color:#a78bfa;">🎨 Landing Page Builder</label>
+                    <p style="font-size:0.65rem; opacity:0.6; margin-bottom:10px;">Select an AI-generated landing page design, fill in your data, and bring it to life.</p>
+                </div>
+                <div class="control-group">
+                    <label>Choose Design</label>
+                    <div id="lp-designs-gallery" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
+                </div>
+                <div id="lp-builder-form" style="display:none;">
+                    <div class="control-group" style="border-top:1px solid var(--glass-border); padding-top:1rem; margin-top:0.5rem;">
+                        <label>Your Information</label>
+                        <input type="text" id="lp-fill-name" placeholder="Full Name" value="">
+                        <input type="text" id="lp-fill-title" placeholder="Job Title" value="">
+                        <input type="text" id="lp-fill-company" placeholder="Company" value="">
+                        <input type="email" id="lp-fill-email" placeholder="Email" value="">
+                        <input type="tel" id="lp-fill-phone" placeholder="Phone" value="">
+                        <input type="text" id="lp-fill-github" placeholder="GitHub Username" value="">
+                        <input type="text" id="lp-fill-linkedin" placeholder="LinkedIn Username" value="">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <button class="btn-generate" style="background:var(--primary);" onclick="previewLpDesign()">👁️ Preview</button>
+                        <button class="btn-generate" style="background:#22c55e;" onclick="loadLpToEditor()">✏️ Load to Editor</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD BUILDER PANEL -->
+            <div class="panel" id="panel-card-builder">
+                <div class="control-group">
+                    <label style="color:#f472b6;">💳 Card Builder</label>
+                    <p style="font-size:0.65rem; opacity:0.6; margin-bottom:10px;">Select an AI-generated card design, fill in your data, and create your business card.</p>
+                </div>
+                <div class="control-group">
+                    <label>Choose Design</label>
+                    <div id="card-designs-gallery" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
+                </div>
+                <div id="card-builder-form" style="display:none;">
+                    <div class="control-group" style="border-top:1px solid var(--glass-border); padding-top:1rem; margin-top:0.5rem;">
+                        <label>Your Information</label>
+                        <input type="text" id="card-fill-name" placeholder="Full Name" value="">
+                        <input type="text" id="card-fill-title" placeholder="Job Title" value="">
+                        <input type="text" id="card-fill-company" placeholder="Company" value="">
+                        <input type="email" id="card-fill-email" placeholder="Email" value="">
+                        <input type="tel" id="card-fill-phone" placeholder="Phone" value="">
+                        <input type="text" id="card-fill-github" placeholder="GitHub Username" value="">
+                        <input type="text" id="card-fill-linkedin" placeholder="LinkedIn Username" value="">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <button class="btn-generate" style="background:var(--primary);" onclick="previewCardDesign()">👁️ Preview</button>
+                        <button class="btn-generate" style="background:#22c55e;" onclick="loadCardToEditor()">✏️ Load to Editor</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- PUBLIC GALLERY PANEL -->
             <div class="panel" id="panel-gallery">
                 <div class="control-group">
@@ -422,19 +544,26 @@
                 <span style="color: var(--text-dim); font-size: 0.8rem;" id="preview-title">Live Preview</span>
                 <span id="status-tag" style="margin-left: 10px; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(34, 197, 94, 0.2); color: #4ade80;">Synced</span>
             </div>
+            <div class="view-controls">
+                <button class="view-btn active" data-view="mobile">Mobile</button>
+                <button class="view-btn" data-view="card">Card</button>
+                <button class="view-btn" data-view="both">Both</button>
+            </div>
         </header>
 
-        <!-- LANDING PREVIEW -->
-        <div class="preview-container active-preview" id="preview-landing">
-            <iframe id="preview-frame"></iframe>
-            <div class="preview-overlay" id="loader">
-                <div class="spinner">Rendering...</div>
+        <div class="preview-grid" id="main-preview-grid">
+            <!-- LANDING PREVIEW -->
+            <div class="preview-container active-preview phone-mockup" id="preview-landing">
+                <iframe id="preview-frame"></iframe>
+                <div class="preview-overlay" id="loader">
+                    <div class="spinner">Rendering...</div>
+                </div>
             </div>
-        </div>
 
-        <!-- CARD CANVAS -->
-        <div class="preview-container" id="preview-card" style="display:none; background: #0f172a; display: flex; align-items: center; justify-content: center;">
-            <canvas id="card-canvas"></canvas>
+            <!-- CARD CANVAS -->
+            <div class="preview-container" id="preview-card" style="display:none; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+                <canvas id="card-canvas"></canvas>
+            </div>
         </div>
     </main>
 
@@ -469,8 +598,10 @@
             },
             printableCard: {
                 layers: [
-                    { type: 'text', content: 'Ahmed Hany', x: 80, y: 150, style: { size: 64, color: 'white' } },
-                    { type: 'qr', x: 680, y: 150, size: 300 }
+                    { type: 'text', content: 'AHMED HANY', x: 60, y: 80, style: { size: 72, color: 'white' } },
+                    { type: 'text', content: 'LEAD DESIGNER', x: 60, y: 160, style: { size: 24, color: '#94a3b8' } },
+                    { type: 'text', content: 'ELITE DESIGN SUITE', x: 60, y: 200, style: { size: 32, color: '#6366f1' } },
+                    { type: 'qr', x: 680, y: 240, size: 300 }
                 ]
             }
         };
@@ -770,13 +901,55 @@
                 if (panel) panel.classList.add('active');
                 tab.classList.add('active');
                 
-                // Hide/Show preview areas
-                const isCard = panelId === 'card';
-                document.getElementById('preview-landing').style.display = isCard ? 'none' : 'block';
-                document.getElementById('preview-card').style.display = isCard ? 'flex' : 'none';
-                document.getElementById('preview-title').textContent = isCard ? 'Business Card Designer (Interactive)' : 'Landing Page Preview';
+                // If switching to Card Builder or Designer tab, auto-switch view to Card
+                if (panelId === 'card' || panelId === 'card-builder') {
+                    document.querySelector('[data-view="card"]').click();
+                } else {
+                    document.querySelector('[data-view="mobile"]').click();
+                }
 
-                if (panelId === 'card' && !canvas) initCanvas(); // Changed target to panelId
+                if (panelId === 'card' && !canvas) initCanvas();
+            });
+        });
+
+        // --- VIEW CONTROLS ---
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.view;
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const landing = document.getElementById('preview-landing');
+                const cardView = document.getElementById('preview-card');
+                const grid = document.getElementById('main-preview-grid');
+
+                if (view === 'mobile') {
+                    landing.style.display = 'block';
+                    landing.classList.add('phone-mockup');
+                    cardView.style.display = 'none';
+                    grid.classList.remove('split');
+                } else if (view === 'card') {
+                    landing.style.display = 'none';
+                    cardView.style.display = 'flex';
+                    grid.classList.remove('split');
+                    if (!canvas) initCanvas();
+                } else if (view === 'both') {
+                    landing.style.display = 'block';
+                    landing.classList.remove('phone-mockup');
+                    cardView.style.display = 'flex';
+                    grid.classList.add('split');
+                    if (!canvas) initCanvas();
+                }
+                
+                if (canvas) {
+                     setTimeout(() => {
+                        const wrapper = document.getElementById('preview-card');
+                        const scale = Math.min((wrapper.clientWidth - 40) / 1050, (wrapper.clientHeight - 40) / 600);
+                        canvas.setZoom(scale);
+                        canvas.setWidth(1050 * scale);
+                        canvas.setHeight(600 * scale);
+                     }, 100);
+                }
             });
         });
 
@@ -1562,6 +1735,252 @@
                 });
             }
         });
+
+        // ======================================================
+        // AI DESIGN BUILDERS (LP + Card)
+        // ======================================================
+        let selectedLpDesign = null;
+        let selectedCardDesign = null;
+
+        async function loadAiDesigns() {
+            try {
+                const res = await fetch('/api/ai-designs');
+                const designs = await res.json();
+
+                // Render Landing Page designs
+                const lpGallery = document.getElementById('lp-designs-gallery');
+                lpGallery.innerHTML = '';
+                if (designs.landing.length === 0) {
+                    lpGallery.innerHTML = '<p style="font-size:0.7rem; opacity:0.5; grid-column:1/-1;">No designs yet. Add images to ai_designs/landing page/</p>';
+                }
+                designs.landing.forEach(d => {
+                    const card = document.createElement('div');
+                    card.style = 'cursor:pointer; border:2px solid transparent; border-radius:10px; overflow:hidden; transition:all 0.3s; position:relative;';
+                    card.innerHTML = `
+                        <img src="${d.url}" style="width:100%; height:120px; object-fit:cover; display:block;">
+                        <div style="padding:6px; background:var(--glass);">
+                            <span style="font-size:0.6rem; color:var(--text-dim); word-break:break-all;">${d.name.slice(0, 20)}...</span>
+                        </div>
+                    `;
+                    card.onclick = () => {
+                        selectedLpDesign = d;
+                        lpGallery.querySelectorAll('div').forEach(c => c.style.borderColor = 'transparent');
+                        card.style.borderColor = '#a78bfa';
+                        card.style.boxShadow = '0 0 15px rgba(167,139,250,0.3)';
+                        document.getElementById('lp-builder-form').style.display = 'block';
+                        // Pre-fill from state
+                        document.getElementById('lp-fill-name').value = state.fullName || '';
+                        document.getElementById('lp-fill-title').value = state.jobTitle || '';
+                        document.getElementById('lp-fill-email').value = state.email || '';
+                        document.getElementById('lp-fill-phone').value = state.phone || '';
+                    };
+                    lpGallery.appendChild(card);
+                });
+
+                // Render Card designs
+                const cardGallery = document.getElementById('card-designs-gallery');
+                cardGallery.innerHTML = '';
+                if (designs.card.length === 0) {
+                    cardGallery.innerHTML = '<p style="font-size:0.7rem; opacity:0.5; grid-column:1/-1;">No designs yet. Add images to ai_designs/card/</p>';
+                }
+                designs.card.forEach(d => {
+                    const card = document.createElement('div');
+                    card.style = 'cursor:pointer; border:2px solid transparent; border-radius:10px; overflow:hidden; transition:all 0.3s; position:relative;';
+                    card.innerHTML = `
+                        <img src="${d.url}" style="width:100%; height:90px; object-fit:cover; display:block;">
+                        <div style="padding:6px; background:var(--glass);">
+                            <span style="font-size:0.6rem; color:var(--text-dim); word-break:break-all;">${d.name.slice(0, 20)}...</span>
+                        </div>
+                    `;
+                    card.onclick = () => {
+                        selectedCardDesign = d;
+                        cardGallery.querySelectorAll('div').forEach(c => c.style.borderColor = 'transparent');
+                        card.style.borderColor = '#f472b6';
+                        card.style.boxShadow = '0 0 15px rgba(244,114,182,0.3)';
+                        document.getElementById('card-builder-form').style.display = 'block';
+                        // Pre-fill from state
+                        document.getElementById('card-fill-name').value = state.fullName || '';
+                        document.getElementById('card-fill-title').value = state.jobTitle || '';
+                        document.getElementById('card-fill-email').value = state.email || '';
+                        document.getElementById('card-fill-phone').value = state.phone || '';
+                    };
+                    cardGallery.appendChild(card);
+                });
+            } catch (err) {
+                console.error('Failed to load AI designs:', err);
+            }
+        }
+
+        // --- LP Builder Actions ---
+        window.previewLpDesign = function() {
+            if (!selectedLpDesign) return alert('Select a design first');
+            const data = {
+                name: document.getElementById('lp-fill-name').value || 'NAME',
+                title: document.getElementById('lp-fill-title').value || 'TITLE',
+                company: document.getElementById('lp-fill-company').value || 'COMPANY',
+                email: document.getElementById('lp-fill-email').value || 'EMAIL',
+                phone: document.getElementById('lp-fill-phone').value || 'PHONE',
+                github: document.getElementById('lp-fill-github').value || 'GITHUB_USERNAME',
+                linkedin: document.getElementById('lp-fill-linkedin').value || 'LINKEDIN_USERNAME'
+            };
+
+            // Show design image with data overlay in preview iframe
+            const html = `<!DOCTYPE html>
+            <html><head><style>
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { background:#0a0f1e; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; font-family:Inter,sans-serif; }
+                .wrapper { position:relative; width:100%; max-width:500px; margin:0 auto; }
+                .wrapper img { width:100%; display:block; }
+                .overlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px; background:rgba(0,0,0,0.5); padding:2rem; }
+                .overlay h1 { color:white; font-size:2rem; text-shadow:0 2px 10px rgba(0,0,0,0.8); }
+                .overlay h2 { color:#d4a574; font-size:1.2rem; }
+                .overlay h3 { color:#f472b6; font-size:1rem; font-weight:bold; }
+                .overlay .info { color:rgba(255,255,255,0.9); font-size:0.85rem; display:flex; align-items:center; gap:8px; }
+                .badge { background:rgba(167,139,250,0.3); padding:4px 12px; border-radius:20px; font-size:0.75rem; color:#a78bfa; border:1px solid rgba(167,139,250,0.4); }
+            </style></head>
+            <body>
+                <div class="wrapper">
+                    <img src="${selectedLpDesign.url}" alt="Design Preview">
+                    <div class="overlay">
+                        <h1>${data.name}</h1>
+                        <h2>${data.title}</h2>
+                        <h3>${data.company}</h3>
+                        <div class="info">📧 ${data.email}</div>
+                        <div class="info">📱 ${data.phone}</div>
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <span class="badge">🐙 ${data.github}</span>
+                            <span class="badge">💼 ${data.linkedin}</span>
+                        </div>
+                    </div>
+                </div>
+            </body></html>`;
+
+            document.getElementById('preview-landing').style.display = 'block';
+            document.getElementById('preview-card').style.display = 'none';
+            document.getElementById('preview-frame').srcdoc = html;
+            document.getElementById('preview-title').textContent = '🎨 LP Builder Preview';
+        };
+
+        window.loadLpToEditor = function() {
+            if (!selectedLpDesign) return alert('Select a design first');
+            const name = document.getElementById('lp-fill-name').value || state.fullName;
+            const title = document.getElementById('lp-fill-title').value || state.jobTitle;
+            const email = document.getElementById('lp-fill-email').value || '';
+            const phone = document.getElementById('lp-fill-phone').value || '';
+            const github = document.getElementById('lp-fill-github').value || '';
+            const linkedin = document.getElementById('lp-fill-linkedin').value || '';
+
+            pushHistory();
+            state.fullName = name;
+            state.jobTitle = title;
+            state.email = email;
+            state.phone = phone;
+
+            // Update profile components with new data
+            state.pages.forEach(p => {
+                p.components.forEach(c => {
+                    if (c.type === 'profile' || c.type === 'nano-profile') {
+                        c.data.name = name;
+                        c.data.fullName = name;
+                        c.data.jobTitle = title;
+                    }
+                });
+            });
+
+            syncUiFromState();
+            renderComponentList();
+            triggerPreviewUpdate();
+            document.querySelector('[data-panel="landing"]').click();
+            alert('✅ Data loaded into editor! Switch to Landing Page tab to customize.');
+        };
+
+        // --- Card Builder Actions ---
+        window.previewCardDesign = function() {
+            if (!selectedCardDesign) return alert('Select a design first');
+            const data = {
+                name: document.getElementById('card-fill-name').value || 'NAME',
+                title: document.getElementById('card-fill-title').value || 'TITLE',
+                company: document.getElementById('card-fill-company').value || 'COMPANY',
+                email: document.getElementById('card-fill-email').value || 'EMAIL',
+                phone: document.getElementById('card-fill-phone').value || 'PHONE',
+                github: document.getElementById('card-fill-github').value || 'GITHUB_USERNAME',
+                linkedin: document.getElementById('card-fill-linkedin').value || 'LINKEDIN_USERNAME'
+            };
+
+            // Show card design with data overlay in preview area
+            const html = `<!DOCTYPE html>
+            <html><head><style>
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { background:#0a0f1e; display:flex; justify-content:center; align-items:center; min-height:100vh; font-family:Inter,sans-serif; }
+                .card-wrapper { position:relative; width:100%; max-width:700px; aspect-ratio:1050/600; }
+                .card-wrapper img { width:100%; height:100%; object-fit:cover; border-radius:12px; }
+                .card-overlay { position:absolute; top:0; left:0; right:0; bottom:0; padding:8% 6%; display:flex; flex-direction:column; justify-content:space-between; }
+                .top h1 { color:white; font-size:clamp(1.2rem,4vw,2.5rem); font-weight:900; text-shadow:0 2px 15px rgba(0,0,0,0.9); margin-bottom:4px; }
+                .top h2 { color:#d4a574; font-size:clamp(0.7rem,2vw,1.1rem); text-shadow:0 1px 8px rgba(0,0,0,0.8); margin-bottom:2px; }
+                .top h3 { color:#f472b6; font-size:clamp(0.65rem,1.8vw,1rem); font-weight:bold; text-shadow:0 1px 8px rgba(0,0,0,0.8); }
+                .bottom { display:flex; flex-direction:column; gap:4px; }
+                .bottom .line { color:rgba(255,255,255,0.9); font-size:clamp(0.55rem,1.5vw,0.8rem); display:flex; align-items:center; gap:6px; text-shadow:0 1px 6px rgba(0,0,0,0.8); }
+            </style></head>
+            <body>
+                <div class="card-wrapper">
+                    <img src="${selectedCardDesign.url}" alt="Card Preview">
+                    <div class="card-overlay">
+                        <div class="top">
+                            <h1>${data.name}</h1>
+                            <h2>${data.title}</h2>
+                            <h3>${data.company}</h3>
+                        </div>
+                        <div class="bottom">
+                            <div class="line">📧 ${data.email}</div>
+                            <div class="line">📱 ${data.phone}</div>
+                            <div class="line">🐙 ${data.github}</div>
+                            <div class="line">💼 ${data.linkedin}</div>
+                        </div>
+                    </div>
+                </div>
+            </body></html>`;
+
+            document.getElementById('preview-landing').style.display = 'block';
+            document.getElementById('preview-card').style.display = 'none';
+            document.getElementById('preview-frame').srcdoc = html;
+            document.getElementById('preview-title').textContent = '💳 Card Builder Preview';
+        };
+
+        window.loadCardToEditor = function() {
+            if (!selectedCardDesign) return alert('Select a design first');
+            const name = document.getElementById('card-fill-name').value || state.fullName;
+            const title = document.getElementById('card-fill-title').value || state.jobTitle;
+
+            pushHistory();
+            state.fullName = name;
+            state.jobTitle = title;
+
+            // Update card layers with user data
+            if (state.printableCard && state.printableCard.layers) {
+                state.printableCard.layers.forEach(layer => {
+                    if (layer.type === 'text') {
+                        if (layer.content === state.fullName || layer.content.includes('Name')) {
+                            layer.content = name;
+                        }
+                    }
+                });
+            }
+            // Ensure there are text layers for the card
+            state.printableCard = state.printableCard || { layers: [] };
+            state.printableCard.layers = [
+                { type: 'text', content: name, x: 80, y: 150, style: { size: 64, color: 'white' } },
+                { type: 'text', content: title, x: 80, y: 230, style: { size: 32, color: 'white' } },
+                { type: 'qr', x: 680, y: 150, size: 300 }
+            ];
+
+            syncUiFromState();
+            if (canvas) syncCanvasFromState();
+            document.querySelector('[data-panel="card"]').click();
+            alert('✅ Card data loaded! Switch to Card Design tab to customize.');
+        };
+
+        // Init builders on load
+        loadAiDesigns();
     </script>
 </body>
 </html>

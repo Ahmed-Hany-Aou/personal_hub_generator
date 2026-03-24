@@ -700,16 +700,47 @@ const GALLERY_TEMPLATES_DIR = safePathJoin(__dirname, 'templates', 'gallery');
 app.get('/api/templates', (req, res) => {
     if (!fs.existsSync(GALLERY_TEMPLATES_DIR)) return res.json([]);
     const files = fs.readdirSync(GALLERY_TEMPLATES_DIR).filter(f => f.endsWith('.json'));
-    const templates = files.map(f => {
-        const data = JSON.parse(fs.readFileSync(path.join(GALLERY_TEMPLATES_DIR, f), 'utf8'));
-        return {
-            id: path.parse(f).name,
-            name: data.name,
-            description: data.description,
-            config: data.config
-        };
-    });
+    const templates = files.reduce((acc, f) => {
+        try {
+            const raw = fs.readFileSync(path.join(GALLERY_TEMPLATES_DIR, f), 'utf8').trim();
+            if (!raw) return acc; // skip empty files
+            const data = JSON.parse(raw);
+            acc.push({
+                id: path.parse(f).name,
+                name: data.name,
+                description: data.description,
+                config: data.config
+            });
+        } catch (e) {
+            console.warn(`⚠️  Skipping invalid template file: ${f} (${e.message})`);
+        }
+        return acc;
+    }, []);
     res.json(templates);
+});
+
+// --- AI DESIGNS GALLERY API ---
+const AI_DESIGNS_DIR = path.join(__dirname, 'ai_designs');
+app.use('/ai-designs', express.static(AI_DESIGNS_DIR));
+
+app.get('/api/ai-designs', (req, res) => {
+    const result = { card: [], landing: [] };
+    
+    const cardDir = path.join(AI_DESIGNS_DIR, 'card');
+    if (fs.existsSync(cardDir)) {
+        result.card = fs.readdirSync(cardDir)
+            .filter(f => /\.(png|jpg|jpeg|webp|gif)$/i.test(f))
+            .map(f => ({ name: f, url: `/ai-designs/card/${encodeURIComponent(f)}` }));
+    }
+    
+    const landingDir = path.join(AI_DESIGNS_DIR, 'landing page');
+    if (fs.existsSync(landingDir)) {
+        result.landing = fs.readdirSync(landingDir)
+            .filter(f => /\.(png|jpg|jpeg|webp|gif)$/i.test(f))
+            .map(f => ({ name: f, url: `/ai-designs/landing%20page/${encodeURIComponent(f)}` }));
+    }
+    
+    res.json(result);
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,0 +1,80 @@
+{
+  "id": "66e5044d-cb2f-47c1-83cf-2f66150fc840",
+  "lastModified": "2026-03-19T20:22:07.629Z",
+  "config": {
+    "fullName": "Ahmed Hany",
+    "jobTitle": "Lead Designer",
+    "accentColor": "#6366f1",
+    "phone": "+20 123 456 7890",
+    "email": "ahmed@example.com",
+    "pages": [
+      {
+        "slug": "index",
+        "name": "Home",
+        "theme": "glass",
+        "components": [
+          {
+            "type": "profile",
+            "data": {
+              "profileImage": "https://api.dicebear.com/7.x/initials/svg?seed=AH",
+              "name": "Ahmed Hany",
+              "jobTitle": "Lead Designer"
+            }
+          },
+          {
+            "type": "link-item",
+            "data": {
+              "url": "https://github.com/Ahmed-Hany-Aou",
+              "label": "🚀 My GitHub"
+            }
+          },
+          {
+            "type": "social-icons",
+            "data": {
+              "links": [
+                {
+                  "url": "https://github.com/ahmedhany",
+                  "label": "GitHub"
+                }
+              ]
+            }
+          },
+          {
+            "type": "footer",
+            "data": {
+              "footerText": "Elite Design Suite"
+            }
+          }
+        ]
+      }
+    ],
+    "activePageSlug": "index",
+    "partyMode": false,
+    "globalLeadWebhook": "",
+    "seo": {
+      "title": "Ahmed Hany | Pro Hub",
+      "description": "Personal portfolio and links of Ahmed Hany, Lead Designer.",
+      "ogImage": ""
+    },
+    "printableCard": {
+      "layers": [
+        {
+          "type": "text",
+          "content": "Ahmed Hany",
+          "x": 80,
+          "y": 150,
+          "style": {
+            "size": 64,
+            "color": "white"
+          }
+        },
+        {
+          "type": "qr",
+          "x": 680,
+          "y": 150,
+          "size": 300
+        }
+      ]
+    }
+  }
+}

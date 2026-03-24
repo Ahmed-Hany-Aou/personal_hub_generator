@@ -1,0 +1,10 @@
+{
+  "name": "NanoBana2 Tech Suite",
+  "description": "A premium cyberpunk landing page + business card combo",
+  "collection": "nanobana2",
+  "config": {
+    "theme": "cyber-dark",
+    "primaryColor": "#a78bfa",
+    "accentColor": "#f472b6"
+  }
+}

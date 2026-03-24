@@ -1,0 +1,96 @@
+{
+  "id": "8be4428d-c8e5-49b8-bec8-84504ac3e998",
+  "lastModified": "2026-03-19T21:19:20.555Z",
+  "config": {
+    "fullName": "Ahmed Hany",
+    "jobTitle": "Lead Designer",
+    "accentColor": "#00ffcc",
+    "phone": "+20 123 456 7890",
+    "email": "ahmed@example.com",
+    "pages": [
+      {
+        "slug": "index",
+        "name": "Home",
+        "theme": "cyber",
+        "components": [
+          {
+            "type": "profile",
+            "data": {
+              "profileImage": "https://api.dicebear.com/7.x/bottts/svg?seed=Cyber",
+              "name": "Ahmed Hany",
+              "jobTitle": "CYBER_ARCHITECT"
+            }
+          },
+          {
+            "type": "cta-button",
+            "data": {
+              "label": "INITIATE CONTACT",
+              "url": "#",
+              "style": "pulse",
+              "color": "#00ffcc"
+            }
+          },
+          {
+            "type": "social-icons",
+            "data": {
+              "links": [
+                {
+                  "url": "https://github.com",
+                  "label": "GITHUB"
+                },
+                {
+                  "url": "https://twitter.com",
+                  "label": "TWITTER"
+                }
+              ]
+            }
+          },
+          {
+            "type": "footer",
+            "data": {
+              "footerText": "// END_OF_TRANSMISSION"
+            }
+          }
+        ]
+      }
+    ],
+    "activePageSlug": "index",
+    "partyMode": false,
+    "globalLeadWebhook": "",
+    "seo": {
+      "title": "Ahmed Hany | Pro Hub",
+      "description": "Personal portfolio and links of Ahmed Hany, Lead Designer.",
+      "ogImage": ""
+    },
+    "printableCard": {
+      "layers": [
+        {
+          "type": "text",
+          "content": "Ahmed Hany",
+          "x": 80,
+          "y": 150,
+          "style": {
+            "size": 64,
+            "color": "white"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Lead Designer",
+          "x": 80,
+          "y": 230,
+          "style": {
+            "size": 32,
+            "color": "white"
+          }
+        },
+        {
+          "type": "qr",
+          "x": 680,
+          "y": 150,
+          "size": 300
+        }
+      ]
+    }
+  }
+}
