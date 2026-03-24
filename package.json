@@ -1,19 +1,36 @@
 {
   "dependencies": {
     "@inquirer/input": "^2.1.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "fs": "^0.0.1-security",
+    "html2canvas": "^1.4.1",
     "inquirer": "^9.2.16",
     "jimp": "^1.6.0",
-    "qr-image": "^3.2.0"
+    "jszip": "^3.10.1",
+    "qr-image": "^3.2.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.2"
   },
   "name": "2.4-qr-code-project",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "dev": "vite --config client/vite.config.js",
+    "build": "vite build --config client/vite.config.js",
+    "server": "node server/index.js",
+    "client": "vite --config client/vite.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "vite": "^8.0.2"
+  }
 }

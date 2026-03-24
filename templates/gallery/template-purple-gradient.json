@@ -1,0 +1,31 @@
+{
+  "id": "template-purple-gradient",
+  "name": "Purple Gradient",
+  "category": "creative",
+  "tags": ["purple", "gradient", "bold", "vibrant"],
+  "description": "Bold purple-to-indigo gradient card with white text — great for creatives.",
+  "theme": {
+    "bg": "#4f46e5",
+    "cardBg": "linear-gradient(135deg, #6d28d9, #4f46e5)",
+    "accent": "#f9a8d4",
+    "textPrimary": "#ffffff",
+    "textSecondary": "rgba(255,255,255,0.75)",
+    "glassBackground": "rgba(255,255,255,0.1)",
+    "fontHeading": "Poppins",
+    "fontBody": "Inter"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "githubHandle", "linkedinHandle", "profileUrl"],
+    "defaults": {
+      "userName": "Maya Rivera",
+      "userTitle": "Creative Director",
+      "companyName": "Vivid Agency",
+      "userEmail": "maya@vividagency.co",
+      "userPhone": "+1 (555) 321-0987",
+      "githubHandle": "mayarivera",
+      "linkedinHandle": "maya-rivera-creative",
+      "profileUrl": "https://mayarivera.co"
+    }
+  }
+}
