@@ -1,0 +1,153 @@
+.card {
+  position: relative;
+  width: 1050px;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 50px 60px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  transform-origin: top left;
+  scale: 0.65;
+  margin-bottom: -210px;
+  margin-right: -367.5px;
+}
+
+@media (max-width: 1200px) {
+  .card {
+    scale: 0.5;
+    margin-bottom: -300px;
+    margin-right: -525px;
+  }
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,211,238,0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1;
+}
+
+.name {
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  line-height: 1.1;
+}
+
+.title {
+  font-size: 18px;
+  letter-spacing: 2px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.company {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.divider {
+  width: 320px;
+  height: 1px;
+  margin: 10px 0;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.icon {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.qrArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.qrBox {
+  width: 130px;
+  height: 130px;
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+}
+
+.qrInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+.qrLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.qrDots {
+  flex: 1;
+  width: 100%;
+  background-image:
+    radial-gradient(circle, currentColor 2px, transparent 2px);
+  background-size: 12px 12px;
+  opacity: 0.3;
+}
+
+.qrCaption {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

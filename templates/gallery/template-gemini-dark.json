@@ -1,0 +1,31 @@
+{
+  "id": "template-gemini-dark",
+  "name": "Dark Tech Pro",
+  "category": "technology",
+  "tags": ["dark", "cyber", "tech", "neon", "cyan"],
+  "description": "Dark tech business card with cyan accents and a matching mobile landing page.",
+  "theme": {
+    "bg": "#0a0f16",
+    "cardBg": "#0d1520",
+    "accent": "#22d3ee",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#a0a0b0",
+    "glassBackground": "rgba(255,255,255,0.05)",
+    "fontHeading": "Poppins",
+    "fontBody": "Inter"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "githubHandle", "linkedinHandle", "profileUrl"],
+    "defaults": {
+      "userName": "Alex Chen",
+      "userTitle": "Senior Full-Stack Engineer",
+      "companyName": "Neural Dynamics LLC",
+      "userEmail": "alex@neuraldynamics.io",
+      "userPhone": "+1 (555) 000-1234",
+      "githubHandle": "alexchen-dev",
+      "linkedinHandle": "alex-chen-eng",
+      "profileUrl": "https://yourpage.com"
+    }
+  }
+}

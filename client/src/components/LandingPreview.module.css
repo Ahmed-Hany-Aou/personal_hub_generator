@@ -1,0 +1,172 @@
+.page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px 32px;
+  gap: 28px;
+  font-family: var(--font-body), 'Inter', sans-serif;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 16px;
+  text-align: center;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  margin-bottom: 8px;
+}
+
+.name {
+  font-family: var(--font-heading), 'Poppins', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+
+.title {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.company {
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-family: var(--font-heading), 'Poppins', sans-serif;
+  margin-bottom: 4px;
+}
+
+.glassCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.glassCard:hover { opacity: 0.85; }
+
+.glassIcon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+.glassLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.glassValue {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.socialRow {
+  display: flex;
+  gap: 10px;
+}
+
+.socialBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.socialBtn:hover { opacity: 0.8; }
+
+.qrBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.qrPlaceholder {
+  width: 70px;
+  height: 70px;
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qrMock {
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, currentColor 2px, transparent 2px);
+  background-size: 10px 10px;
+  opacity: 0.3;
+}
+
+.qrScan {
+  font-family: var(--font-heading), 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.qrUrl {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.saveBtn {
+  padding: 16px;
+  border-radius: 14px;
+  text-align: center;
+  font-family: var(--font-heading), 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0a0f16;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
