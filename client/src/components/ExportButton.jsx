@@ -100,16 +100,33 @@ export default function ExportButton({ values, template }) {
     try {
       const zip = new JSZip();
 
-      const cardEl = document.getElementById('card-canvas');
+      const cardEl = document.getElementById('card-export-target');
       if (cardEl) {
-        const canvas = await html2canvas(cardEl, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: template.theme.bg,
-          logging: false,
-        });
-        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-        zip.file('business-card.png', blob);
+        const clone = cardEl.cloneNode(true);
+        clone.style.transform = 'none';
+        clone.style.position = 'fixed';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        clone.style.width = '1050px';
+        clone.style.height = '600px';
+        clone.style.borderRadius = '16px';
+        clone.style.overflow = 'hidden';
+        document.body.appendChild(clone);
+        try {
+          const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: template.theme.bg,
+            logging: false,
+            width: 1050,
+            height: 600,
+          });
+          const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+          zip.file('business-card.png', blob);
+        } finally {
+          document.body.removeChild(clone);
+        }
       }
 
       const profileUrl = values.profileUrl || `mailto:${values.userEmail}` || 'https://yourpage.com';
@@ -117,8 +134,8 @@ export default function ExportButton({ values, template }) {
         width: 400,
         margin: 2,
         color: {
-          dark: template.theme.accent.replace('#', '') === template.theme.accent ? template.theme.accent : template.theme.accent,
-          light: '#00000000',
+          dark: template.theme.accent,
+          light: template.theme.bg,
         },
       });
       const qrBase64 = qrDataUrl.split(',')[1];
