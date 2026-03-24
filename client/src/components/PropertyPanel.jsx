@@ -8,7 +8,16 @@ const FIELD_LABELS = {
   userPhone: 'Phone',
   githubHandle: 'GitHub Username',
   linkedinHandle: 'LinkedIn Username',
+  xHandle: 'X / Twitter Username',
+  instagramHandle: 'Instagram Username',
+  facebookHandle: 'Facebook Username',
+  snapchatHandle: 'Snapchat Username',
+  threadsHandle: 'Threads Username',
+  youtubeHandle: 'YouTube URL/Channel',
   profileUrl: 'Profile URL',
+  avatarInitials: 'Custom Avatar Initials',
+  companyLogo: 'Company Logo URL',
+  userAvatar: 'Profile Picture URL',
 };
 
 const FIELD_ICONS = {
@@ -19,7 +28,16 @@ const FIELD_ICONS = {
   userPhone: '☎',
   githubHandle: '⌥',
   linkedinHandle: '🔗',
+  xHandle: '𝕏',
+  instagramHandle: '📸',
+  facebookHandle: '📘',
+  snapchatHandle: '👻',
+  threadsHandle: '🧵',
+  youtubeHandle: '▶️',
   profileUrl: '🌐',
+  avatarInitials: '🔤',
+  companyLogo: '🖼️',
+  userAvatar: '🙎',
 };
 
 export default function PropertyPanel({ template, values, onChange }) {
@@ -61,6 +79,19 @@ export default function PropertyPanel({ template, values, onChange }) {
 }
 
 function Field({ fieldKey, value, onChange, required }) {
+  const isImageField = fieldKey === 'userAvatar' || fieldKey === 'companyLogo';
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange(fieldKey, reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className={styles.field}>
       <label className={styles.label}>
@@ -68,13 +99,33 @@ function Field({ fieldKey, value, onChange, required }) {
         {FIELD_LABELS[fieldKey] || fieldKey}
         {required && <span className={styles.req}>*</span>}
       </label>
-      <input
-        className={styles.input}
-        type={fieldKey === 'userEmail' ? 'email' : fieldKey === 'profileUrl' ? 'url' : 'text'}
-        value={value}
-        placeholder={FIELD_LABELS[fieldKey]}
-        onChange={e => onChange(fieldKey, e.target.value)}
-      />
+      <div className={styles.inputGroup}>
+        <input
+          className={styles.input}
+          type={fieldKey === 'userEmail' ? 'email' : fieldKey === 'profileUrl' ? 'url' : 'text'}
+          value={value}
+          placeholder={FIELD_LABELS[fieldKey]}
+          onChange={e => onChange(fieldKey, e.target.value)}
+        />
+        {isImageField && (
+          <>
+            <label className={styles.uploadBtn}>
+              Upload
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
+            {value && (
+              <button 
+                type="button" 
+                className={styles.clearBtn} 
+                onClick={() => onChange(fieldKey, '')}
+                title="Clear image"
+              >
+                ✕
+              </button>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

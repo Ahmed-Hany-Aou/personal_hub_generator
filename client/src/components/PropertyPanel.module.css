@@ -70,15 +70,59 @@
   margin-left: auto;
 }
 
+.inputGroup {
+  display: flex;
+  gap: 8px;
+}
+
 .input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 0.82rem;
-  color: var(--text);
+  flex: 1;
   width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-modifier-hover);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  color: var(--text-normal);
+  font-family: inherit;
+  font-size: 0.9rem;
+  min-width: 0;
   transition: border-color 0.15s;
+}
+
+.uploadBtn {
+  background: var(--interactive-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uploadBtn:hover {
+  opacity: 0.9;
+}
+
+.clearBtn {
+  background: rgba(255, 60, 60, 0.15);
+  color: #ff5555;
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.clearBtn:hover {
+  background: rgba(255, 60, 60, 0.25);
+  color: #ff3333;
 }
 
 .input:focus {

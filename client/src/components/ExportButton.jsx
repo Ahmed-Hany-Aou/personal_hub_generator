@@ -15,6 +15,12 @@ function generateVCard(values) {
     `TEL:${values.userPhone || ''}`,
     values.githubHandle ? `URL:https://github.com/${values.githubHandle}` : '',
     values.linkedinHandle ? `URL:https://linkedin.com/in/${values.linkedinHandle}` : '',
+    values.xHandle ? `URL:https://x.com/${values.xHandle}` : '',
+    values.instagramHandle ? `URL:https://instagram.com/${values.instagramHandle}` : '',
+    values.facebookHandle ? `URL:https://facebook.com/${values.facebookHandle}` : '',
+    values.snapchatHandle ? `URL:https://snapchat.com/add/${values.snapchatHandle}` : '',
+    values.youtubeHandle ? `URL:https://youtube.com/${values.youtubeHandle}` : '',
+    values.threadsHandle ? `URL:https://threads.net/@${values.threadsHandle}` : '',
     values.profileUrl ? `URL:${values.profileUrl}` : '',
     'END:VCARD',
   ].filter(Boolean).join('\r\n');
@@ -27,7 +33,7 @@ function generateLandingHTML(theme, values) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${values.userName || 'Digital Card'}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{background:${theme.bg};color:${theme.textPrimary};font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
@@ -57,7 +63,9 @@ function generateLandingHTML(theme, values) {
 <body>
   <div class="card">
     <div class="hero">
-      <div class="avatar">${(values.userName || 'U').charAt(0).toUpperCase()}</div>
+      <div class="avatar">
+        ${values.userAvatar ? `<img src="${values.userAvatar}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%" />` : (values.avatarInitials ? values.avatarInitials.substring(0, 3).toUpperCase() : (values.userName || 'U').substring(0, 2).toUpperCase())}
+      </div>
       <h1>${values.userName || ''}</h1>
       <div class="title-sub">${values.userTitle || ''}</div>
       ${values.companyName ? `<div class="company">${values.companyName}</div>` : ''}
@@ -67,12 +75,18 @@ function generateLandingHTML(theme, values) {
       ${values.userEmail ? `<a href="mailto:${values.userEmail}" class="glass"><span class="icon-col">✉</span><div><div class="label">Email</div><div class="value">${values.userEmail}</div></div></a>` : ''}
       ${values.userPhone ? `<a href="tel:${values.userPhone}" class="glass"><span class="icon-col">☎</span><div><div class="label">Phone</div><div class="value">${values.userPhone}</div></div></a>` : ''}
     </div>
-    ${(values.githubHandle || values.linkedinHandle) ? `
+    ${(values.githubHandle || values.linkedinHandle || values.xHandle || values.facebookHandle || values.instagramHandle || values.snapchatHandle || values.youtubeHandle || values.threadsHandle) ? `
     <div>
       <div class="section-label">Social</div>
-      <div class="social-row">
+      <div class="social-row" style="flex-wrap: wrap;">
         ${values.githubHandle ? `<a href="https://github.com/${values.githubHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">⌥</span> GitHub</a>` : ''}
         ${values.linkedinHandle ? `<a href="https://linkedin.com/in/${values.linkedinHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">🔗</span> LinkedIn</a>` : ''}
+        ${values.xHandle ? `<a href="https://x.com/${values.xHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">𝕏</span> X</a>` : ''}
+        ${values.facebookHandle ? `<a href="https://facebook.com/${values.facebookHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">📘</span> Facebook</a>` : ''}
+        ${values.instagramHandle ? `<a href="https://instagram.com/${values.instagramHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">📸</span> Instagram</a>` : ''}
+        ${values.youtubeHandle ? `<a href="https://youtube.com/${values.youtubeHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">▶️</span> YouTube</a>` : ''}
+        ${values.snapchatHandle ? `<a href="https://snapchat.com/add/${values.snapchatHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">👻</span> Snapchat</a>` : ''}
+        ${values.threadsHandle ? `<a href="https://threads.net/@${values.threadsHandle}" target="_blank" class="social-btn"><span style="color:${theme.accent}">🧵</span> Threads</a>` : ''}
       </div>
     </div>` : ''}
     ${values.profileUrl ? `

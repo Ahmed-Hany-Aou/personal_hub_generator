@@ -1,7 +1,19 @@
+import { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import styles from './CardCanvas.module.css';
 
 export default function CardCanvas({ theme, values }) {
   const isGradient = (theme.cardBg || theme.bg).includes('gradient');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+
+  useEffect(() => {
+    const url = values.profileUrl || 'https://yourpage.com';
+    QRCode.toDataURL(url, {
+      width: 260,
+      margin: 1,
+      color: { dark: theme.accent, light: theme.bg }
+    }).then(setQrCodeUrl).catch(console.error);
+  }, [values.profileUrl, theme.accent, theme.bg]);
 
   return (
     <div className={styles.scaleWrapper}>
@@ -11,8 +23,12 @@ export default function CardCanvas({ theme, values }) {
         style={{
           background: isGradient ? theme.cardBg : theme.bg,
           backgroundColor: !isGradient ? theme.bg : undefined,
+          '--accent': theme.accent,
+          '--font-heading': theme.fontHeading || 'Poppins',
+          '--font-body': theme.fontBody || 'Inter',
         }}
       >
+        {theme.accentBar && <div className={styles.accentBar} style={{ background: theme.accent }} />}
         <div className={styles.grid} />
         <div className={styles.glow} />
 
@@ -23,6 +39,9 @@ export default function CardCanvas({ theme, values }) {
           >
             {(values.userName || '').toUpperCase()}
           </div>
+          {values.companyLogo && (
+            <img src={values.companyLogo} alt="Logo" className={styles.cardLogo} />
+          )}
 
           <div
             className={styles.title}
@@ -74,11 +93,15 @@ export default function CardCanvas({ theme, values }) {
         </div>
 
         <div className={styles.qrArea}>
-          <div className={styles.qrBox} style={{ borderColor: `${theme.accent}80` }}>
-            <div className={styles.qrInner} style={{ color: theme.accent }}>
-              <div className={styles.qrLabel} style={{ color: `${theme.accent}90` }}>SCAN</div>
-              <div className={styles.qrDots} />
-            </div>
+          <div className={styles.qrBox} style={{ borderColor: `${theme.accent}80`, padding: qrCodeUrl ? 0 : 10, overflow: 'hidden' }}>
+            {qrCodeUrl ? (
+              <img src={qrCodeUrl} alt="QR Code" style={{ width: '100%', height: '100%', borderRadius: '10px' }} />
+            ) : (
+              <div className={styles.qrInner} style={{ color: theme.accent }}>
+                <div className={styles.qrLabel} style={{ color: `${theme.accent}90` }}>SCAN</div>
+                <div className={styles.qrDots} />
+              </div>
+            )}
           </div>
           <div className={styles.qrCaption} style={{ color: `${theme.accent}70` }}>
             {values.profileUrl ? values.profileUrl.replace(/^https?:\/\//, '') : 'yourpage.com'}
