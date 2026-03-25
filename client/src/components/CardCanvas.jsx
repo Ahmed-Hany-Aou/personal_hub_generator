@@ -3,10 +3,23 @@ import QRCode from 'qrcode';
 import styles from './CardCanvas.module.css';
 import DraggableNode from './DraggableNode.jsx';
 
-export default function CardCanvas({ 
-  theme, 
-  values, 
-  width, 
+const CONTACT_MAP = [
+  { id: 'card-email',     icon: '✉️', label: v => v.userEmail      || null },
+  { id: 'card-phone',     icon: '📞', label: v => v.userPhone      || null },
+  { id: 'card-github',    icon: '⌥',  label: v => v.githubHandle   ? `github.com/${v.githubHandle}`   : null },
+  { id: 'card-linkedin',  icon: '🔗', label: v => v.linkedinHandle ? `in/${v.linkedinHandle}`          : null },
+  { id: 'card-x',         icon: '𝕏',  label: v => v.xHandle        ? `@${v.xHandle}`                  : null },
+  { id: 'card-facebook',  icon: '📘', label: v => v.facebookHandle ? `fb.com/${v.facebookHandle}`     : null },
+  { id: 'card-instagram', icon: '📸', label: v => v.instagramHandle ? `@${v.instagramHandle}`          : null },
+  { id: 'card-youtube',   icon: '▶️', label: v => v.youtubeHandle  || null },
+  { id: 'card-snapchat',  icon: '👻', label: v => v.snapchatHandle  || null },
+  { id: 'card-threads',   icon: '🧵', label: v => v.threadsHandle  ? `@${v.threadsHandle}`            : null },
+];
+
+export default function CardCanvas({
+  theme,
+  values,
+  width,
   height,
   isFreeform,
   layoutState,
@@ -38,7 +51,6 @@ export default function CardCanvas({
     return 'horizontal';
   };
 
-  // Common DraggableNode props
   const dn = (id) => ({
     id,
     isFreeform,
@@ -48,6 +60,27 @@ export default function CardCanvas({
     canvasRef,
   });
 
+  /**
+   * Build inline styles for inner content divs by merging base (theme) styles
+   * with per-node overrides from layoutState. This lets fontSize, fontFamily,
+   * color, etc. override the CSS class values directly on the element.
+   */
+  const ns = (id, base = {}) => {
+    const s = layoutState?.[id] || {};
+    return {
+      ...base,
+      ...(s.color          ? { color: s.color } : {}),
+      ...(s.fontSize       ? { fontSize: `${s.fontSize}px` } : {}),
+      ...(s.fontFamily     ? { fontFamily: s.fontFamily } : {}),
+      ...(s.fontWeight     ? { fontWeight: s.fontWeight } : {}),
+      ...(s.fontStyle      ? { fontStyle: s.fontStyle } : {}),
+      ...(s.textDecoration ? { textDecoration: s.textDecoration } : {}),
+      ...(s.textAlign      ? { textAlign: s.textAlign } : {}),
+      ...(s.letterSpacing  != null ? { letterSpacing: `${s.letterSpacing}px` } : {}),
+      ...(s.opacity        != null ? { opacity: s.opacity } : {}),
+    };
+  };
+
   return (
     <div className={styles.scaleWrapper} style={{ width: width * scale, height: height * scale }}>
       <div
@@ -56,8 +89,8 @@ export default function CardCanvas({
         className={styles.card}
         data-layout={getLayout()}
         style={{
-          width: width,
-          height: height,
+          width,
+          height,
           transform: `scale(${scale})`,
           background: isGradient ? theme.cardBg : theme.bg,
           backgroundColor: !isGradient ? theme.bg : undefined,
@@ -73,20 +106,38 @@ export default function CardCanvas({
 
         <div className={styles.body}>
           <DraggableNode {...dn('userName')}>
-            <div className={styles.name} style={{ color: theme.textPrimary, fontFamily: theme.fontHeading }}>
+            <div
+              className={styles.name}
+              style={ns('userName', {
+                color: theme.textPrimary,
+                fontFamily: theme.fontHeading || 'Poppins, sans-serif',
+              })}
+            >
               {(values.userName || '').toUpperCase()}
             </div>
           </DraggableNode>
 
           <DraggableNode {...dn('userTitle')}>
-            <div className={styles.title} style={{ color: theme.textSecondary, fontFamily: theme.fontBody }}>
+            <div
+              className={styles.title}
+              style={ns('userTitle', {
+                color: theme.textSecondary || theme.textPrimary,
+                fontFamily: theme.fontBody || 'Inter, sans-serif',
+              })}
+            >
               {(values.userTitle || '').toUpperCase()}
             </div>
           </DraggableNode>
 
           {values.companyName && (
             <DraggableNode {...dn('companyName')}>
-              <div className={styles.company} style={{ color: theme.accent, fontFamily: theme.fontHeading }}>
+              <div
+                className={styles.company}
+                style={ns('companyName', {
+                  color: theme.accent,
+                  fontFamily: theme.fontHeading || 'Poppins, sans-serif',
+                })}
+              >
                 {values.companyName}
               </div>
             </DraggableNode>
@@ -96,40 +147,27 @@ export default function CardCanvas({
             <div className={styles.divider} style={{ background: theme.accent, opacity: 0.3 }} />
           </DraggableNode>
 
-          <DraggableNode {...dn('contacts')}>
-            <div className={styles.contacts}>
-              {values.userEmail && (
-                <div className={styles.contactRow}><span className={styles.icon}>✉️</span>{values.userEmail}</div>
-              )}
-              {values.userPhone && (
-                <div className={styles.contactRow}><span className={styles.icon}>📞</span>{values.userPhone}</div>
-              )}
-              {values.githubHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>⌥</span>github.com/{values.githubHandle}</div>
-              )}
-              {values.linkedinHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>🔗</span>in/{values.linkedinHandle}</div>
-              )}
-              {values.xHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>𝕏</span>@{values.xHandle}</div>
-              )}
-              {values.facebookHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>📘</span>fb.com/{values.facebookHandle}</div>
-              )}
-              {values.instagramHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>📸</span>@{values.instagramHandle}</div>
-              )}
-              {values.youtubeHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>▶️</span>{values.youtubeHandle}</div>
-              )}
-              {values.snapchatHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>👻</span>{values.snapchatHandle}</div>
-              )}
-              {values.threadsHandle && (
-                <div className={styles.contactRow}><span className={styles.icon}>🧵</span>@{values.threadsHandle}</div>
-              )}
-            </div>
-          </DraggableNode>
+          {/* ── Individual contact rows — each is its own node ────── */}
+          <div className={styles.contacts}>
+            {CONTACT_MAP.map(({ id, icon, label }) => {
+              const text = label(values);
+              if (!text) return null;
+              return (
+                <DraggableNode key={id} {...dn(id)}>
+                  <div
+                    className={styles.contactRow}
+                    style={ns(id, {
+                      color: theme.textSecondary || theme.textPrimary,
+                      fontFamily: theme.fontBody || 'Inter, sans-serif',
+                    })}
+                  >
+                    <span className={styles.icon}>{icon}</span>
+                    {text}
+                  </div>
+                </DraggableNode>
+              );
+            })}
+          </div>
         </div>
 
         <DraggableNode {...dn('qrArea')}>
@@ -144,7 +182,12 @@ export default function CardCanvas({
                 </div>
               )}
             </div>
-            <div className={styles.qrCaption}>{values.profileUrl || 'your-hub.link'}</div>
+            <div
+              className={styles.qrCaption}
+              style={ns('qrArea', { color: theme.textSecondary || theme.textPrimary })}
+            >
+              {values.profileUrl || 'your-hub.link'}
+            </div>
           </div>
         </DraggableNode>
       </div>
