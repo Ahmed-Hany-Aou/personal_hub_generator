@@ -109,30 +109,39 @@
   font-weight: 500;
 }
 
-.socialRow {
+.socialGrid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .socialBtn {
-  flex: 1 1 calc(50% - 5px);
-  min-width: 100px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
+  gap: 6px;
+  padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid;
   font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
   transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.socialIcon {
+  font-size: 1rem;
 }
 
 .socialBtn:hover { opacity: 0.8; }
+
+.bio {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
 
 .qrBlock {
   display: flex;
@@ -186,4 +195,7 @@
   color: #0a0f16;
   cursor: pointer;
   letter-spacing: 0.5px;
+  display: block;
+  text-decoration: none;
 }
+.saveBtn:hover { opacity: 0.9; }

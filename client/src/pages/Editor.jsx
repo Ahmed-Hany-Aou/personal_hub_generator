@@ -30,6 +30,9 @@ export default function Editor() {
   // ── Background colour override (card & landing) ──────────────────────────
   const [bgOverride, setBgOverride] = useState(null);
 
+  // ── Per-key theme overrides from the Theme panel ─────────────────────────
+  const [themeOverrides, setThemeOverrides] = useState({});
+
   // ── Canvas container refs (for getBoundingClientRect offset calc) ────────
   const cardCanvasRef = useRef(null);
   const landingCanvasRef = useRef(null);
@@ -67,10 +70,22 @@ export default function Editor() {
         setTemplate(data);
         setValues(data.placeholders.defaults || {});
         setBgOverride(null);
+        setThemeOverrides({});
         setLayoutState({});
         setSelectedNodeId(null);
       });
   }, [templateId]);
+
+  /** Called from PropertyPanel Theme section — key=null means reset */
+  const handleThemeOverride = useCallback((key, value) => {
+    if (key === null) {
+      setThemeOverrides({});
+      setBgOverride(null);
+    } else {
+      setThemeOverrides(prev => ({ ...prev, [key]: value }));
+      if (key === 'bg') setBgOverride(value);
+    }
+  }, []);
 
   const handleChange = (key, val) => {
     setValues(prev => ({ ...prev, [key]: val }));
@@ -138,10 +153,8 @@ export default function Editor() {
     return <div className={styles.loading}>Loading editor…</div>;
   }
 
-  // Merge theme with any background override
-  const effectiveTheme = bgOverride
-    ? { ...template.theme, bg: bgOverride, cardBg: bgOverride }
-    : template.theme;
+  // Merge template theme with per-key overrides from the Theme panel
+  const effectiveTheme = { ...template.theme, ...themeOverrides };
 
   // ─────────────────────────────────────────────────────────────────────────
   // Shared canvas ref for the active tab
@@ -165,8 +178,8 @@ export default function Editor() {
         nodeId={selectedNodeId}
         nodeStyles={layoutState[selectedNodeId] || {}}
         onStyleChange={handleLayoutChange}
-        bgColor={bgOverride || effectiveTheme.bg}
-        onBgChange={setBgOverride}
+        bgColor={effectiveTheme.bg}
+        onBgChange={v => handleThemeOverride('bg', v)}
         onClose={closeToolbar}
       />
 
@@ -181,6 +194,8 @@ export default function Editor() {
           onCustomDimsChange={setCustomDims}
           isFreeform={isFreeform}
           onToggleFreeform={toggleFreeform}
+          themeOverrides={themeOverrides}
+          onThemeOverride={handleThemeOverride}
         />
 
         <main className={styles.canvas} onPointerDown={handleCanvasPointerDown}>

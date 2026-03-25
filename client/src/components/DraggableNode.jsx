@@ -5,9 +5,8 @@ import { useRef, useEffect, useState, useCallback } from 'react';
  *  - Dragged freely when isFreeform=true
  *  - Clicked to select it for the StyleToolbar
  *
- * On first switch to freeform mode, the element reads its own
- * DOM position via getBoundingClientRect() relative to the canvas
- * container, so it stays exactly where it was in structured mode.
+ * Links inside the node remain functional — a drag is only registered
+ * after the pointer has moved >4px, so short taps/clicks still work.
  */
 export default function DraggableNode({
   id,
@@ -15,99 +14,105 @@ export default function DraggableNode({
   layoutState,
   onLayoutChange,
   onSelect,
-  canvasRef,    // ref to the parent canvas container for relative positioning
+  canvasRef,
   children,
 }) {
-  const nodeRef = useRef(null);
+  const nodeRef  = useRef(null);
+  const dragRef  = useRef({ active: false, moved: false, mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
 
-  const current = layoutState[id] || {};
+  const current    = layoutState[id] || {};
   const hasPosition = current.x !== undefined && current.y !== undefined;
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // When freeform mode is first enabled and we don't yet have a position
-  // stored for this node, calculate it from the DOM.
-  // ─────────────────────────────────────────────────────────────────────────
+  // When freeform mode first activates, seed position from DOM
   useEffect(() => {
     if (isFreeform && !hasPosition && nodeRef.current && canvasRef?.current) {
-      const nodeRect = nodeRef.current.getBoundingClientRect();
+      const nodeRect   = nodeRef.current.getBoundingClientRect();
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      // Position relative to the canvas container
-      const x = nodeRect.left - canvasRect.left;
-      const y = nodeRect.top - canvasRect.top;
-      onLayoutChange(id, { ...current, x, y });
+      onLayoutChange(id, { ...current, x: nodeRect.left - canvasRect.left, y: nodeRect.top - canvasRect.top });
     }
-    // Only run when freeform first turns on
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFreeform]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Drag handlers (only active in freeform mode)
-  // ─────────────────────────────────────────────────────────────────────────
   const handlePointerDown = useCallback((e) => {
     e.stopPropagation();
-
-    // Fire selection so the StyleToolbar appears
-    if (onSelect) onSelect(id, e.currentTarget);
+    onSelect?.(id, e.currentTarget);
 
     if (!isFreeform) return;
 
-    e.preventDefault();
-    setIsDragging(true);
-    dragStart.current = {
+    dragRef.current = {
+      active: true,
+      moved:  false,
       mouseX: e.clientX,
       mouseY: e.clientY,
-      elemX: current.x ?? 0,
-      elemY: current.y ?? 0,
+      elemX:  current.x ?? 0,
+      elemY:  current.y ?? 0,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
   }, [isFreeform, id, onSelect, current.x, current.y]);
 
   const handlePointerMove = useCallback((e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - dragStart.current.mouseX;
-    const dy = e.clientY - dragStart.current.mouseY;
+    if (!dragRef.current.active) return;
+    const dx = e.clientX - dragRef.current.mouseX;
+    const dy = e.clientY - dragRef.current.mouseY;
+
+    // Only start dragging after 4px movement (preserves link clicks)
+    if (!dragRef.current.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+
+    dragRef.current.moved = true;
+    setIsDragging(true);
     onLayoutChange(id, {
       ...layoutState[id],
-      x: dragStart.current.elemX + dx,
-      y: dragStart.current.elemY + dy,
+      x: dragRef.current.elemX + dx,
+      y: dragRef.current.elemY + dy,
     });
-  }, [isDragging, id, onLayoutChange, layoutState]);
+  }, [id, onLayoutChange, layoutState]);
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = useCallback((e) => {
+    const wasDragging = dragRef.current.moved;
+    dragRef.current.active = false;
+    dragRef.current.moved  = false;
     setIsDragging(false);
+
+    // If we never actually dragged, treat as a click — allow link navigation
+    if (!wasDragging) {
+      const link = e.target.closest('a');
+      if (link && link.href) {
+        window.open(link.href, link.target || '_blank', 'noopener,noreferrer');
+      }
+    }
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Build inline styles
-  // ─────────────────────────────────────────────────────────────────────────
+  // Build styles
   const style = {};
-
   if (isFreeform && hasPosition) {
-    style.position = 'absolute';
-    style.left = `${current.x}px`;
-    style.top  = `${current.y}px`;
-    style.cursor = isDragging ? 'grabbing' : 'grab';
-    style.zIndex = isDragging ? 200 : 10;
+    style.position   = 'absolute';
+    style.left       = `${current.x}px`;
+    style.top        = `${current.y}px`;
+    style.cursor     = isDragging ? 'grabbing' : 'grab';
+    style.zIndex     = isDragging ? 200 : 10;
     style.userSelect = 'none';
-    style.outline = isDragging
-      ? '2px dashed rgba(255,255,255,0.7)'
-      : '1px solid transparent';
+    style.outline    = isDragging ? '2px dashed rgba(255,255,255,0.7)' : '1px solid transparent';
     style.outlineOffset = '3px';
-    style.borderRadius = '3px';
+    style.borderRadius  = '3px';
   } else if (!isFreeform) {
-    style.cursor = 'pointer';
-    style.outline = '1px solid transparent';
+    style.cursor        = 'pointer';
+    style.outline       = '1px solid transparent';
     style.outlineOffset = '3px';
-    style.borderRadius = '3px';
-    style.transition = 'outline-color 0.15s';
+    style.borderRadius  = '3px';
+    style.transition    = 'outline-color 0.15s';
   }
 
-  // Apply overridden text-level styles
-  if (current.color)    style.color    = current.color;
-  if (current.fontSize) style.fontSize = `${current.fontSize}px`;
+  if (current.color)      style.color      = current.color;
+  if (current.fontSize)   style.fontSize   = `${current.fontSize}px`;
   if (current.fontFamily) style.fontFamily = current.fontFamily;
+  if (current.opacity !== undefined) style.opacity = current.opacity;
+  if (current.letterSpacing) style.letterSpacing = `${current.letterSpacing}px`;
+  if (current.lineHeight)    style.lineHeight    = current.lineHeight;
+  if (current.textAlign)     style.textAlign     = current.textAlign;
+  if (current.fontWeight)    style.fontWeight    = current.fontWeight;
+  if (current.fontStyle)     style.fontStyle     = current.fontStyle;
+  if (current.textDecoration) style.textDecoration = current.textDecoration;
 
   return (
     <div

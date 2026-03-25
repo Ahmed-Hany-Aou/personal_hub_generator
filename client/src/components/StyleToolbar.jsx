@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './StyleToolbar.module.css';
 
 const FONTS = [
+  { label: 'Default',  value: '' },
   { label: 'Inter',    value: 'Inter, sans-serif' },
   { label: 'Poppins',  value: 'Poppins, sans-serif' },
   { label: 'Raleway',  value: 'Raleway, sans-serif' },
@@ -10,18 +11,44 @@ const FONTS = [
   { label: 'Courier',  value: "'Courier New', monospace" },
 ];
 
-/**
- * Floating toolbar that appears when an element is selected.
- *
- * Props:
- *  anchor       – { x, y } viewport pixel where to place the toolbar
- *  nodeId       – id of the currently selected node
- *  nodeStyles   – current style overrides from layoutState for the node
- *  onStyleChange(nodeId, patch) – callback to update layoutState
- *  bgColor      – current card/page background color
- *  onBgChange(color) – callback to override the background
- *  onClose()    – closes the toolbar (e.g. clicking away)
- */
+/** Sync a hex text input with a color picker, and call onChange(#RRGGBB) */
+function HexColorPair({ value, onChange, label, title }) {
+  const [hex, setHex] = useState((value || '#ffffff').replace('#', ''));
+
+  useEffect(() => {
+    setHex((value || '#ffffff').replace('#', ''));
+  }, [value]);
+
+  const tryApply = (raw) => {
+    const cleaned = raw.replace(/[^0-9a-fA-F]/g, '').slice(0, 6);
+    setHex(cleaned);
+    if (cleaned.length === 6) onChange(`#${cleaned}`);
+  };
+
+  return (
+    <div className={styles.hexPair} title={title}>
+      <span className={styles.pairLabel}>{label}</span>
+      <input
+        type="color"
+        className={styles.colorPicker}
+        value={value && /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#ffffff'}
+        onChange={e => { onChange(e.target.value); setHex(e.target.value.replace('#', '')); }}
+      />
+      <span className={styles.hashSymbol}>#</span>
+      <input
+        type="text"
+        className={styles.hexInput}
+        value={hex}
+        maxLength={6}
+        placeholder="22d3ee"
+        onChange={e => tryApply(e.target.value)}
+        onBlur={e => tryApply(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && tryApply(e.target.value)}
+      />
+    </div>
+  );
+}
+
 export default function StyleToolbar({
   anchor,
   nodeId,
@@ -33,25 +60,24 @@ export default function StyleToolbar({
 }) {
   const ref = useRef(null);
 
-  // Close on Escape key
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  // Position the toolbar so it doesn't go off-screen
   const toolbarStyle = {};
   if (anchor) {
     const vw = window.innerWidth;
-    const TOOLBAR_W = 440;
+    const TOOLBAR_W = 560;
     let left = anchor.x;
-    if (left + TOOLBAR_W > vw - 8) left = vw - TOOLBAR_W - 8;
+    if (left + TOOLBAR_W > vw - 8) left = Math.max(8, vw - TOOLBAR_W - 8);
     toolbarStyle.left = `${left}px`;
-    toolbarStyle.top  = `${anchor.y - 70}px`; // appear above the element
+    toolbarStyle.top  = `${Math.max(8, anchor.y - 64)}px`;
   }
 
   const patch = (key, val) => onStyleChange?.(nodeId, { ...nodeStyles, [key]: val });
+  const toggle = (key, on, off) => patch(key, nodeStyles[key] === on ? off : on);
 
   if (!nodeId) return null;
 
@@ -60,85 +86,137 @@ export default function StyleToolbar({
       ref={ref}
       className={styles.toolbar}
       style={toolbarStyle}
-      onPointerDown={(e) => e.stopPropagation()} // prevent canvas deselect
+      onPointerDown={e => e.stopPropagation()}
     >
-      {/* ── Font Family ───────────────────────────────── */}
+      {/* ── Node label ──────────────────────────────────────────────── */}
+      <span className={styles.nodeLabel}>{nodeId.replace(/-/g,' ')}</span>
+      <span className={styles.sep} />
+
+      {/* ── Font family ─────────────────────────────────────────────── */}
       <div className={styles.group}>
-        <span className={styles.label}>Font</span>
+        <span className={styles.groupLabel}>Font</span>
         <select
           className={styles.select}
           value={nodeStyles.fontFamily || ''}
-          onChange={(e) => patch('fontFamily', e.target.value)}
+          onChange={e => patch('fontFamily', e.target.value)}
         >
-          <option value="">Default</option>
           {FONTS.map(f => (
-            <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+            <option key={f.value} value={f.value} style={{ fontFamily: f.value || 'inherit' }}>
               {f.label}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Divider */}
-      <div className={styles.divider} />
+      <span className={styles.sep} />
 
-      {/* ── Font Size ─────────────────────────────────── */}
+      {/* ── Font size ───────────────────────────────────────────────── */}
       <div className={styles.group}>
-        <span className={styles.label}>Size</span>
+        <span className={styles.groupLabel}>Size</span>
         <input
           type="range"
           className={styles.slider}
-          min={8}
-          max={120}
-          step={1}
+          min={8} max={120} step={1}
           value={nodeStyles.fontSize ?? 16}
-          onChange={(e) => patch('fontSize', Number(e.target.value))}
+          onChange={e => patch('fontSize', Number(e.target.value))}
         />
         <input
           type="number"
           className={styles.numInput}
-          min={8}
-          max={120}
+          min={8} max={120}
           value={nodeStyles.fontSize ?? 16}
-          onChange={(e) => patch('fontSize', Number(e.target.value))}
+          onChange={e => patch('fontSize', Number(e.target.value))}
         />
       </div>
 
-      {/* Divider */}
-      <div className={styles.divider} />
+      <span className={styles.sep} />
 
-      {/* ── Text Color ────────────────────────────────── */}
+      {/* ── Format buttons ──────────────────────────────────────────── */}
       <div className={styles.group}>
-        <span className={styles.label}>Color</span>
-        <div className={styles.swatchWrap}>
-          <input
-            type="color"
-            className={styles.colorPicker}
-            value={nodeStyles.color || '#ffffff'}
-            onChange={(e) => patch('color', e.target.value)}
-            title="Text / element color"
-          />
-        </div>
+        <span className={styles.groupLabel}>Format</span>
+        <button
+          className={`${styles.fmtBtn} ${nodeStyles.fontWeight === 'bold' ? styles.fmtActive : ''}`}
+          onClick={() => toggle('fontWeight', 'bold', 'normal')}
+          title="Bold"
+        ><b>B</b></button>
+        <button
+          className={`${styles.fmtBtn} ${nodeStyles.fontStyle === 'italic' ? styles.fmtActive : ''}`}
+          onClick={() => toggle('fontStyle', 'italic', 'normal')}
+          title="Italic"
+        ><i>I</i></button>
+        <button
+          className={`${styles.fmtBtn} ${nodeStyles.textDecoration === 'underline' ? styles.fmtActive : ''}`}
+          onClick={() => toggle('textDecoration', 'underline', 'none')}
+          title="Underline"
+        ><u>U</u></button>
       </div>
 
-      {/* Divider */}
-      <div className={styles.divider} />
+      <span className={styles.sep} />
 
-      {/* ── Card / Page Background ────────────────────── */}
+      {/* ── Text align ──────────────────────────────────────────────── */}
       <div className={styles.group}>
-        <span className={styles.label}>BG</span>
-        <div className={styles.swatchWrap}>
-          <input
-            type="color"
-            className={styles.colorPicker}
-            value={bgColor || '#0a0f16'}
-            onChange={(e) => onBgChange?.(e.target.value)}
-            title="Card / page background color"
-          />
-        </div>
+        <span className={styles.groupLabel}>Align</span>
+        {['left','center','right'].map(a => (
+          <button
+            key={a}
+            className={`${styles.fmtBtn} ${nodeStyles.textAlign === a ? styles.fmtActive : ''}`}
+            onClick={() => patch('textAlign', a)}
+            title={`Align ${a}`}
+          >{a === 'left' ? '⬅' : a === 'center' ? '☰' : '➡'}</button>
+        ))}
       </div>
 
-      {/* Close button */}
+      <span className={styles.sep} />
+
+      {/* ── Text color + hex ────────────────────────────────────────── */}
+      <HexColorPair
+        label="Text"
+        title="Text / element color"
+        value={nodeStyles.color || '#ffffff'}
+        onChange={v => patch('color', v)}
+      />
+
+      <span className={styles.sep} />
+
+      {/* ── Background / page color + hex ───────────────────────────── */}
+      <HexColorPair
+        label="BG"
+        title="Card / page background"
+        value={bgColor || '#0a0f16'}
+        onChange={v => onBgChange?.(v)}
+      />
+
+      <span className={styles.sep} />
+
+      {/* ── Opacity ─────────────────────────────────────────────────── */}
+      <div className={styles.group}>
+        <span className={styles.groupLabel}>Opacity</span>
+        <input
+          type="range"
+          className={styles.slider}
+          min={0} max={1} step={0.05}
+          value={nodeStyles.opacity ?? 1}
+          onChange={e => patch('opacity', Number(e.target.value))}
+        />
+        <span className={styles.numDisplay}>{Math.round((nodeStyles.opacity ?? 1) * 100)}%</span>
+      </div>
+
+      <span className={styles.sep} />
+
+      {/* ── Letter spacing ──────────────────────────────────────────── */}
+      <div className={styles.group}>
+        <span className={styles.groupLabel}>Spacing</span>
+        <input
+          type="range"
+          className={styles.slider}
+          min={-2} max={20} step={0.5}
+          value={nodeStyles.letterSpacing ?? 0}
+          onChange={e => patch('letterSpacing', Number(e.target.value))}
+        />
+        <span className={styles.numDisplay}>{nodeStyles.letterSpacing ?? 0}px</span>
+      </div>
+
+      {/* ── Close ───────────────────────────────────────────────────── */}
       <button className={styles.closeBtn} onClick={onClose} title="Close (Esc)">✕</button>
     </div>
   );

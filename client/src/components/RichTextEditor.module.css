@@ -1,0 +1,133 @@
+.wrapper {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.toolBtn {
+  padding: 4px 8px;
+  min-width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.toolBtn:hover {
+  background: var(--accent-dim);
+  border-color: var(--border);
+  color: var(--accent);
+}
+
+.bold { font-weight: 700; }
+.italic { font-style: italic; }
+.underline { text-decoration: underline; }
+.strike { text-decoration: line-through; }
+
+.toolSelect {
+  padding: 3px 6px;
+  height: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 0.72rem;
+  cursor: pointer;
+  max-width: 80px;
+}
+
+.sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.colorGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 6px;
+  height: 28px;
+}
+
+.colorLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.colorSwatch {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: none;
+}
+
+.colorSwatch::-webkit-color-swatch-wrapper { padding: 0; }
+.colorSwatch::-webkit-color-swatch { border: none; border-radius: 2px; }
+
+.hexPrefix {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.hexInput {
+  width: 52px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.72rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  padding: 0;
+}
+
+.hexInput:focus { outline: none; }
+
+.editor {
+  min-height: 80px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  outline: none;
+  word-break: break-word;
+}
+
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.editor a { color: var(--accent); text-decoration: underline; }
+.editor ul { padding-left: 20px; }
+.editor ol { padding-left: 20px; }
