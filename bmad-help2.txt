@@ -1,0 +1,13 @@
+﻿Usage: bmad-cli [options] [command]
+
+BMAD Core CLI - Universal AI agent framework
+
+Options:
+  -V, --version        output the version number
+  -h, --help           display help for command
+
+Commands:
+  install [options]    Install BMAD Core agents and tools
+  status               Display BMAD installation status and module versions
+  uninstall [options]  Remove BMAD installation from the current project
+  help [command]       display help for command

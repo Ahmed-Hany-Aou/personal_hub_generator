@@ -16,7 +16,7 @@
   },
   "placeholders": {
     "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["companyName", "githubHandle", "linkedinHandle", "profileUrl"],
+    "optional": ["userAvatar", "companyLogo", "avatarInitials", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
     "defaults": {
       "userName": "Maya Rivera",
       "userTitle": "Creative Director",

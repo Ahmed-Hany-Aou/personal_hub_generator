@@ -16,7 +16,7 @@
   },
   "placeholders": {
     "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["companyName", "githubHandle", "linkedinHandle", "profileUrl"],
+    "optional": ["userAvatar", "companyLogo", "avatarInitials", "companyName", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
     "defaults": {
       "userName": "Jordan Lee",
       "userTitle": "Product Designer",
