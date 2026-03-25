@@ -17,24 +17,48 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 1050px;
-  height: 600px;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
-  align-items: flex-end;
-  padding: 50px 60px;
-  position: relative;
+  align-items: center;
+  padding: min(50px, 10cqh) min(60px, 8cqw);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
   transform-origin: top left;
-  transform: scale(0.65);
+  container-type: size;
+  container-name: card;
+}
+
+.card[data-layout="vertical"] {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: min(80px, 8cqh) min(40px, 10cqw);
+}
+
+.card[data-layout="vertical"] .body {
+  align-items: center;
+}
+
+.card[data-layout="vertical"] .divider {
+  width: min(200px, 50cqw);
+}
+
+.card[data-layout="square"] {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: min(60px, 10cqh);
+}
+
+.card[data-layout="square"] .body {
+  align-items: center;
 }
 
 .accentBar {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40px;
+  width: min(40px, 5cqw);
   height: 100%;
 }
 
@@ -69,54 +93,57 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: min(10px, 2cqh);
   z-index: 1;
 }
 
 .name {
-  font-size: 52px;
+  font-size: min(52px, 12cqh, 8cqw);
   font-weight: 700;
   letter-spacing: 3px;
   line-height: 1.1;
 }
 
 .title {
-  font-size: 18px;
+  font-size: min(18px, 6cqh, 4cqw);
   letter-spacing: 2px;
   font-weight: 500;
   opacity: 0.85;
 }
 
 .cardLogo {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 10px;
+  width: min(60px, 15cqh);
+  height: min(60px, 15cqh);
+  margin-bottom: min(10px, 2cqh);
   object-fit: contain;
 }
 
 .company {
-  font-size: 22px;
+  font-size: min(22px, 7cqh, 5cqw);
   font-weight: 600;
   letter-spacing: 1px;
 }
 
 .divider {
-  width: 320px;
+  width: min(320px, 60cqw);
   height: 1px;
-  margin: 10px 0;
+  margin: min(10px, 2cqh) 0;
 }
 
 .contacts {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 16px;
+  row-gap: 8px;
+  max-width: 100%;
 }
 
 .contactRow {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 15px;
+  gap: 8px;
+  font-size: min(15px, 5cqh, 3.5cqw);
   opacity: 0.9;
 }
 

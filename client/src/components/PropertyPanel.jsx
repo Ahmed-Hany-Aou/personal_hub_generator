@@ -40,7 +40,17 @@ const FIELD_ICONS = {
   userAvatar: '🙎',
 };
 
-export default function PropertyPanel({ template, values, onChange }) {
+export default function PropertyPanel({ 
+  template, 
+  values, 
+  onChange, 
+  cardFormat, 
+  onFormatChange, 
+  customDims, 
+  onCustomDimsChange,
+  isFreeform,
+  onToggleFreeform,
+}) {
   const { required = [], optional = [] } = template.placeholders;
 
   return (
@@ -48,6 +58,65 @@ export default function PropertyPanel({ template, values, onChange }) {
       <div className={styles.panelHeader}>
         <span className={styles.panelTitle}>Properties</span>
         <span className={styles.panelSub}>Edit your card content</span>
+      </div>
+
+      <div className={styles.formatSelector}>
+        <div className={styles.groupLabel}>Card Format</div>
+        <div className={styles.formatButtons}>
+          {[
+            { id: 'standard', label: '3.5×2 (US)', icon: '🇺🇸' },
+            { id: 'm90x50', label: '90×50', icon: '📏' },
+            { id: 'uk', label: 'UK/EU', icon: '🇬🇧' },
+            { id: 'japan', label: 'Japan', icon: '🇯🇵' },
+            { id: 'credit', label: 'Credit', icon: '💳' },
+            { id: 'vertical', label: '2×3.5 (Vert)', icon: '📱' },
+            { id: 'square', label: 'Square', icon: '⬛' },
+            { id: 'custom', label: 'Custom', icon: '🛠️' }
+          ].map(f => (
+            <button
+              key={f.id}
+              className={`${styles.formatBtn} ${cardFormat === f.id ? styles.formatBtnActive : ''}`}
+              onClick={() => onFormatChange(f.id)}
+              title={`${f.label} Standard`}
+            >
+              <span className={styles.formatBtnIcon}>{f.icon}</span>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {cardFormat === 'custom' && (
+        <div className={styles.customInputs}>
+          <div className={styles.field}>
+            <label className={styles.label}>Width (mm)</label>
+            <input 
+              type="number" 
+              className={styles.input} 
+              value={customDims.width}
+              onChange={e => onCustomDimsChange(prev => ({ ...prev, width: Number(e.target.value) }))}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Height (mm)</label>
+            <input 
+              type="number" 
+              className={styles.input} 
+              value={customDims.height}
+              onChange={e => onCustomDimsChange(prev => ({ ...prev, height: Number(e.target.value) }))}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className={styles.modeToggleSection}>
+        <div className={styles.groupLabel}>Engine Layout Mode</div>
+        <button 
+          className={`${styles.modeBtn} ${isFreeform ? styles.modeBtnActive : ''}`} 
+          onClick={onToggleFreeform} 
+        >
+          {isFreeform ? '🚀 Freeform Drag-and-Drop' : '📦 Structured Layout'}
+        </button>
       </div>
 
       <div className={styles.fields}>

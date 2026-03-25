@@ -106,13 +106,14 @@ function generateLandingHTML(theme, values) {
 </html>`;
 }
 
-export default function ExportButton({ values, template }) {
+export default function ExportButton({ values, template, activeDims }) {
   const [state, setState] = useState('idle');
 
   const handleExport = async () => {
     setState('loading');
     try {
       const zip = new JSZip();
+      const dims = activeDims;
 
       const cardEl = document.getElementById('card-export-target');
       if (cardEl) {
@@ -121,8 +122,8 @@ export default function ExportButton({ values, template }) {
         clone.style.position = 'fixed';
         clone.style.left = '-9999px';
         clone.style.top = '0';
-        clone.style.width = '1050px';
-        clone.style.height = '600px';
+        clone.style.width = `${dims.width}px`;
+        clone.style.height = `${dims.height}px`;
         clone.style.borderRadius = '16px';
         clone.style.overflow = 'hidden';
         document.body.appendChild(clone);
@@ -133,8 +134,8 @@ export default function ExportButton({ values, template }) {
             allowTaint: true,
             backgroundColor: template.theme.bg,
             logging: false,
-            width: 1050,
-            height: 600,
+            width: dims.width,
+            height: dims.height,
           });
           const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
           zip.file('business-card.png', blob);
