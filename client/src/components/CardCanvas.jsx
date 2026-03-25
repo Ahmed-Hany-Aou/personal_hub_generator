@@ -33,7 +33,7 @@ export default function CardCanvas({
   useEffect(() => {
     const url = values.profileUrl || 'https://yourpage.com';
     QRCode.toDataURL(url, {
-      width: 260,
+      width: 512,
       margin: 1,
       color: { dark: theme.accent, light: theme.bg }
     }).then(setQrCodeUrl).catch(console.error);
@@ -172,7 +172,14 @@ export default function CardCanvas({
 
         <DraggableNode {...dn('qrArea')}>
           <div className={styles.qrArea}>
-            <div className={styles.qrBox} style={{ borderColor: theme.accent }}>
+            <div
+              className={styles.qrBox}
+              style={{
+                borderColor: theme.accent,
+                width: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
+                height: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
+              }}
+            >
               {qrCodeUrl ? (
                 <img src={qrCodeUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
               ) : (

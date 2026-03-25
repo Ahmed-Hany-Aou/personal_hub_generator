@@ -50,7 +50,6 @@ function HexColorPair({ value, onChange, label, title }) {
 }
 
 export default function StyleToolbar({
-  anchor,
   nodeId,
   nodeStyles = {},
   onStyleChange,
@@ -66,16 +65,6 @@ export default function StyleToolbar({
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const toolbarStyle = {};
-  if (anchor) {
-    const vw = window.innerWidth;
-    const TOOLBAR_W = 560;
-    let left = anchor.x;
-    if (left + TOOLBAR_W > vw - 8) left = Math.max(8, vw - TOOLBAR_W - 8);
-    toolbarStyle.left = `${left}px`;
-    toolbarStyle.top  = `${Math.max(8, anchor.y - 64)}px`;
-  }
-
   const patch = (key, val) => onStyleChange?.(nodeId, { ...nodeStyles, [key]: val });
   const toggle = (key, on, off) => patch(key, nodeStyles[key] === on ? off : on);
 
@@ -85,7 +74,6 @@ export default function StyleToolbar({
     <div
       ref={ref}
       className={styles.toolbar}
-      style={toolbarStyle}
       onPointerDown={e => e.stopPropagation()}
     >
       {/* ── Node label ──────────────────────────────────────────────── */}
