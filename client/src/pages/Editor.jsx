@@ -25,32 +25,59 @@ export default function Editor() {
 
   // ── Style toolbar state ──────────────────────────────────────────────────
   const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [toolbarAnchor, setToolbarAnchor] = useState(null);   // { x, y } viewport px
+  const [toolbarAnchor, setToolbarAnchor] = useState(null);
 
-  // ── Background colour override (card & landing) ──────────────────────────
-  const [bgOverride, setBgOverride] = useState(null);
-
-  // ── Per-key theme overrides from the Theme panel ─────────────────────────
+  // ── Per-key theme overrides ──────────────────────────────────────────────
   const [themeOverrides, setThemeOverrides] = useState({});
 
-  // ── Canvas container refs (for getBoundingClientRect offset calc) ────────
-  const cardCanvasRef = useRef(null);
+  // ── Mobile sidebar open/close ────────────────────────────────────────────
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── Canvas refs ──────────────────────────────────────────────────────────
+  const cardCanvasRef   = useRef(null);
   const landingCanvasRef = useRef(null);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Helpers
+  // Load template
+  // ─────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch(`/templates/${templateId}.json`)
+      .then(r => r.json())
+      .then(data => {
+        setTemplate(data);
+        setValues(data.placeholders.defaults || {});
+        setThemeOverrides({});
+        setLayoutState({});
+        setSelectedNodeId(null);
+      });
+  }, [templateId]);
+
+  const handleChange = useCallback((key, val) => {
+    setValues(prev => ({ ...prev, [key]: val }));
+  }, []);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Theme overrides
+  // ─────────────────────────────────────────────────────────────────────────
+  const handleThemeOverride = useCallback((key, value) => {
+    if (key === null) {
+      setThemeOverrides({});
+    } else {
+      setThemeOverrides(prev => ({ ...prev, [key]: value }));
+    }
+  }, []);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Layout change / node select
   // ─────────────────────────────────────────────────────────────────────────
   const handleLayoutChange = useCallback((id, newStyles) => {
     setLayoutState(prev => ({ ...prev, [id]: newStyles }));
   }, []);
 
-  /** Called by DraggableNode when a node is clicked.
-   *  `element` is the DOM node of the wrapper div. */
   const handleNodeSelect = useCallback((id, element) => {
     setSelectedNodeId(id);
     if (element) {
       const r = element.getBoundingClientRect();
-      // Place toolbar above the element; StyleToolbar itself clamps to viewport
       setToolbarAnchor({ x: r.left, y: r.top });
     }
   }, []);
@@ -60,48 +87,16 @@ export default function Editor() {
     setToolbarAnchor(null);
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Load template JSON
-  // ─────────────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    fetch(`/templates/${templateId}.json`)
-      .then(r => r.json())
-      .then(data => {
-        setTemplate(data);
-        setValues(data.placeholders.defaults || {});
-        setBgOverride(null);
-        setThemeOverrides({});
-        setLayoutState({});
-        setSelectedNodeId(null);
-      });
-  }, [templateId]);
-
-  /** Called from PropertyPanel Theme section — key=null means reset */
-  const handleThemeOverride = useCallback((key, value) => {
-    if (key === null) {
-      setThemeOverrides({});
-      setBgOverride(null);
-    } else {
-      setThemeOverrides(prev => ({ ...prev, [key]: value }));
-      if (key === 'bg') setBgOverride(value);
-    }
-  }, []);
-
-  const handleChange = (key, val) => {
-    setValues(prev => ({ ...prev, [key]: val }));
-  };
+  const handleCanvasPointerDown = useCallback((e) => {
+    if (!e.target.closest('[data-node-id]')) closeToolbar();
+  }, [closeToolbar]);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Freeform toggle – reset layout when turning OFF so elements snap back
+  // Freeform toggle
   // ─────────────────────────────────────────────────────────────────────────
   const toggleFreeform = useCallback(() => {
     setIsFreeform(prev => {
-      if (prev) {
-        // Turning off: clear stored positions so structured layout takes over
-        setLayoutState({});
-        setSelectedNodeId(null);
-        setToolbarAnchor(null);
-      }
+      if (prev) { setLayoutState({}); setSelectedNodeId(null); setToolbarAnchor(null); }
       return !prev;
     });
   }, []);
@@ -109,7 +104,7 @@ export default function Editor() {
   // ─────────────────────────────────────────────────────────────────────────
   // Card dimensions
   // ─────────────────────────────────────────────────────────────────────────
-  const presetDims = {
+  const PRESET_DIMS = {
     standard: { width: 1050, height: 600 },
     m90x50:   { width: 1063, height: 591 },
     uk:       { width: 1011, height: 636 },
@@ -119,60 +114,55 @@ export default function Editor() {
     square:   { width: 800,  height: 800 },
   };
 
-  const getActiveDims = () => {
-    if (cardFormat === 'custom') {
-      return {
-        width:  Math.round(customDims.width  * 11.81),
-        height: Math.round(customDims.height * 11.81),
-      };
-    }
-    return presetDims[cardFormat] || presetDims.standard;
-  };
-  const activeDims = getActiveDims();
+  const activeDims = cardFormat === 'custom'
+    ? { width: Math.round(customDims.width * 11.81), height: Math.round(customDims.height * 11.81) }
+    : (PRESET_DIMS[cardFormat] || PRESET_DIMS.standard);
 
-  const formatLabels = {
-    standard: '3.5" × 2" US Standard Card',
-    uk:       '3.34" × 2.16" UK/EU Standard Card',
-    japan:    '3.58" × 2.16" Japan Standard Card',
-    credit:   '3.37" × 2.12" Credit Card Size',
-    m90x50:   '90mm × 50mm Business Card Preview',
-    vertical: '2" × 3.5" Vertical Card Preview',
-    square:   '2.5" × 2.5" Square Card Preview',
-    custom:   `Custom ${customDims.width}mm × ${customDims.height}mm Card`,
+  const FORMAT_LABELS = {
+    standard: '3.5" × 2" US Standard',
+    uk:       '3.34" × 2.16" UK / EU',
+    japan:    '3.58" × 2.16" Japan',
+    credit:   '3.37" × 2.12" Credit Card',
+    m90x50:   '90 mm × 50 mm',
+    vertical: '2" × 3.5" Vertical',
+    square:   '2.5" × 2.5" Square',
+    custom:   `Custom ${customDims.width} × ${customDims.height} mm`,
   };
-
-  /** Deselect only when clicking empty canvas space, not on a DraggableNode */
-  const handleCanvasPointerDown = useCallback((e) => {
-    const nodeEl = e.target.closest('[data-node-id]');
-    if (!nodeEl) {
-      closeToolbar();
-    }
-  }, [closeToolbar]);
 
   if (!template) {
-    return <div className={styles.loading}>Loading editor…</div>;
+    return (
+      <div className={styles.loading}>
+        <span style={{ color: 'var(--accent)', marginRight: 12, fontSize: '1.5rem' }}>⏳</span>
+        Loading editor…
+      </div>
+    );
   }
 
-  // Merge template theme with per-key overrides from the Theme panel
   const effectiveTheme = { ...template.theme, ...themeOverrides };
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Shared canvas ref for the active tab
-  // ─────────────────────────────────────────────────────────────────────────
-  const activeCanvasRef = activeTab === 'card' ? cardCanvasRef : landingCanvasRef;
 
   return (
     <div className={styles.layout}>
+      {/* ── Header ──────────────────────────────────────────────────── */}
       <header className={styles.header}>
-        <button className={styles.back} onClick={() => navigate('/')}>← Templates</button>
+        <button className={styles.back} onClick={() => navigate('/')}>
+          <span>←</span> <span>Templates</span>
+        </button>
+
         <div className={styles.headerCenter}>
-          <span className={styles.logo}><span className={styles.logoAccent}>Creative</span> Studio</span>
+          <span className={styles.logo}>
+            <span className={styles.logoAccent}>Creative</span> Studio
+          </span>
           <span className={styles.templateName}>{template.name}</span>
         </div>
-        <ExportButton values={values} template={{ ...template, theme: effectiveTheme }} activeDims={activeDims} />
+
+        <ExportButton
+          values={values}
+          template={{ ...template, theme: effectiveTheme }}
+          activeDims={activeDims}
+        />
       </header>
 
-      {/* ── Floating Style Toolbar ────────────────────────────────────────── */}
+      {/* ── Floating Style Toolbar ───────────────────────────────────── */}
       <StyleToolbar
         anchor={toolbarAnchor}
         nodeId={selectedNodeId}
@@ -183,7 +173,15 @@ export default function Editor() {
         onClose={closeToolbar}
       />
 
+      {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
+
+        {/* Mobile overlay backdrop */}
+        {sidebarOpen && (
+          <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
+        )}
+
+        {/* Property panel — always rendered; CSS handles mobile slide-in/out */}
         <PropertyPanel
           template={template}
           values={values}
@@ -196,24 +194,32 @@ export default function Editor() {
           onToggleFreeform={toggleFreeform}
           themeOverrides={themeOverrides}
           onThemeOverride={handleThemeOverride}
+          open={sidebarOpen}
         />
 
+        {/* ── Canvas ─────────────────────────────────────────────────── */}
         <main className={styles.canvas} onPointerDown={handleCanvasPointerDown}>
+          {/* Tab switcher */}
           <div className={styles.tabs}>
             <button
               className={`${styles.tab} ${activeTab === 'card' ? styles.tabActive : ''}`}
-              onClick={(e) => { e.stopPropagation(); setActiveTab('card'); }}
-            >Business Card</button>
+              onClick={e => { e.stopPropagation(); setActiveTab('card'); }}
+            >
+              Business Card
+            </button>
             <button
               className={`${styles.tab} ${activeTab === 'landing' ? styles.tabActive : ''}`}
-              onClick={(e) => { e.stopPropagation(); setActiveTab('landing'); }}
-            >Landing Page</button>
+              onClick={e => { e.stopPropagation(); setActiveTab('landing'); }}
+            >
+              Landing Page
+            </button>
           </div>
 
+          {/* Preview */}
           <div className={styles.previewArea}>
             {activeTab === 'card' ? (
               <div className={styles.cardWrapper}>
-                <div className={styles.cardSizeLabel}>{formatLabels[cardFormat]}</div>
+                <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
                 <div id="card-canvas">
                   <CardCanvas
                     theme={effectiveTheme}
@@ -229,33 +235,40 @@ export default function Editor() {
                 </div>
               </div>
             ) : (
-              <div className={styles.mobileWrapper} style={{ flexDirection: 'column', gap: '24px' }}>
+              <div className={styles.mobileWrapper}>
                 <div className={styles.viewToggle}>
-                  {['mobile', 'tablet', 'desktop'].map(v => (
+                  {[
+                    { v: 'mobile',  icon: '📱', label: 'Mobile' },
+                    { v: 'tablet',  icon: '💊', label: 'Tablet' },
+                    { v: 'desktop', icon: '💻', label: 'Desktop' },
+                  ].map(({ v, icon, label }) => (
                     <button
                       key={v}
                       className={`${styles.viewBtn} ${landingView === v ? styles.viewBtnActive : ''}`}
                       onClick={() => setLandingView(v)}
                     >
-                      {v === 'mobile' ? '📱' : v === 'tablet' ? '💊' : '💻'} {v.charAt(0).toUpperCase() + v.slice(1)}
+                      {icon} {label}
                     </button>
                   ))}
                 </div>
-                <div className={
-                  landingView === 'mobile'  ? styles.phoneMock  :
-                  landingView === 'tablet'  ? styles.tabletMock :
-                  styles.desktopMock
-                }>
-                  <div className={styles.phoneMockInner} id="landing-canvas" ref={landingCanvasRef}>
-                    <LandingPreview
-                      theme={effectiveTheme}
-                      values={values}
-                      isFreeform={isFreeform}
-                      layoutState={layoutState}
-                      onLayoutChange={handleLayoutChange}
-                      onSelectNode={handleNodeSelect}
-                      canvasRef={landingCanvasRef}
-                    />
+
+                <div className={styles.deviceWrapper}>
+                  <div className={
+                    landingView === 'mobile'  ? styles.phoneMock  :
+                    landingView === 'tablet'  ? styles.tabletMock :
+                    styles.desktopMock
+                  }>
+                    <div className={styles.phoneMockInner} id="landing-canvas" ref={landingCanvasRef}>
+                      <LandingPreview
+                        theme={effectiveTheme}
+                        values={values}
+                        isFreeform={isFreeform}
+                        layoutState={layoutState}
+                        onLayoutChange={handleLayoutChange}
+                        onSelectNode={handleNodeSelect}
+                        canvasRef={landingCanvasRef}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -263,6 +276,16 @@ export default function Editor() {
           </div>
         </main>
       </div>
+
+      {/* ── Mobile FAB to open/close panel ─────────────────────────── */}
+      <button
+        className={styles.sidebarToggle}
+        onClick={() => setSidebarOpen(o => !o)}
+        title={sidebarOpen ? 'Close panel' : 'Edit properties'}
+        aria-label="Toggle panel"
+      >
+        {sidebarOpen ? '✕' : '✏'}
+      </button>
     </div>
   );
 }
