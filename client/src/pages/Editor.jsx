@@ -34,8 +34,9 @@ export default function Editor() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ── Canvas refs ──────────────────────────────────────────────────────────
-  const cardCanvasRef   = useRef(null);
+  const cardCanvasRef    = useRef(null);
   const landingCanvasRef = useRef(null);
+  const previewAreaRef   = useRef(null);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load template
@@ -77,8 +78,31 @@ export default function Editor() {
   const handleNodeSelect = useCallback((id, element) => {
     setSelectedNodeId(id);
     if (element) {
-      const r = element.getBoundingClientRect();
-      setToolbarAnchor({ x: r.left, y: r.top });
+      const pane = previewAreaRef.current?.getBoundingClientRect();
+      const TOOLBAR_W = 600;
+
+      if (pane) {
+        // Try to place toolbar below the card canvas
+        const cardEl = document.getElementById('card-canvas') || document.getElementById('landing-canvas');
+        const cardRect = cardEl?.getBoundingClientRect();
+
+        // Center toolbar horizontally in the preview area
+        const centeredX = Math.max(8, pane.left + (pane.width - TOOLBAR_W) / 2);
+
+        if (cardRect && cardRect.bottom + 72 < pane.bottom) {
+          // Room below the card — place it right under the card
+          setToolbarAnchor({ x: centeredX, y: cardRect.bottom + 12 });
+        } else if (cardRect && cardRect.top - 72 > pane.top) {
+          // Place it above the card
+          setToolbarAnchor({ x: centeredX, y: cardRect.top - 68 });
+        } else {
+          // Fallback: pin near bottom of viewport, centered in canvas pane
+          setToolbarAnchor({ x: centeredX, y: window.innerHeight - 76 });
+        }
+      } else {
+        const r = element.getBoundingClientRect();
+        setToolbarAnchor({ x: r.left, y: r.bottom + 8 });
+      }
     }
   }, []);
 
