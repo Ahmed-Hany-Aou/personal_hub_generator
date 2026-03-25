@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
+import styles from './DraggableNode.module.css';
 
 /**
  * DraggableNode wraps any element so it can be:
@@ -98,8 +99,8 @@ export default function DraggableNode({
   } else if (!isFreeform) {
     style.cursor        = 'pointer';
     style.outline       = '1px solid transparent';
-    style.outlineOffset = '3px';
-    style.borderRadius  = '3px';
+    style.outlineOffset = '4px';
+    style.borderRadius  = '4px';
     style.transition    = 'outline-color 0.15s';
   }
 
@@ -117,6 +118,7 @@ export default function DraggableNode({
   return (
     <div
       ref={nodeRef}
+      className={isFreeform ? styles.nodeFreeform : styles.node}
       style={style}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

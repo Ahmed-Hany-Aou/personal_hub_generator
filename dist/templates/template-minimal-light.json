@@ -1,0 +1,31 @@
+{
+  "id": "template-minimal-light",
+  "name": "Minimal Light",
+  "category": "professional",
+  "tags": ["light", "clean", "minimal", "white"],
+  "description": "Clean, minimalist card with a white background and subtle grey accents.",
+  "theme": {
+    "bg": "#ffffff",
+    "cardBg": "#f8f9fa",
+    "accent": "#2563eb",
+    "textPrimary": "#111827",
+    "textSecondary": "#6b7280",
+    "glassBackground": "rgba(0,0,0,0.04)",
+    "fontHeading": "Poppins",
+    "fontBody": "Inter"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["userAvatar", "companyLogo", "avatarInitials", "companyName", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
+    "defaults": {
+      "userName": "Jordan Lee",
+      "userTitle": "Product Designer",
+      "companyName": "Studio Co.",
+      "userEmail": "jordan@studio.co",
+      "userPhone": "+1 (555) 987-6543",
+      "githubHandle": "jordanlee",
+      "linkedinHandle": "jordan-lee-design",
+      "profileUrl": "https://jordanlee.design"
+    }
+  }
+}

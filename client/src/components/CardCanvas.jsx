@@ -26,9 +26,9 @@ export default function CardCanvas({
     }).then(setQrCodeUrl).catch(console.error);
   }, [values.profileUrl, theme.accent, theme.bg]);
 
-  const PREVIEW_WIDTH = 682.5;
-  const PREVIEW_HEIGHT = 450; 
-  const scale = Math.min(PREVIEW_WIDTH / width, PREVIEW_HEIGHT / height, 0.65);
+  const PREVIEW_WIDTH = 920;
+  const PREVIEW_HEIGHT = 570;
+  const scale = Math.min(PREVIEW_WIDTH / width, PREVIEW_HEIGHT / height, 0.88);
 
   const getLayout = () => {
     if (isFreeform) return 'custom';
