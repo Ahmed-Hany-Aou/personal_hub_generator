@@ -1,0 +1,8 @@
+The Logic Flow
+Ask: Do you have a custom image?
+
+Branch:
+
+If Yes: Ask for the file path -> Verify it exists -> Copy it to the output folder as avatar.jpg.
+
+If No: Take your internal default.png -> Copy it to the output folder as avatar.jpg.

@@ -12,7 +12,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-const templatesDir = path.join(__dirname, '../templates/gallery');
+const templatesDir = path.join(__dirname, '../client/public/templates');
 
 function loadTemplates() {
   const files = fs.readdirSync(templatesDir).filter(f => f.endsWith('.json'));

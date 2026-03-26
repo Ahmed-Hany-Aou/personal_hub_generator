@@ -28,7 +28,7 @@ export default function LandingPreview({
   useEffect(() => {
     const url = values.profileUrl || 'https://yourpage.com';
     QRCode.toDataURL(url, {
-      width: 200,
+      width: 512,
       margin: 1,
       color: { dark: theme.accent, light: theme.glassBackground || theme.bg },
     }).then(setQrCodeUrl).catch(console.error);
@@ -172,7 +172,15 @@ export default function LandingPreview({
         <div className={styles.section}>
           <div className={styles.sectionTitle} style={{ color: `${theme.accent}80` }}>CONNECT</div>
           <div className={styles.qrBlock} style={{ background: theme.glassBackground, borderColor: `${theme.accent}20` }}>
-            <div className={styles.qrPlaceholder} style={{ borderColor: theme.accent, padding: qrCodeUrl ? 0 : 6 }}>
+            <div
+              className={styles.qrPlaceholder}
+              style={{
+                borderColor: theme.accent,
+                padding: qrCodeUrl ? (layoutState?.landingConnect?.fontSize ? (layoutState.landingConnect.fontSize / 16) * 6 : 6) : 6,
+                width:  layoutState?.landingConnect?.fontSize ? (layoutState.landingConnect.fontSize / 16) * 70 : 70,
+                height: layoutState?.landingConnect?.fontSize ? (layoutState.landingConnect.fontSize / 16) * 70 : 70,
+              }}
+            >
               {qrCodeUrl
                 ? <img src={qrCodeUrl} alt="QR Code" style={{ width: '100%', height: '100%', borderRadius: '4px' }} />
                 : <div className={styles.qrMock} />}

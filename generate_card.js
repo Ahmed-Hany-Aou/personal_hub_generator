@@ -31,6 +31,22 @@ const questions = [
     message: 'What is your Email Address?'
   },
   {
+    type: 'confirm',
+    name: 'hasCustomImage',
+    message: 'Do you have a custom profile image?',
+    default: false
+  },
+  {
+    type: 'input',
+    name: 'customImagePath',
+    message: 'Please enter the file path for your custom image:',
+    when: (answers) => answers.hasCustomImage,
+    validate: (input) => {
+      if (fs.existsSync(input)) return true;
+      return 'File does not exist. Please enter a valid path.';
+    }
+  },
+  {
     type: 'input',
     name: 'portfolioUrl',
     message: 'Link to your Portfolio (e.g. Behance, Dribbble, Custom Site):',
@@ -76,11 +92,62 @@ const questions = [
   }
 ];
 
-inquirer.prompt(questions).then(async (answers) => {
+// Check for config file to bypass prompts
+const configPath = 'card_config.json';
+let answers;
+
+if (fs.existsSync(configPath)) {
+  console.log("⚡ Auto-filling data from card_config.json...");
+  answers = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+  // Validate basic requirements if needed, but for now trusting the config
+  runGenerator(answers);
+} else {
+  // Interactive Mode
+  inquirer.prompt(questions).then((collectedAnswers) => {
+    runGenerator(collectedAnswers);
+  });
+}
+
+async function runGenerator(answers) {
   console.log("\nGenerating your files...\n");
 
   // Format WhatsApp number (remove +, spaces, dashes)
   const whatsAppNumber = answers.phone.replace(/[^0-9]/g, '');
+
+  // --- Avatar Logic ---
+  const initialAvatar = answers.hasCustomImage ? answers.customImagePath : 'profile_pic.png';
+  const finalAvatarName = 'avatar.jpg';
+
+  try {
+    if (fs.existsSync(initialAvatar)) {
+      console.log(`...Resizing Avatar: ${initialAvatar}...`);
+      const image = await Jimp.read(initialAvatar);
+      // Resize to 300x300 for optimal vCard compatibility (<100KB)
+      image.resize({ w: 300, h: 300 });
+      await image.write(finalAvatarName);
+      console.log(`✅ Avatar resized & saved to: ${finalAvatarName}`);
+    } else {
+      console.warn(`⚠️ Warning: Source image "${initialAvatar}" not found.`);
+    }
+  } catch (err) {
+    console.error("❌ Error processing avatar:", err);
+  }
+
+  // Read and encode avatar for vCard
+  let vCardPhotoBlock = '';
+  try {
+    if (fs.existsSync(finalAvatarName)) {
+      const imageBitmap = fs.readFileSync(finalAvatarName);
+      const imageBase64 = imageBitmap.toString('base64');
+      const mimeType = 'JPEG';
+      vCardPhotoBlock = `\nPHOTO;ENCODING=b;TYPE=${mimeType}:${imageBase64}`;
+    }
+  } catch (e) {
+    console.error("Error processing vCard photo:", e);
+  }
+
+  // 1. Generate vCard Content
 
   // 1. Generate vCard Content
   let vCardContent = `BEGIN:VCARD
@@ -88,7 +155,7 @@ VERSION:3.0
 FN:${answers.fullName}
 TITLE:${answers.jobTitle}
 TEL;TYPE=CELL:${answers.phone}
-EMAIL:${answers.email}`;
+EMAIL:${answers.email}${vCardPhotoBlock}`;
 
   if (answers.portfolioUrl) vCardContent += `\nURL;TYPE=PORTFOLIO:${answers.portfolioUrl}`;
   if (answers.liveAppUrl) vCardContent += `\nURL;TYPE=WEBSITE:${answers.liveAppUrl}`;
@@ -200,7 +267,7 @@ EMAIL:${answers.email}`;
 
     <div class="container">
         <!-- Profile Picture: Expected to be in the same folder -->
-        <img src="profile_pic.png" alt="${answers.fullName}" class="avatar">
+        <img src="avatar.jpg" alt="${answers.fullName}" class="avatar">
 
         <h1>${answers.fullName}</h1>
         <p class="title">${answers.jobTitle}</p>
@@ -289,9 +356,9 @@ EMAIL:${answers.email}`;
     console.log("🎉 SUCCESS! Your Digital Business Card is ready.");
     console.log("------------------------------------------------");
     console.log("Next Steps:");
-    console.log("1. Host 'index.html', 'contact.vcf' & 'profile_pic.png' at your URL: " + answers.baseUrl);
+    console.log("1. Host 'index.html', 'contact.vcf' & 'avatar.jpg' at your URL: " + answers.baseUrl);
     console.log("2. Use 'final_card_with_qr.png' for printing or sharing.");
   });
 
-});
+}
 

@@ -1,0 +1,29 @@
+{
+  "id": "template-solaris-glass",
+  "name": "Solaris Glass",
+  "category": "lifestyle",
+  "tags": ["minimal", "bright", "glassmorphism", "clean", "gold"],
+  "description": "An airy and elegant minimalist design with soft sunrise-gold accents and frosted glass effects.",
+  "theme": {
+    "bg": "#ffffff",
+    "cardBg": "#fafaf9",
+    "accent": "#d97706",
+    "textPrimary": "#1c1917",
+    "textSecondary": "#78716c",
+    "glassBackground": "rgba(217, 119, 6, 0.08)",
+    "fontHeading": "Playfair Display",
+    "fontBody": "Montserrat"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["portfolioUrl", "instagramHandle", "profileUrl"],
+    "defaults": {
+      "userName": "Elena Moretti",
+      "userTitle": "Principal Interior Architect",
+      "userEmail": "elena@solaris.design",
+      "userPhone": "+39 02 1234 5678",
+      "portfolioUrl": "www.solaris.design/elena",
+      "instagramHandle": "elena_designs"
+    }
+  }
+}

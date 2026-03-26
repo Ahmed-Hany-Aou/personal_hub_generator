@@ -50,7 +50,7 @@ export default function Gallery() {
                   <span className={styles.cardCategory}>{t.category}</span>
                 </div>
                 <div className={styles.cardTags}>
-                  {t.tags.slice(0, 3).map(tag => (
+                  {(t.tags || []).slice(0, 3).map(tag => (
                     <span key={tag} className={styles.tag}>{tag}</span>
                   ))}
                 </div>

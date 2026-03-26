@@ -19,7 +19,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vite --config client/vite.config.js",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "vite build --config client/vite.config.js",
     "server": "node server/index.js",
     "client": "vite --config client/vite.config.js",

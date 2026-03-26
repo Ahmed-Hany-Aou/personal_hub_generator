@@ -25,13 +25,15 @@ export default function Editor() {
 
   // ── Style toolbar state ──────────────────────────────────────────────────
   const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [toolbarAnchor, setToolbarAnchor] = useState(null);
 
   // ── Per-key theme overrides ──────────────────────────────────────────────
   const [themeOverrides, setThemeOverrides] = useState({});
 
   // ── Mobile sidebar open/close ────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ── Grid persistence ─────────────────────────────────────────────────────
+  const [showGrid, setShowGrid] = useState(true);
 
   // ── Canvas refs ──────────────────────────────────────────────────────────
   const cardCanvasRef    = useRef(null);
@@ -75,40 +77,12 @@ export default function Editor() {
     setLayoutState(prev => ({ ...prev, [id]: newStyles }));
   }, []);
 
-  const handleNodeSelect = useCallback((id, element) => {
+  const handleNodeSelect = useCallback((id) => {
     setSelectedNodeId(id);
-    if (element) {
-      const pane = previewAreaRef.current?.getBoundingClientRect();
-      const TOOLBAR_W = 600;
-
-      if (pane) {
-        // Try to place toolbar below the card canvas
-        const cardEl = document.getElementById('card-canvas') || document.getElementById('landing-canvas');
-        const cardRect = cardEl?.getBoundingClientRect();
-
-        // Center toolbar horizontally in the preview area
-        const centeredX = Math.max(8, pane.left + (pane.width - TOOLBAR_W) / 2);
-
-        if (cardRect && cardRect.bottom + 72 < pane.bottom) {
-          // Room below the card — place it right under the card
-          setToolbarAnchor({ x: centeredX, y: cardRect.bottom + 12 });
-        } else if (cardRect && cardRect.top - 72 > pane.top) {
-          // Place it above the card
-          setToolbarAnchor({ x: centeredX, y: cardRect.top - 68 });
-        } else {
-          // Fallback: pin near bottom of viewport, centered in canvas pane
-          setToolbarAnchor({ x: centeredX, y: window.innerHeight - 76 });
-        }
-      } else {
-        const r = element.getBoundingClientRect();
-        setToolbarAnchor({ x: r.left, y: r.bottom + 8 });
-      }
-    }
   }, []);
 
   const closeToolbar = useCallback(() => {
     setSelectedNodeId(null);
-    setToolbarAnchor(null);
   }, []);
 
   const handleCanvasPointerDown = useCallback((e) => {
@@ -186,17 +160,6 @@ export default function Editor() {
         />
       </header>
 
-      {/* ── Floating Style Toolbar ───────────────────────────────────── */}
-      <StyleToolbar
-        anchor={toolbarAnchor}
-        nodeId={selectedNodeId}
-        nodeStyles={layoutState[selectedNodeId] || {}}
-        onStyleChange={handleLayoutChange}
-        bgColor={effectiveTheme.bg}
-        onBgChange={v => handleThemeOverride('bg', v)}
-        onClose={closeToolbar}
-      />
-
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
 
@@ -219,6 +182,8 @@ export default function Editor() {
           themeOverrides={themeOverrides}
           onThemeOverride={handleThemeOverride}
           open={sidebarOpen}
+          showGrid={showGrid}
+          onToggleGrid={setShowGrid}
         />
 
         {/* ── Canvas ─────────────────────────────────────────────────── */}
@@ -239,8 +204,18 @@ export default function Editor() {
             </button>
           </div>
 
-          {/* Preview */}
-          <div className={styles.previewArea}>
+          {/* Preview — position:relative so toolbar positions absolute inside */}
+          <div className={styles.previewArea} ref={previewAreaRef}>
+            {/* ── Style Toolbar — docked inside canvas, no overlap with element ── */}
+            <StyleToolbar
+              nodeId={selectedNodeId}
+              nodeStyles={layoutState[selectedNodeId] || {}}
+              onStyleChange={handleLayoutChange}
+              bgColor={effectiveTheme.bg}
+              onBgChange={v => handleThemeOverride('bg', v)}
+              onClose={closeToolbar}
+            />
+
             {activeTab === 'card' ? (
               <div className={styles.cardWrapper}>
                 <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
@@ -255,6 +230,7 @@ export default function Editor() {
                     onLayoutChange={handleLayoutChange}
                     onSelectNode={handleNodeSelect}
                     canvasRef={cardCanvasRef}
+                    showGrid={showGrid}
                   />
                 </div>
               </div>
