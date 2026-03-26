@@ -26,6 +26,7 @@ export default function CardCanvas({
   onLayoutChange,
   onSelectNode,
   canvasRef,
+  showGrid = true,
 }) {
   const isGradient = (theme.cardBg || theme.bg).includes('gradient');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -101,7 +102,7 @@ export default function CardCanvas({
         }}
       >
         {theme.accentBar && <div className={styles.accentBar} style={{ background: theme.accent }} />}
-        <div className={styles.grid} />
+        {showGrid && <div className={styles.grid} />}
         <div className={styles.glow} />
 
         <div className={styles.body}>

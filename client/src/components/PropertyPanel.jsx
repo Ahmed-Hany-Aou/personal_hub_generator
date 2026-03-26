@@ -152,6 +152,8 @@ export default function PropertyPanel({
   themeOverrides,
   onThemeOverride,
   open = true,
+  showGrid = true,
+  onToggleGrid,
 }) {
   const { required = [], optional = [] } = template.placeholders;
   const [sections, setSections] = useState({ identity: true, social: false, bio: false, media: false, theme: false, format: false });
@@ -240,6 +242,16 @@ export default function PropertyPanel({
           <button className={styles.resetBtn} onClick={() => onThemeOverride(null, null)}>
             ↺ Reset to template defaults
           </button>
+          
+          <div className={styles.divider} />
+          
+          <div className={styles.themeRow}>
+            <span className={styles.themeRowLabel}>Show Canvas Grid</span>
+            <label className={styles.switch}>
+              <input type="checkbox" checked={showGrid} onChange={e => onToggleGrid(e.target.checked)} />
+              <span className={styles.slider} />
+            </label>
+          </div>
         </Section>
 
         {/* ── Format & Layout ────────────────────────────────────────── */}

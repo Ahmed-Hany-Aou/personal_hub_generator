@@ -1,0 +1,29 @@
+{
+  "id": "template-cyber-noir",
+  "name": "Cyber Noir",
+  "category": "creative",
+  "tags": ["cyber", "noir", "neon", "violet", "dark"],
+  "description": "A stealthy, high-contrast design with electric violet accents and deep noir backgrounds.",
+  "theme": {
+    "bg": "#020617",
+    "cardBg": "#0f172a",
+    "accent": "#c084fc",
+    "textPrimary": "#f8fafc",
+    "textSecondary": "#94a3b8",
+    "glassBackground": "rgba(192, 132, 252, 0.05)",
+    "fontHeading": "Orbitron",
+    "fontBody": "Inter"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["githubHandle", "linkedinHandle", "profileUrl"],
+    "defaults": {
+      "userName": "Kaelen Voss",
+      "userTitle": "Lead Cyber Security Architect",
+      "userEmail": "voss@noir.tech",
+      "userPhone": "+44 20 7946 0958",
+      "githubHandle": "kvoss_noir",
+      "linkedinHandle": "kaelen-voss"
+    }
+  }
+}

@@ -32,6 +32,9 @@ export default function Editor() {
   // ── Mobile sidebar open/close ────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // ── Grid persistence ─────────────────────────────────────────────────────
+  const [showGrid, setShowGrid] = useState(true);
+
   // ── Canvas refs ──────────────────────────────────────────────────────────
   const cardCanvasRef    = useRef(null);
   const landingCanvasRef = useRef(null);
@@ -179,6 +182,8 @@ export default function Editor() {
           themeOverrides={themeOverrides}
           onThemeOverride={handleThemeOverride}
           open={sidebarOpen}
+          showGrid={showGrid}
+          onToggleGrid={setShowGrid}
         />
 
         {/* ── Canvas ─────────────────────────────────────────────────── */}
@@ -225,6 +230,7 @@ export default function Editor() {
                     onLayoutChange={handleLayoutChange}
                     onSelectNode={handleNodeSelect}
                     canvasRef={cardCanvasRef}
+                    showGrid={showGrid}
                   />
                 </div>
               </div>
