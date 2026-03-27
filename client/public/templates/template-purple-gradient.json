@@ -2,7 +2,12 @@
   "id": "template-purple-gradient",
   "name": "Purple Gradient",
   "category": "creative",
-  "tags": ["purple", "gradient", "bold", "vibrant"],
+  "tags": [
+    "purple",
+    "gradient",
+    "bold",
+    "vibrant"
+  ],
   "description": "Bold purple-to-indigo gradient card with white text — great for creatives.",
   "theme": {
     "bg": "#4f46e5",
@@ -15,8 +20,29 @@
     "fontBody": "Inter"
   },
   "placeholders": {
-    "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["userAvatar", "companyLogo", "avatarInitials", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
+    "required": [
+      "userName",
+      "userTitle",
+      "userEmail",
+      "userPhone"
+    ],
+    "optional": [
+      "userAvatar",
+      "companyLogo",
+      "avatarInitials",
+      "githubHandle",
+      "linkedinHandle",
+      "xHandle",
+      "facebookHandle",
+      "instagramHandle",
+      "snapchatHandle",
+      "youtubeHandle",
+      "threadsHandle",
+      "profileUrl",
+      "whatsAppNumber",
+      "cvUrl",
+      "companyName"
+    ],
     "defaults": {
       "userName": "Maya Rivera",
       "userTitle": "Creative Director",

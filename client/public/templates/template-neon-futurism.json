@@ -1,0 +1,30 @@
+{
+  "id": "template-neon-futurism",
+  "name": "Neon Futurism",
+  "category": "creative",
+  "tags": ["neon", "cyberpunk", "bold", "vibrant"],
+  "description": "A high-energy cyberpunk design with glowing neon gradients and sharp typography.",
+  "theme": {
+    "bg": "#0a0a0c",
+    "cardBg": "linear-gradient(135deg, #bc13fe 0%, #7e0fff 100%)",
+    "accent": "#00f3ff",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#e0e0e0",
+    "glassBackground": "rgba(0, 0, 0, 0.4)",
+    "fontHeading": "Orbitron",
+    "fontBody": "Exo 2"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "whatsAppNumber", "cvUrl", "profileUrl", "githubHandle"],
+    "defaults": {
+      "userName": "Kaelen Voss",
+      "userTitle": "Lead Cyber Security Architect",
+      "companyName": "NOIR TECH INDUSTRIES",
+      "userEmail": "voss@noir.tech",
+      "userPhone": "+44 20 7946 0958",
+      "githubHandle": "kvoss-security",
+      "profileUrl": "https://noir.tech/voss"
+    }
+  }
+}

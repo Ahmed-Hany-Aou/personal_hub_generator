@@ -5,7 +5,8 @@ import DraggableNode from './DraggableNode.jsx';
 
 const CONTACT_MAP = [
   { id: 'card-email',     icon: '✉️', label: v => v.userEmail      || null },
-  { id: 'card-phone',     icon: '📞', label: v => v.userPhone      || null },
+  { id: 'card-phone',     icon: '📞', label: v => (v.userPhone && v.whatsAppNumber === v.userPhone) ? `${v.userPhone} 📱` : (v.userPhone || null) },
+  { id: 'card-whatsapp',  icon: '💬', label: v => (v.whatsAppNumber && v.whatsAppNumber !== v.userPhone) ? v.whatsAppNumber : null },
   { id: 'card-github',    icon: '⌥',  label: v => v.githubHandle   ? `github.com/${v.githubHandle}`   : null },
   { id: 'card-linkedin',  icon: '🔗', label: v => v.linkedinHandle ? `in/${v.linkedinHandle}`          : null },
   { id: 'card-x',         icon: '𝕏',  label: v => v.xHandle        ? `@${v.xHandle}`                  : null },
