@@ -41,6 +41,16 @@ export default function DraggableNode({
 
     if (!isFreeform) return;
 
+    // To handle scale transforms correctly during dragging
+    let scale = 1;
+    if (canvasRef.current) {
+      const transform = window.getComputedStyle(canvasRef.current).transform;
+      if (transform && transform !== 'none') {
+        const matrix = transform.match(/^matrix\((.+)\)$/);
+        if (matrix) scale = parseFloat(matrix[1].split(', ')[0]);
+      }
+    }
+
     dragRef.current = {
       active: true,
       moved:  false,
@@ -48,14 +58,15 @@ export default function DraggableNode({
       mouseY: e.clientY,
       elemX:  current.x ?? 0,
       elemY:  current.y ?? 0,
+      scale,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
   }, [isFreeform, id, onSelect, current.x, current.y]);
 
   const handlePointerMove = useCallback((e) => {
     if (!dragRef.current.active) return;
-    const dx = e.clientX - dragRef.current.mouseX;
-    const dy = e.clientY - dragRef.current.mouseY;
+    const dx = (e.clientX - dragRef.current.mouseX) / (dragRef.current.scale || 1);
+    const dy = (e.clientY - dragRef.current.mouseY) / (dragRef.current.scale || 1);
 
     // Only start dragging after 4px movement (preserves link clicks)
     if (!dragRef.current.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;

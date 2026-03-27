@@ -1,0 +1,30 @@
+{
+  "id": "template-earth-tone-elegance",
+  "name": "Earth Tone Elegance",
+  "category": "lifestyle",
+  "tags": ["organic", "warm", "professional", "minimal"],
+  "description": "Sophisticated organic design with a warm, natural color palette and soft typography.",
+  "theme": {
+    "bg": "#fdfbf7",
+    "cardBg": "#f8f3eb",
+    "accent": "#8b5e3c",
+    "textPrimary": "#2c1e14",
+    "textSecondary": "#5a4a3a",
+    "glassBackground": "rgba(139, 94, 60, 0.05)",
+    "fontHeading": "Cormorant Garamond",
+    "fontBody": "Mulish"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "whatsAppNumber", "cvUrl", "profileUrl", "instagramHandle"],
+    "defaults": {
+      "userName": "Elena Moretti",
+      "userTitle": "Principal Interior Architect",
+      "companyName": "Moretti & Co. Studio",
+      "userEmail": "elena@moretti.design",
+      "userPhone": "+39 02 1234 5678",
+      "instagramHandle": "elena.moretti.arch",
+      "profileUrl": "https://moretti.design"
+    }
+  }
+}

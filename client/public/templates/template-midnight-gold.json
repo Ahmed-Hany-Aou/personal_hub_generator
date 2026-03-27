@@ -1,0 +1,30 @@
+{
+  "id": "template-midnight-gold",
+  "name": "Midnight Gold",
+  "category": "professional",
+  "tags": ["premium", "luxury", "executive", "dark"],
+  "description": "Premium executive design with deep navy background and polished gold accents.",
+  "theme": {
+    "bg": "#050a14",
+    "cardBg": "#0a1224",
+    "accent": "#f59e0b",
+    "textPrimary": "#f1f5f9",
+    "textSecondary": "#94a3b8",
+    "glassBackground": "rgba(245, 158, 11, 0.03)",
+    "fontHeading": "Playfair Display",
+    "fontBody": "Montserrat"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "whatsAppNumber", "cvUrl", "profileUrl", "linkedinHandle"],
+    "defaults": {
+      "userName": "Omar Ahmed",
+      "userTitle": "Managing Director",
+      "companyName": "Emerald Solutions",
+      "userEmail": "omarahmed.dev",
+      "userPhone": "+1 (555) 012-3456",
+      "linkedinHandle": "omarahmed-exec",
+      "profileUrl": "https://emerald.dev/omar"
+    }
+  }
+}

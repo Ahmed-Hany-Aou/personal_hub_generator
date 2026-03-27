@@ -196,15 +196,43 @@ export default function LandingPreview({
       </DraggableNode>
 
       {/* ── Save contact button ───────────────────────────────────────────── */}
-      <DraggableNode {...dn('landingSaveBtn')}>
-        <a
-          href="contact.vcf"
-          className={styles.saveBtn}
-          style={{ background: theme.accent, color: '#0a0f16' }}
-        >
-          📞 Save Contact Info
-        </a>
-      </DraggableNode>
+      <div className={styles.actionGroup}>
+        {values.whatsAppNumber && (
+          <DraggableNode {...dn('landingWhatsApp')}>
+            <a
+              href={`https://api.whatsapp.com/send/?phone=${values.whatsAppNumber.replace(/\D/g, '')}&text&type=phone_number&app_absent=0`}
+              target="_blank" rel="noreferrer"
+              className={styles.saveBtn}
+              style={{ background: '#25D366', color: '#fff' }}
+            >
+              💬 WhatsApp Me
+            </a>
+          </DraggableNode>
+        )}
+
+        {values.cvUrl && (
+          <DraggableNode {...dn('landingCv')}>
+            <a
+              href={values.cvUrl}
+              target="_blank" rel="noreferrer"
+              className={styles.saveBtn}
+              style={{ background: theme.accent, color: '#000' }}
+            >
+              📄 View CV
+            </a>
+          </DraggableNode>
+        )}
+
+        <DraggableNode {...dn('landingSaveBtn')}>
+          <a
+            href="contact.vcf"
+            className={styles.saveBtn}
+            style={{ background: theme.textPrimary, color: theme.bg }}
+          >
+            👤 Save Contact
+          </a>
+        </DraggableNode>
+      </div>
     </div>
   );
 }

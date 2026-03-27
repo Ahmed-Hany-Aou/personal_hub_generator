@@ -1,26 +1,37 @@
 {
-    "id": "template-circuit-dark",
-    "name": "Circuit Dark Professional",
-    "category": "professional",
-    "tags": ["dark", "circuit", "tech", "amber", "minimal"],
-    "description": "A high-tech professional layout with an amber and deep navy circuit board aesthetic.",
-    "theme": {
-        "bg": "#0A192F",
-        "cardBg": "#112240",
-        "accent": "#F59E0B",
-        "textPrimary": "#CCD6F6",
-        "textSecondary": "#8892B0",
-        "glassBackground": "rgba(255, 255, 255, 0.05)",
-        "fontHeading": "Montserrat",
-        "fontBody": "Inter"
+  "id": "template-circuit-dark",
+  "name": "Circuit Dark Professional",
+  "category": "professional",
+  "tags": [
+    "dark",
+    "circuit",
+    "tech",
+    "amber",
+    "minimal"
+  ],
+  "description": "A high-tech professional layout with an amber and deep navy circuit board aesthetic.",
+  "theme": {
+    "bg": "#0A192F",
+    "cardBg": "#112240",
+    "accent": "#F59E0B",
+    "textPrimary": "#CCD6F6",
+    "textSecondary": "#8892B0",
+    "glassBackground": "rgba(255, 255, 255, 0.05)",
+    "fontHeading": "Montserrat",
+    "fontBody": "Inter"
+  },
+  "placeholders": {
+    "defaults": {
+      "companyName": "CODE + AMBER",
+      "userName": "Amira Hassan",
+      "jobTitle": "Lead Frontend Developer",
+      "email": "email@amber.dev",
+      "github": "github.com/amirahassan"
     },
-    "placeholders": {
-        "defaults": {
-            "companyName": "CODE + AMBER",
-            "userName": "Amira Hassan",
-            "jobTitle": "Lead Frontend Developer",
-            "email": "email@amber.dev",
-            "github": "github.com/amirahassan"
-        }
-    }
+    "optional": [
+      "whatsAppNumber",
+      "cvUrl",
+      "companyName"
+    ]
+  }
 }

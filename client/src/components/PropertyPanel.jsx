@@ -8,6 +8,8 @@ const FIELD_LABELS = {
   companyName: 'Company',
   userEmail: 'Email',
   userPhone: 'Phone',
+  whatsAppNumber: 'WhatsApp',
+  cvUrl: 'CV URL (Google Drive/Dropbox)',
   githubHandle: 'GitHub',
   linkedinHandle: 'LinkedIn',
   xHandle: 'X / Twitter',
@@ -24,7 +26,7 @@ const FIELD_LABELS = {
 
 const FIELD_ICONS = {
   userName: '👤', userTitle: '💼', companyName: '🏢',
-  userEmail: '✉', userPhone: '☎',
+  userEmail: '✉', userPhone: '☎', whatsAppNumber: '💬', cvUrl: '📄',
   githubHandle: '⌥', linkedinHandle: '🔗', xHandle: '𝕏',
   instagramHandle: '📸', facebookHandle: '📘',
   snapchatHandle: '👻', threadsHandle: '🧵', youtubeHandle: '▶',
@@ -184,7 +186,15 @@ export default function PropertyPanel({
           {required.map(k => (
             <Field key={k} fieldKey={k} value={values[k] || ''} onChange={onChange} required />
           ))}
-          {otherKeys.map(k => (
+
+          {/* Ensure common fields are grouped logically */}
+          {['companyName', 'userPhone', 'whatsAppNumber', 'cvUrl'].map(k => (
+            (optional.includes(k) || required.includes(k)) && (
+              <Field key={k} fieldKey={k} value={values[k] || ''} onChange={onChange} required={required.includes(k)} />
+            )
+          ))}
+
+          {otherKeys.filter(k => !['companyName', 'userPhone', 'whatsAppNumber', 'cvUrl'].includes(k)).map(k => (
             <Field key={k} fieldKey={k} value={values[k] || ''} onChange={onChange} />
           ))}
 

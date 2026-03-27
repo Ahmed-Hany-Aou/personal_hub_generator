@@ -199,3 +199,10 @@
   text-decoration: none;
 }
 .saveBtn:hover { opacity: 0.9; }
+
+.actionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 24px;
+}
