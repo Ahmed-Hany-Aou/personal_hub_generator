@@ -45,6 +45,9 @@ export default function LandingPreview({
 
   const gs = (id) => layoutState[id] || {};
 
+  const hasWhatsApp = !!values.whatsAppNumber;
+  const waSameAsPhone = hasWhatsApp && values.whatsAppNumber.replace(/\D/g, '') === (values.userPhone || '').replace(/\D/g, '');
+
   return (
     <div
       ref={canvasRef}
@@ -132,8 +135,24 @@ export default function LandingPreview({
             >
               <span className={styles.glassIcon} style={{ color: theme.accent }}>☎</span>
               <div>
-                <div className={styles.glassLabel} style={{ color: theme.textSecondary }}>Phone</div>
+                <div className={styles.glassLabel} style={{ color: theme.textSecondary }}>
+                  Phone {waSameAsPhone && <span style={{ color: '#25D366', marginLeft: 6 }}>💬</span>}
+                </div>
                 <div className={styles.glassValue} style={{ color: theme.textPrimary }}>{values.userPhone}</div>
+              </div>
+            </a>
+          )}
+          {!waSameAsPhone && hasWhatsApp && (
+            <a
+              href={`https://api.whatsapp.com/send/?phone=${values.whatsAppNumber.replace(/\D/g, '')}&text&type=phone_number&app_absent=0`}
+              className={styles.glassCard}
+              style={{ background: theme.glassBackground, borderColor: `${theme.accent}20` }}
+              target="_blank" rel="noreferrer"
+            >
+              <span className={styles.glassIcon} style={{ color: '#25D366' }}>💬</span>
+              <div>
+                <div className={styles.glassLabel} style={{ color: theme.textSecondary }}>WhatsApp</div>
+                <div className={styles.glassValue} style={{ color: theme.textPrimary }}>{values.whatsAppNumber}</div>
               </div>
             </a>
           )}
