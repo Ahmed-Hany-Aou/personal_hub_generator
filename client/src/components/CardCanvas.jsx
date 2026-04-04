@@ -146,7 +146,15 @@ export default function CardCanvas({
           )}
 
           <DraggableNode {...dn('divider')}>
-            <div className={styles.divider} style={{ background: theme.accent, opacity: 0.3 }} />
+            <div
+              className={styles.divider}
+              style={{
+                ...ns('divider', { opacity: 0.3 }),
+                background: layoutState?.divider?.color || theme.accent,
+                '--divider-width': layoutState?.divider?.fontSize ? `${layoutState.divider.fontSize * 7}px` : '320px',
+                '--divider-height': layoutState?.divider?.letterSpacing ? `${Math.max(1, layoutState.divider.letterSpacing)}px` : '2px'
+              }}
+            />
           </DraggableNode>
 
           {/* ── Individual contact rows — each is its own node ────── */}
