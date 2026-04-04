@@ -25,6 +25,7 @@ export default function Editor() {
 
   // ── Style toolbar state ──────────────────────────────────────────────────
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [toolbarPos, setToolbarPos] = useState(null);
 
   // ── Per-key theme overrides ──────────────────────────────────────────────
   const [themeOverrides, setThemeOverrides] = useState({});
@@ -214,6 +215,8 @@ export default function Editor() {
               bgColor={effectiveTheme.bg}
               onBgChange={v => handleThemeOverride('bg', v)}
               onClose={closeToolbar}
+              position={toolbarPos}
+              onPositionChange={setToolbarPos}
             />
 
             {activeTab === 'card' ? (

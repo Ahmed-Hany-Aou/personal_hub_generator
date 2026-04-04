@@ -56,8 +56,12 @@ export default function StyleToolbar({
   bgColor,
   onBgChange,
   onClose,
+  position,
+  onPositionChange,
 }) {
   const ref = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
@@ -65,19 +69,64 @@ export default function StyleToolbar({
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMove = (e) => {
+      // Find the preview area bounding box to keep the toolbar within it if possible
+      const x = e.clientX - dragOffset.x;
+      const y = e.clientY - dragOffset.y;
+      onPositionChange?.({ x, y });
+    };
+
+    const handleUp = () => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+  }, [isDragging, dragOffset, onPositionChange]);
+
   const patch = (key, val) => onStyleChange?.(nodeId, { ...nodeStyles, [key]: val });
   const toggle = (key, on, off) => patch(key, nodeStyles[key] === on ? off : on);
 
+  const startDrag = (e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setIsDragging(true);
+  };
+
   if (!nodeId) return null;
+
+  const style = position ? {
+    position: 'fixed',
+    left: position.x,
+    top: position.y,
+    transform: 'none',
+    bottom: 'auto',
+    '--toolbar-anim': 'none',
+  } : {};
 
   return (
     <div
       ref={ref}
-      className={styles.toolbar}
+      style={style}
+      className={`${styles.toolbar} ${isDragging ? styles.dragging : ''}`}
       onPointerDown={e => e.stopPropagation()}
     >
-      {/* ── Node label ──────────────────────────────────────────────── */}
-      <span className={styles.nodeLabel}>{nodeId.replace(/-/g,' ')}</span>
+      {/* ── Drag Handle + Node label ──────────────────────────────────── */}
+      <div className={styles.dragHandle} onPointerDown={startDrag} title="Drag to move">
+        <span style={{ fontSize: '0.8rem', marginRight: 4, opacity: 0.5 }}>⠿</span>
+        <span className={styles.nodeLabel}>{nodeId.replace(/-/g,' ')}</span>
+      </div>
       <span className={styles.sep} />
 
       {/* ── Font family ─────────────────────────────────────────────── */}
