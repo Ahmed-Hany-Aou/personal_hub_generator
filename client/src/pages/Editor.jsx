@@ -82,23 +82,36 @@ export default function Editor() {
   // ── Interaction Guard state ─────────────────────────────────────────────
   const toggleQueue = useRef(Promise.resolve());
   const abortControllerRef = useRef(null);
-  const [isToggling, setIsToggling] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
+  const [isInstalled, setIsInstalled] = useState(
+    window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone
+  );
   
   useEffect(() => {
-    const handler = (e) => {
+    const promptHandler = (e) => {
       e.preventDefault();
       setInstallPrompt(e);
     };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    const installHandler = () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+    };
+    window.addEventListener('beforeinstallprompt', promptHandler);
+    window.addEventListener('appinstalled', installHandler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', promptHandler);
+      window.removeEventListener('appinstalled', installHandler);
+    };
   }, []);
 
   const handleInstallClick = useCallback(async () => {
     if (!installPrompt) return;
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') setInstallPrompt(null);
+    if (outcome === 'accepted') {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+    }
   }, [installPrompt]);
 
   // ── Canvas refs ──────────────────────────────────────────────────────────
@@ -422,6 +435,7 @@ export default function Editor() {
           onResetFormat={handleResetFormat}
           onInstall={handleInstallClick}
           canInstall={!!installPrompt}
+          isInstalled={isInstalled}
           cardFormat={cardFormat}
           onFormatChange={setCardFormat}
           customDims={customDims}

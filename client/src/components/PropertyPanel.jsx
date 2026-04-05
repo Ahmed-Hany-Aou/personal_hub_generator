@@ -174,6 +174,7 @@ export default function PropertyPanel({
   onResetFormat,
   onInstall,
   canInstall,
+  isInstalled,
   onFullTemplateSelect,
 }) {
   const navigate = useNavigate();
@@ -195,6 +196,8 @@ export default function PropertyPanel({
   const socialFilled = socialKeys.filter(k => values[k]).length;
   const hasBio = !!values.userBio;
 
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
   return (
     <aside className={`${styles.panel} ${!open ? styles.panelHidden : ''}`}>
       {/* Brand header */}
@@ -207,16 +210,24 @@ export default function PropertyPanel({
       <div className={styles.scroll}>
 
         {/* ── PWA Install Banner ─────────────────────────────────────── */}
-        {canInstall && (
+        {!isStandalone && (canInstall || isInstalled) && (
           <div className={styles.installBanner}>
             <div className={styles.installInfo}>
               <span className={styles.installIcon}>📲</span>
               <div>
-                <div className={styles.installTitle}>Install Creative Studio</div>
-                <div className={styles.installSub}>Quick access from your home screen</div>
+                <div className={styles.installTitle}>{isInstalled ? 'Creative Studio App' : 'Install Creative Studio'}</div>
+                <div className={styles.installSub}>{isInstalled ? 'Installed on your device' : 'Quick access from home screen'}</div>
               </div>
             </div>
-            <button className={styles.installBtn} onClick={onInstall}>Install App</button>
+            {isInstalled ? (
+              <button className={styles.installBtn} onClick={() => window.open(window.location.href, '_self')} style={{ background: 'var(--glass-border)', color: 'var(--text-primary)' }}>
+                Open App
+              </button>
+            ) : (
+              <button className={styles.installBtn} onClick={onInstall}>
+                Install App
+              </button>
+            )}
           </div>
         )}
 
