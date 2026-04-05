@@ -1,6 +1,7 @@
 {
   "id": "template-circuit-dark",
-  "name": "Circuit Dark Professional",
+  "name": "Technical Blueprint",
+  "layout": "blueprint",
   "category": "professional",
   "tags": [
     "dark",

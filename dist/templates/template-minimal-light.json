@@ -1,8 +1,14 @@
 {
   "id": "template-minimal-light",
   "name": "Minimal Light",
+  "layout": "centered",
   "category": "professional",
-  "tags": ["light", "clean", "minimal", "white"],
+  "tags": [
+    "light",
+    "clean",
+    "minimal",
+    "white"
+  ],
   "description": "Clean, minimalist card with a white background and subtle grey accents.",
   "theme": {
     "bg": "#ffffff",
@@ -15,8 +21,29 @@
     "fontBody": "Inter"
   },
   "placeholders": {
-    "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["userAvatar", "companyLogo", "avatarInitials", "companyName", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
+    "required": [
+      "userName",
+      "userTitle",
+      "userEmail",
+      "userPhone"
+    ],
+    "optional": [
+      "userAvatar",
+      "companyLogo",
+      "avatarInitials",
+      "companyName",
+      "githubHandle",
+      "linkedinHandle",
+      "xHandle",
+      "facebookHandle",
+      "instagramHandle",
+      "snapchatHandle",
+      "youtubeHandle",
+      "threadsHandle",
+      "profileUrl",
+      "whatsAppNumber",
+      "cvUrl"
+    ],
     "defaults": {
       "userName": "Jordan Lee",
       "userTitle": "Product Designer",

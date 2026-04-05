@@ -1,6 +1,7 @@
 {
   "id": "template-gemini-dark",
-  "name": "Dark Tech Pro",
+  "name": "Floating Balance",
+  "layout": "float",
   "category": "technology",
   "tags": [
     "dark",

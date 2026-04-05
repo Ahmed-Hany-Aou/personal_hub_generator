@@ -1,0 +1,31 @@
+{
+  "id": "template-horizon-split",
+  "name": "Horizon Split",
+  "layout": "horizon",
+  "theme": {
+    "bg": "#0a0a0a",
+    "cardBg": "#0a0a0a",
+    "accent": "#ffffff",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#888888",
+    "glassBackground": "rgba(255,255,255,0.02)",
+    "glassBorder": "rgba(255,255,255,0.05)"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "profileUrl", "userBio"],
+    "defaults": {
+      "userName": "Horizon User",
+      "userTitle": "Strategic Director",
+      "companyName": "Horizon Studio",
+      "userEmail": "hello@horizon.io",
+      "userPhone": "+1 000 000 000",
+      "profileUrl": "horizon-design.link",
+      "userBio": "Clean, horizontal organization for maximum professional impact."
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "layoutFamily": "horizontal-split"
+  }
+}

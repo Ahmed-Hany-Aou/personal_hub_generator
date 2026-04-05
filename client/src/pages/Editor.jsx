@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Editor.module.css';
 import CardCanvas from '../components/CardCanvas.jsx';
 import LandingPreview from '../components/LandingPreview.jsx';
@@ -7,9 +7,36 @@ import PropertyPanel from '../components/PropertyPanel.jsx';
 import ExportButton from '../components/ExportButton.jsx';
 import StyleToolbar from '../components/StyleToolbar.jsx';
 
+// BMAD Sticky Theme Mapper: Maps specific templates to their visual "Moods" 
+// so the layout becomes separate from the vibe immediately on entry.
+const STYLE_PRESETS = {
+  'template-neon-futurism': {
+    id: 'neon',
+    theme: { bg: '#060d14', cardBg: 'linear-gradient(135deg, #bc13fe 0%, #7e0fff 100%)', accent: '#00f3ff', textPrimary: '#ffffff', textSecondary: '#a5b4fc', glassBackground: 'rgba(6, 13, 20, 0.6)', glassBorder: 'rgba(0, 243, 255, 0.4)', glow: '0 0 15px rgba(0, 243, 255, 0.6)' }
+  },
+  'template-solaris-glass': {
+    id: 'solaris',
+    theme: { bg: '#0f172a', cardBg: 'linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)', accent: '#22d3ee', textPrimary: '#f8fafc', textSecondary: '#94a3b8', glassBackground: 'rgba(255, 255, 255, 0.05)', glassBorder: 'rgba(255, 255, 255, 0.1)', accentBar: true }
+  }
+};
+
+const SOCIAL_KEYS = ['githubHandle','linkedinHandle','xHandle','instagramHandle','facebookHandle','youtubeHandle','snapchatHandle','threadsHandle'];
+
+const PRESET_DIMS = {
+  standard: { width: 1050, height: 600 },
+  m90x50:   { width: 1063, height: 591 },
+  uk:       { width: 1011, height: 636 },
+  japan:    { width: 1075, height: 650 },
+  credit:   { width: 1011, height: 637 },
+  vertical: { width: 600,  height: 1050 },
+  square:   { width: 800,  height: 800 },
+};
+
 export default function Editor() {
   const { templateId } = useParams();
+  const [initialTemplateId] = useState(templateId); // Capture starting point
   const navigate = useNavigate();
+  const location = useLocation();
 
   // ── Template & form state ────────────────────────────────────────────────
   const [template, setTemplate] = useState(null);
@@ -29,12 +56,36 @@ export default function Editor() {
 
   // ── Per-key theme overrides ──────────────────────────────────────────────
   const [themeOverrides, setThemeOverrides] = useState({});
+  const [selectedStyleId, setSelectedStyleId] = useState(null);
+  const [isStyleLocked, setIsStyleLocked] = useState(false);
 
   // ── Mobile sidebar open/close ────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ── Grid persistence ─────────────────────────────────────────────────────
   const [showGrid, setShowGrid] = useState(true);
+
+  // ── Interaction Guard state ─────────────────────────────────────────────
+  const toggleQueue = useRef(Promise.resolve());
+  const abortControllerRef = useRef(null);
+  const [isToggling, setIsToggling] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = useCallback(async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') setInstallPrompt(null);
+  }, [installPrompt]);
 
   // ── Canvas refs ──────────────────────────────────────────────────────────
   const cardCanvasRef    = useRef(null);
@@ -45,29 +96,102 @@ export default function Editor() {
   // Load template
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    fetch(`/templates/${templateId}.json`)
-      .then(r => r.json())
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    
+    let active = true;
+
+    fetch(`/templates/${templateId}.json`, { signal: controller.signal })
+      .then(async r => {
+        if (!r.ok) throw new Error(`${r.status}: Template not found`);
+        return r.json();
+      })
       .then(data => {
-        setTemplate(data);
-        setValues(data.placeholders.defaults || {});
-        setThemeOverrides({});
+        if (!active) return;
+        setTemplate(prev => {
+          if (prev && !location.state?.resetStyle) {
+            return { ...data, theme: prev.theme };
+          }
+          return data;
+        });
+        
+        if (location.state?.resetStyle) {
+          setThemeOverrides({});
+          setSelectedStyleId(null);
+          setIsStyleLocked(false);
+          setValues(data.placeholders.defaults || {});
+        } else {
+          setValues(prev => ({ ...data.placeholders.defaults, ...prev }));
+        }
+        
         setLayoutState({});
         setSelectedNodeId(null);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError' || !active) return;
+        console.warn("Template fetch failed, using fallback:", err);
+        
+        // Virtual template fallback based on ID
+        const virtual = {
+          id: templateId,
+          name: templateId.replace('template-', '').split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
+          layout: templateId.includes('horizon') ? 'horizon' : 'minimal',
+          theme: { bg: '#0a0a0a', cardBg: '#0a0a0a', accent: '#ffffff', textPrimary: '#ffffff', textSecondary: '#888888' },
+          placeholders: { required: ['userName', 'userTitle'], optional: ['companyName', 'profileUrl'], defaults: { userName: 'Demo User', userTitle: 'Creative Director' } }
+        };
+        setTemplate(virtual);
       });
-  }, [templateId]);
+
+    return () => { active = false; controller.abort(); };
+  }, [templateId, location.state?.resetStyle]);
 
   const handleChange = useCallback((key, val) => {
     setValues(prev => ({ ...prev, [key]: val }));
   }, []);
 
+  const handleFullTemplateSelect = useCallback((newTemplateId) => {
+    // Force exit Freeform mode and clear custom positions when choosing a new template
+    setIsFreeform(false);
+    setLayoutState({});
+    setSelectedNodeId(null);
+    
+    navigate(`/editor/${newTemplateId}`, { replace: true, state: { resetStyle: true } });
+  }, [navigate]);
+
+  const handleStructuralLayoutSwap = useCallback((newTemplateId) => {
+    // Force exit Freeform mode and clear custom positions when swapping structure
+    setIsFreeform(false);
+    setLayoutState({});
+    setSelectedNodeId(null);
+    
+    navigate(`/editor/${newTemplateId}`, { replace: true });
+  }, [navigate]);
+
   // ─────────────────────────────────────────────────────────────────────────
   // Theme overrides
   // ─────────────────────────────────────────────────────────────────────────
-  const handleThemeOverride = useCallback((key, value) => {
+  const handleThemeOverride = useCallback((key, value, styleId = null) => {
     if (key === null) {
       setThemeOverrides({});
+      setSelectedStyleId(null);
+      setIsStyleLocked(false);
     } else {
-      setThemeOverrides(prev => ({ ...prev, [key]: value }));
+      // If passing an object of styles or a specific color, we "Lock" the choice.
+      if (typeof key === 'object') {
+         setThemeOverrides(prev => ({ ...prev, ...key }));
+         if (value) setSelectedStyleId(value); // styleId passed as 2nd arg here
+         setIsStyleLocked(true);
+      } else {
+         setThemeOverrides(prev => ({ ...prev, [key]: value }));
+         if (styleId) {
+           setSelectedStyleId(styleId);
+           setIsStyleLocked(true);
+         } else if (key) {
+           // Manual color picker also locks the style
+           setIsStyleLocked(true);
+         }
+      }
     }
   }, []);
 
@@ -77,6 +201,40 @@ export default function Editor() {
   const handleLayoutChange = useCallback((id, newStyles) => {
     setLayoutState(prev => ({ ...prev, [id]: newStyles }));
   }, []);
+
+  // ── Specialized Section Resets ───────────────────────────────────────────
+  const handleResetIdentity = useCallback(() => {
+    setValues(prev => {
+      const { required = [], optional = [] } = template.placeholders;
+      const allKeys = [...required, ...optional];
+      const identityKeys = allKeys.filter(k => !SOCIAL_KEYS.includes(k) && k !== 'userBio');
+      const reset = {};
+      identityKeys.forEach(k => reset[k] = template.placeholders.defaults[k] || '');
+      return { ...prev, ...reset };
+    });
+  }, [template]);
+
+  const handleResetSocial = useCallback(() => {
+    setValues(prev => {
+      const reset = {};
+      SOCIAL_KEYS.forEach(k => reset[k] = '');
+      return { ...prev, ...reset };
+    });
+  }, []);
+
+  const handleResetBio = useCallback(() => {
+    setValues(prev => ({ ...prev, userBio: '' }));
+  }, []);
+
+  const handleResetFormat = useCallback(() => {
+    setCardFormat('standard');
+    setIsFreeform(false);
+    setLayoutState({});
+  }, []);
+
+  const handleResetToInitial = useCallback(() => {
+    handleFullTemplateSelect(initialTemplateId);
+  }, [handleFullTemplateSelect, initialTemplateId]);
 
   const handleNodeSelect = useCallback((id) => {
     setSelectedNodeId(id);
@@ -90,32 +248,61 @@ export default function Editor() {
     if (!e.target.closest('[data-node-id]')) closeToolbar();
   }, [closeToolbar]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Freeform toggle
-  // ─────────────────────────────────────────────────────────────────────────
-  const toggleFreeform = useCallback(() => {
-    setIsFreeform(prev => {
-      if (prev) { setLayoutState({}); setSelectedNodeId(null); setToolbarAnchor(null); }
-      return !prev;
-    });
-  }, []);
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Card dimensions
-  // ─────────────────────────────────────────────────────────────────────────
-  const PRESET_DIMS = {
-    standard: { width: 1050, height: 600 },
-    m90x50:   { width: 1063, height: 591 },
-    uk:       { width: 1011, height: 636 },
-    japan:    { width: 1075, height: 650 },
-    credit:   { width: 1011, height: 637 },
-    vertical: { width: 600,  height: 1050 },
-    square:   { width: 800,  height: 800 },
-  };
-
+  // ── Seeding & Toggle ───────────────────────────────────────────────────
   const activeDims = cardFormat === 'custom'
     ? { width: Math.round(customDims.width * 11.81), height: Math.round(customDims.height * 11.81) }
     : (PRESET_DIMS[cardFormat] || PRESET_DIMS.standard);
+
+  const seedPositionsFromLayout = useCallback(() => {
+    const cardEl = document.getElementById('card-export-target');
+    if (!cardEl) return {};
+
+    const cardRect = cardEl.getBoundingClientRect();
+    const newPositions = {};
+
+    // ── Coordinate Normalization ───────────────────────────────────────────
+    // cardRect.width is the SCALED width on screen.
+    // activeDims.width is the REAL card width in pixels.
+    const scale = cardRect.width / activeDims.width;
+
+    // Universal Capture: find every single draggable node automatically
+    cardEl.querySelectorAll('[data-node-id]').forEach(el => {
+      const id = el.getAttribute('data-node-id');
+      const r = el.getBoundingClientRect();
+      
+      // Store relative offsets in local card-space (UNSCALED)
+      newPositions[id] = { 
+        x: (r.left - cardRect.left) / scale, 
+        y: (r.top - cardRect.top) / scale 
+      };
+    });
+
+    return newPositions;
+  }, [activeDims]);
+
+  const toggleFreeform = useCallback(async () => {
+    await toggleQueue.current;
+    let resolve;
+    const nextPromise = new Promise(r => resolve = r);
+    toggleQueue.current = nextPromise;
+
+    try {
+      if (!isFreeform) {
+        // CAPTURE NOW: while still in structured layout to get the perfect snapshot
+        const initialPositions = seedPositionsFromLayout();
+        setLayoutState(initialPositions);
+        setIsFreeform(true);
+      } else {
+        // EXITING: reset
+        setLayoutState({});
+        setSelectedNodeId(null);
+        setToolbarPos(null);
+        setIsFreeform(false);
+      }
+    } finally {
+      setTimeout(resolve, 50);
+    }
+  }, [isFreeform, seedPositionsFromLayout]);
 
   const FORMAT_LABELS = {
     standard: '3.5" × 2" US Standard',
@@ -174,6 +361,15 @@ export default function Editor() {
           template={template}
           values={values}
           onChange={handleChange}
+          onTemplateChange={handleStructuralLayoutSwap}
+          onFullTemplateSelect={handleFullTemplateSelect}
+          onResetToInitial={handleResetToInitial}
+          onResetIdentity={handleResetIdentity}
+          onResetSocial={handleResetSocial}
+          onResetBio={handleResetBio}
+          onResetFormat={handleResetFormat}
+          onInstall={handleInstallClick}
+          canInstall={!!installPrompt}
           cardFormat={cardFormat}
           onFormatChange={setCardFormat}
           customDims={customDims}
@@ -182,6 +378,8 @@ export default function Editor() {
           onToggleFreeform={toggleFreeform}
           themeOverrides={themeOverrides}
           onThemeOverride={handleThemeOverride}
+          isStyleLocked={isStyleLocked}
+          selectedStyleId={selectedStyleId}
           open={sidebarOpen}
           showGrid={showGrid}
           onToggleGrid={setShowGrid}
@@ -234,6 +432,8 @@ export default function Editor() {
                     onSelectNode={handleNodeSelect}
                     canvasRef={cardCanvasRef}
                     showGrid={showGrid}
+                    templateId={template.id}
+                    layout={template.layout}
                   />
                 </div>
               </div>

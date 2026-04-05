@@ -1,0 +1,26 @@
+{
+  "id": "horizon",
+  "name": "Horizon",
+  "layout": "horizon",
+  "theme": {
+    "bg": "#0a0a0a",
+    "cardBg": "#0a0a0a",
+    "accent": "#ffffff",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#888888",
+    "glassBackground": "rgba(255,255,255,0.02)",
+    "glassBorder": "rgba(255,255,255,0.05)"
+  },
+  "placeholders": {
+    "required": ["userName", "userTitle", "profileUrl"],
+    "optional": ["userEmail", "userPhone", "whatsAppNumber", "userBio"],
+    "defaults": {
+      "userName": "Horizon User",
+      "userTitle": "Strategic Director",
+      "profileUrl": "horizon-design.link",
+      "userEmail": "hello@horizon.io",
+      "userPhone": "+1 000 000 000",
+      "userBio": "Clean, horizontal organization for maximum professional impact."
+    }
+  }
+}

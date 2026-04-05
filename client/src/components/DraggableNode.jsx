@@ -73,10 +73,27 @@ export default function DraggableNode({
 
     dragRef.current.moved = true;
     setIsDragging(true);
+
+    let newX = dragRef.current.elemX + dx;
+    let newY = dragRef.current.elemY + dy;
+
+    // Viewport-aware boundaries: Clamp position within canvas if possible
+    if (canvasRef?.current && nodeRef.current) {
+      const parentRect = canvasRef.current.getBoundingClientRect();
+      const nodeRect   = nodeRef.current.getBoundingClientRect();
+      const pW = parentRect.width / (dragRef.current.scale || 1);
+      const pH = parentRect.height / (dragRef.current.scale || 1);
+      const nW = nodeRect.width / (dragRef.current.scale || 1);
+      const nH = nodeRect.height / (dragRef.current.scale || 1);
+
+      newX = Math.max(0, Math.min(newX, pW - nW));
+      newY = Math.max(0, Math.min(newY, pH - nH));
+    }
+
     onLayoutChange(id, {
       ...layoutState[id],
-      x: dragRef.current.elemX + dx,
-      y: dragRef.current.elemY + dy,
+      x: newX,
+      y: newY,
     });
   }, [id, onLayoutChange, layoutState]);
 

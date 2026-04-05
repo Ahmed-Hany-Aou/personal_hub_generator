@@ -22,10 +22,36 @@
   display: flex;
   align-items: center;
   padding: min(50px, 10cqh) min(60px, 8cqw);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  filter: drop-shadow(var(--card-glow));
   transform-origin: top left;
   container-type: size;
   container-name: card;
+  transition: all 0.3s ease;
+}
+
+@keyframes layoutPulse {
+  0% {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--glass-border);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--accent);
+    transform: scale(1.01);
+  }
+
+  100% {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--glass-border);
+    transform: scale(1);
+  }
+}
+
+.layoutPulse {
+  animation: layoutPulse 0.3s ease-out;
 }
 
 .card[data-layout="vertical"] {
@@ -72,8 +98,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--accent), transparent 94%) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent), transparent 94%) 1px, transparent 1px);
   background-size: 30px 30px;
   pointer-events: none;
 }
@@ -85,7 +111,7 @@
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(34,211,238,0.08), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent), transparent 92%), transparent 70%);
   pointer-events: none;
 }
 
@@ -168,13 +194,14 @@
 .qrBox {
   width: 130px;
   height: 130px;
-  border: 2px solid;
+  border: 2px solid var(--glass-border);
   border-radius: 12px;
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(4px);
 }
 
 .qrInner {
@@ -210,4 +237,294 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 💠 Prism Split Layout – True Diagonal ────────────────────────── */
+.card[data-layout="prism"] {
+  display: flex !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.prismBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 100%;
+  background: var(--prism-left-bg, rgba(0, 0, 0, 0.1));
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid var(--accent);
+  z-index: 1;
+}
+
+.card[data-layout="prism"] .profilePane {
+  width: 40%;
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.card[data-layout="prism"] .ctaPane {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  justify-content: center;
+  align-items: center;
+  margin-left: -5%;
+  /* nudge into the diagonal space */
+}
+
+/* ⚡ Strike Layout – Extreme Left vertical bar ─────────────────── */
+.card[data-layout="strike"] {
+  justify-content: flex-start !important;
+  padding-left: 100px !important;
+}
+
+.card[data-layout="strike"] .accentBar {
+  width: 80px;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: color-mix(in srgb, var(--accent), transparent 90%) !important;
+  border-right: 1px solid var(--accent);
+  border-radius: 0;
+}
+
+.card[data-layout="strike"] .profilePane {
+  align-items: flex-start;
+}
+
+/* 💎 Sidebar Layout – Glassmorphic Pane ────────────────────────── */
+.card[data-layout="sidebar"] {
+  padding: 0 !important;
+}
+
+.card[data-layout="sidebar"] .profilePane {
+  width: 320px;
+  height: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  padding: 40px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card[data-layout="sidebar"] .ctaPane {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🌑 Centered Layout – Perfect Balance ─────────────────────────── */
+.card[data-layout="centered"] {
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+.card[data-layout="centered"] .pane {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.card[data-layout="centered"] .contacts {
+  justify-content: center;
+}
+
+/* ⬜ Wide Layout – Gutter Alignment ────────────────────────────── */
+.card[data-layout="wide"] {
+  justify-content: space-between !important;
+  padding: 60px 100px !important;
+}
+
+.card[data-layout="wide"] .profilePane {
+  align-items: flex-start;
+}
+
+.card[data-layout="wide"] .ctaPane {
+  align-items: flex-end;
+}
+
+/* 🎨 Stack Layout – Unified Column & Spacing Pockets ──────────── */
+.card[data-layout="stack"] {
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0;
+}
+
+.card[data-layout="stack"] .profilePane {
+  margin-bottom: 40px;
+  /* spacing pocket */
+  align-items: center;
+  text-align: center;
+}
+
+/* 💾 Blueprint Layout – Dotted Technical Grid ─────────────────── */
+.card[data-layout="blueprint"] {
+  background-image:
+    repeating-linear-gradient(transparent, transparent 19px, var(--grid-color) 20px),
+    repeating-linear-gradient(90deg, transparent, transparent 19px, var(--grid-color) 20px) !important;
+  background-size: 20px 20px !important;
+  padding: 60px !important;
+}
+
+.blueprintCrosshair {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  opacity: 0.3;
+}
+
+.blueprintCrosshair::before,
+.blueprintCrosshair::after {
+  content: '';
+  position: absolute;
+  background: var(--accent);
+}
+
+.blueprintCrosshair::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.blueprintCrosshair::after {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+}
+
+.card[data-layout="blueprint"] .profilePane {
+  align-items: flex-start;
+}
+
+/* ♊ Float Layout – Staggered Offsets ──────────────────────────── */
+.card[data-layout="float"] {
+  justify-content: space-around !important;
+}
+
+.card[data-layout="float"] .profilePane {
+  transform: translateY(-20px);
+}
+
+.card[data-layout="float"] .ctaPane {
+  transform: translateY(20px);
+}
+
+/* 〰️ Horizon Layout – Clean Horizontal Split ──────────────────── */
+.card[data-layout="horizon"] {
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.card[data-layout="horizon"] .profilePane {
+  flex: 1;
+  width: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center;
+  background: var(--horizon-top-bg, rgba(255, 255, 255, 0.02));
+  padding: 40px;
+}
+
+.card[data-layout="horizon"] .ctaPane {
+  flex: 1;
+  width: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: var(--horizon-bottom-bg, rgba(0, 0, 0, 0.1));
+  padding: 40px;
+}
+
+/* Horizontal divider line for Horizon Layout */
+.card[data-layout="horizon"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: var(--accent, #ffffff);
+  opacity: 0.5;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 🚀 Freeform (Custom) Layout – Stability Fix ────────────────── */
+.card[data-mode="freeform"] {
+  display: block !important;
+  position: relative !important;
+  min-height: 600px !important;
+  background: var(--bg, #0a0a0a);
+}
+
+.card[data-mode="freeform"] .pane {
+  display: block !important;
+  position: static !important;
+}
+
+/* Shared Pane Style */
+.pane {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qrAreaInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mobile responsive – global adjustments */
+@media (max-width: 600px) {
+  .card[data-layout] {
+    flex-direction: column !important;
+    padding: 30px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    overflow-y: auto;
+  }
+
+  .prismBg,
+  .blueprintCrosshair,
+  .accentBar {
+    display: none;
+  }
+
+  .pane {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    align-items: center !important;
+    text-align: center !important;
+    border: none !important;
+    background: none !important;
+  }
+
+  .card[data-layout="prism"] .ctaPane {
+    margin: 0 !important;
+  }
 }

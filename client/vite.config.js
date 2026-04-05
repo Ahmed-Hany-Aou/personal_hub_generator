@@ -9,10 +9,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Creative Studio Card Designer',
-        short_name: 'Card Studio',
-        description: 'Design and export professional digital identity cards.',
-        theme_color: '#0a0f16',
+        id: '/',
+        name: 'Creative Studio: Identity Hub',
+        short_name: 'CreativeHub',
+        description: 'Elite digital identity and business card designer.',
+        theme_color: '#22d3ee',
+        background_color: '#060d14',
+        display: 'standalone',
+        orientation: 'portrait',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -31,6 +35,10 @@ export default defineConfig({
             purpose: 'any maskable'
           }
         ]
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module'
       }
     })
   ],

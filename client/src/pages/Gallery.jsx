@@ -40,7 +40,7 @@ export default function Gallery() {
               <div
                 key={t.id}
                 className={styles.card}
-                onClick={() => navigate(`/editor/${t.id}`)}
+                onClick={() => navigate(`/editor/${t.id}`, { state: { resetStyle: true } })}
               >
                 <div className={styles.cardPreview}>
                   <CardMiniPreview theme={t.theme} defaults={t.placeholders.defaults} />

@@ -1,47 +1,33 @@
 {
   "id": "template-solaris-glass",
-  "name": "Solaris Glass",
-  "category": "lifestyle",
-  "tags": [
-    "minimal",
-    "bright",
-    "glassmorphism",
-    "clean",
-    "gold"
-  ],
-  "description": "An airy and elegant minimalist design with soft sunrise-gold accents and frosted glass effects.",
+  "name": "Left Sidebar",
+  "layout": "sidebar",
+  "category": "premium",
+  "tags": ["glassmorphism", "modern", "premium", "light"],
+  "description": "An elevated glassmorphism design with soft frosted surfaces and vibrant fluid gradients.",
   "theme": {
-    "bg": "#ffffff",
-    "cardBg": "#fafaf9",
-    "accent": "#d97706",
-    "textPrimary": "#1c1917",
-    "textSecondary": "#78716c",
-    "glassBackground": "rgba(217, 119, 6, 0.08)",
-    "fontHeading": "Playfair Display",
-    "fontBody": "Montserrat"
+    "bg": "#0f172a",
+    "cardBg": "linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)",
+    "accent": "#22d3ee",
+    "textPrimary": "#f8fafc",
+    "textSecondary": "#94a3b8",
+    "glassBackground": "rgba(255, 255, 255, 0.05)",
+    "glassBorder": "rgba(255, 255, 255, 0.1)",
+    "fontHeading": "Outfit",
+    "fontBody": "Inter",
+    "accentBar": true
   },
   "placeholders": {
-    "required": [
-      "userName",
-      "userTitle",
-      "userEmail",
-      "userPhone"
-    ],
-    "optional": [
-      "portfolioUrl",
-      "instagramHandle",
-      "profileUrl",
-      "whatsAppNumber",
-      "cvUrl",
-      "companyName"
-    ],
+    "required": ["userName", "userTitle", "userEmail", "userPhone"],
+    "optional": ["companyName", "whatsAppNumber", "profileUrl", "githubHandle", "linkedinHandle"],
     "defaults": {
-      "userName": "Elena Moretti",
-      "userTitle": "Principal Interior Architect",
-      "userEmail": "elena@solaris.design",
-      "userPhone": "+39 02 1234 5678",
-      "portfolioUrl": "www.solaris.design/elena",
-      "instagramHandle": "elena_designs"
+      "userName": "Aria Sterling",
+      "userTitle": "Product Design Director",
+      "companyName": "SOLARIS CREATIVE",
+      "userEmail": "aria@solaris.studio",
+      "userPhone": "+1 (555) 012-3456",
+      "linkedinHandle": "aria-sterling",
+      "profileUrl": "https://solaris.studio/aria"
     }
   }
 }

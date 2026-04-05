@@ -1,6 +1,7 @@
 {
   "id": "template-midnight-gold",
   "name": "Midnight Gold",
+  "layout": "centered",
   "category": "professional",
   "tags": ["premium", "luxury", "executive", "dark"],
   "description": "Premium executive design with deep navy background and polished gold accents.",

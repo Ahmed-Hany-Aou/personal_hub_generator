@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './PropertyPanel.module.css';
 import RichTextEditor from './RichTextEditor.jsx';
 
@@ -33,17 +34,24 @@ const FIELD_ICONS = {
   profileUrl: '🌐', avatarInitials: '🔤', companyLogo: '🖼', userAvatar: '🙎',
 };
 
-const SOCIAL_KEYS = ['githubHandle','linkedinHandle','xHandle','instagramHandle','facebookHandle','youtubeHandle','snapchatHandle','threadsHandle'];
+const SOCIAL_KEYS = ['githubHandle', 'linkedinHandle', 'xHandle', 'instagramHandle', 'facebookHandle', 'youtubeHandle', 'snapchatHandle', 'threadsHandle'];
+
+const LockIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 6, color: 'var(--accent)' }}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+  </svg>
+);
 
 const FORMATS = [
-  { id: 'standard', label: '3.5×2" US',  icon: '🇺🇸' },
-  { id: 'm90x50',   label: '90×50 mm',   icon: '📏' },
-  { id: 'uk',       label: 'UK / EU',    icon: '🇬🇧' },
-  { id: 'japan',    label: 'Japan',      icon: '🇯🇵' },
-  { id: 'credit',   label: 'Credit',     icon: '💳' },
-  { id: 'vertical', label: 'Vertical',   icon: '📱' },
-  { id: 'square',   label: 'Square',     icon: '⬛' },
-  { id: 'custom',   label: 'Custom',     icon: '🛠' },
+  { id: 'standard', label: '3.5×2" US', icon: '🇺🇸' },
+  { id: 'm90x50', label: '90×50 mm', icon: '📏' },
+  { id: 'uk', label: 'UK / EU', icon: '🇬🇧' },
+  { id: 'japan', label: 'Japan', icon: '🇯🇵' },
+  { id: 'credit', label: 'Credit', icon: '💳' },
+  { id: 'vertical', label: 'Vertical', icon: '📱' },
+  { id: 'square', label: 'Square', icon: '⬛' },
+  { id: 'custom', label: 'Custom', icon: '🛠' },
 ];
 
 /** Hex + color-picker combo */
@@ -153,20 +161,37 @@ export default function PropertyPanel({
   onToggleFreeform,
   themeOverrides,
   onThemeOverride,
+  isStyleLocked,
+  selectedStyleId,
   open = true,
   showGrid = true,
   onToggleGrid,
+  onTemplateChange,
+  onResetToInitial,
+  onResetIdentity,
+  onResetSocial,
+  onResetBio,
+  onResetFormat,
+  onInstall,
+  canInstall,
+  onFullTemplateSelect,
 }) {
+  const navigate = useNavigate();
   const { required = [], optional = [] } = template.placeholders;
-  const [sections, setSections] = useState({ identity: true, social: false, bio: false, media: false, theme: false, format: false });
+  const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false });
 
   const toggle = useCallback((id) => {
     setSections(prev => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
-  const mediaKeys  = optional.filter(k => ['userAvatar','companyLogo','avatarInitials'].includes(k));
+  const handleExploreMore = () => {
+    // We navigate home, where selecting any template will perform a full load
+    navigate('/');
+  };
+
+  const mediaKeys = optional.filter(k => ['userAvatar', 'companyLogo', 'avatarInitials'].includes(k));
   const socialKeys = optional.filter(k => SOCIAL_KEYS.includes(k));
-  const otherKeys  = optional.filter(k => !mediaKeys.includes(k) && !socialKeys.includes(k) && k !== 'userBio');
+  const otherKeys = optional.filter(k => !mediaKeys.includes(k) && !socialKeys.includes(k) && k !== 'userBio');
   const socialFilled = socialKeys.filter(k => values[k]).length;
   const hasBio = !!values.userBio;
 
@@ -180,6 +205,95 @@ export default function PropertyPanel({
 
       {/* Scrollable content */}
       <div className={styles.scroll}>
+
+        {/* ── PWA Install Banner ─────────────────────────────────────── */}
+        {canInstall && (
+          <div className={styles.installBanner}>
+            <div className={styles.installInfo}>
+              <span className={styles.installIcon}>📲</span>
+              <div>
+                <div className={styles.installTitle}>Install Creative Studio</div>
+                <div className={styles.installSub}>Quick access from your home screen</div>
+              </div>
+            </div>
+            <button className={styles.installBtn} onClick={onInstall}>Install App</button>
+          </div>
+        )}
+
+        {/* ── Templates (Layouts) ────────────────────────────────────── */}
+        <Section id="templates" icon="📐" title="Change Layout" open={sections.templates} onToggle={toggle}>
+          <div className={styles.galleryGrid}>
+            {[
+              { id: 'template-neon-futurism', name: 'Strike', icon: '⚡' },
+              { id: 'template-solaris-glass', name: 'Sidebar', icon: '💎' },
+              { id: 'template-midnight-gold', name: 'Center', icon: '🌑' },
+              { id: 'template-minimal-light', name: 'Wide', icon: '⬜' },
+              { id: 'template-prism-split', name: 'Split', icon: '💠' },
+              { id: 'template-horizon-split', name: 'Horizon', icon: '〰️' },
+              { id: 'artist-vibrant', name: 'Stack', icon: '🎨' },
+              { id: 'circuit-dark', name: 'Blueprint', icon: '💾' },
+              { id: 'gemini-dark', name: 'Float', icon: '♊' },
+            ].map(t => (
+              <button
+                key={t.id}
+                className={`${styles.galleryBtn} ${template.id === t.id ? styles.galleryBtnActive : ''}`}
+                onClick={() => onTemplateChange(t.id)}
+              >
+                <span className={styles.galleryBtnIcon}>{t.icon}</span>
+                <span className={styles.galleryBtnLabel}>{t.name}</span>
+              </button>
+            ))}
+          </div>
+          <button className={styles.moreTemplates} onClick={() => navigate('/')}>
+            Explore more layouts →
+          </button>
+
+          <div className={styles.divider} />
+          <button className={styles.resetBtn} onClick={onResetToInitial}>
+            ↺ Reset Layout to Original
+          </button>
+        </Section>
+
+        {/* ── Styles (Visual Presets) ───────────────────────────────── */}
+        <Section id="styles" icon="🎭" title="Visual Style" open={sections.styles} onToggle={toggle}>
+          <p className={styles.hint}>Apply a mood without changing your layout</p>
+          <div className={styles.galleryGrid}>
+            {[
+              { id: 'solaris', name: 'Solaris', icon: '💎', theme: { bg: '#0f172a', cardBg: 'linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)', accent: '#22d3ee', textPrimary: '#f8fafc', textSecondary: '#94a3b8', glassBackground: 'rgba(255, 255, 255, 0.05)', glassBorder: 'rgba(255, 255, 255, 0.1)', accentBar: true } },
+              { id: 'neon', name: 'Neon', icon: '⚡', theme: { bg: '#060d14', cardBg: 'linear-gradient(135deg, #bc13fe 0%, #7e0fff 100%)', accent: '#00f3ff', textPrimary: '#ffffff', textSecondary: '#a5b4fc', glassBackground: 'rgba(6, 13, 20, 0.6)', glassBorder: 'rgba(0, 243, 255, 0.4)', glow: '0 0 15px rgba(0, 243, 255, 0.6)' } },
+              { id: 'noir', name: 'Noir', icon: '🌑', theme: { bg: '#0a0a0a', cardBg: '#0a0a0a', accent: '#ffffff', textPrimary: '#ffffff', textSecondary: '#888888', glassBackground: 'rgba(255,255,255,0.02)', glassBorder: 'rgba(255,255,255,0.05)' } },
+              { id: 'emerald', name: 'Emerald', icon: '🌿', theme: { bg: '#062016', cardBg: '#062016', accent: '#10b981', textPrimary: '#ecfdf5', textSecondary: '#6ee7b7' } },
+            ].map(s => (
+              <button
+                key={s.id}
+                title={selectedStyleId === s.id && isStyleLocked ? "Style locked – layout changes won't affect colors." : `Apply ${s.name} mood`}
+                className={`${styles.galleryBtn} ${(selectedStyleId === s.id) ||
+                    (!isStyleLocked && (
+                      template.id.includes(s.id) ||
+                      (s.id === 'noir' && template.id.includes('midnight')) ||
+                      (s.id === 'solaris' && template.id.includes('glass'))
+                    )) ? styles.galleryBtnActive : ''
+                  } ${selectedStyleId === s.id && isStyleLocked ? styles.galleryBtnLocked : ''}`}
+                onClick={() => {
+                  onThemeOverride(s.theme, s.id);
+                }}
+              >
+                <span className={styles.galleryBtnIcon}>{s.icon}</span>
+                <span className={styles.galleryBtnLabel}>
+                  {s.name}
+                  {selectedStyleId === s.id && isStyleLocked && <LockIcon />}
+                </span>
+              </button>
+            ))}
+          </div>
+          <button
+            className={styles.resetBtn}
+            onClick={() => onThemeOverride(null, null)}
+            title="Unlock style and return to layout default colors"
+          >
+            {isStyleLocked ? '🔓 Unlock & Reset Style' : '↺ Reset to Template Default'}
+          </button>
+        </Section>
 
         {/* ── Identity ──────────────────────────────────────────────── */}
         <Section id="identity" icon="👤" title="Your Identity" open={sections.identity} onToggle={toggle}>
@@ -202,6 +316,11 @@ export default function PropertyPanel({
           {required.includes('profileUrl') === false && otherKeys.includes('profileUrl') === false && optional.includes('profileUrl') && (
             <Field fieldKey="profileUrl" value={values.profileUrl || ''} onChange={onChange} placeholder="https://yourwebsite.com" />
           )}
+
+          <div className={styles.divider} />
+          <button className={styles.resetBtn} onClick={onResetIdentity}>
+            ↺ Reset Identity Data
+          </button>
         </Section>
 
         {/* ── Media ─────────────────────────────────────────────────── */}
@@ -210,6 +329,12 @@ export default function PropertyPanel({
             {mediaKeys.map(k => (
               <Field key={k} fieldKey={k} value={values[k] || ''} onChange={onChange} />
             ))}
+            <div className={styles.divider} />
+            <button className={styles.resetBtn} onClick={() => {
+              mediaKeys.forEach(k => onChange(k, ''));
+            }}>
+              ↺ Reset Photos
+            </button>
           </Section>
         )}
 
@@ -220,6 +345,10 @@ export default function PropertyPanel({
             {socialKeys.map(k => (
               <Field key={k} fieldKey={k} value={values[k] || ''} onChange={onChange} />
             ))}
+            <div className={styles.divider} />
+            <button className={styles.resetBtn} onClick={onResetSocial}>
+              ↺ Reset Social Links
+            </button>
           </Section>
         )}
 
@@ -231,14 +360,18 @@ export default function PropertyPanel({
             onChange={html => onChange('userBio', html)}
             placeholder="Tell people about yourself…"
           />
+          <div className={styles.divider} />
+          <button className={styles.resetBtn} onClick={onResetBio}>
+            ↺ Reset Bio
+          </button>
         </Section>
 
         {/* ── Theme ─────────────────────────────────────────────────── */}
         <Section id="theme" icon="🎨" title="Colors & Theme" open={sections.theme} onToggle={toggle}>
           {[
-            { key: 'bg',            label: 'Background' },
-            { key: 'accent',        label: 'Accent' },
-            { key: 'textPrimary',   label: 'Primary Text' },
+            { key: 'bg', label: 'Background' },
+            { key: 'accent', label: 'Accent' },
+            { key: 'textPrimary', label: 'Primary Text' },
             { key: 'textSecondary', label: 'Secondary Text' },
           ].map(({ key, label }) => (
             <div key={key} className={styles.themeRow}>
@@ -252,9 +385,9 @@ export default function PropertyPanel({
           <button className={styles.resetBtn} onClick={() => onThemeOverride(null, null)}>
             ↺ Reset to template defaults
           </button>
-          
+
           <div className={styles.divider} />
-          
+
           <div className={styles.themeRow}>
             <span className={styles.themeRowLabel}>Show Canvas Grid</span>
             <label className={styles.switch}>
@@ -307,6 +440,11 @@ export default function PropertyPanel({
               <span className={styles.modeBtnSub}>{isFreeform ? 'Drag elements anywhere' : 'Auto-arranged layout'}</span>
             </div>
           </button>
+
+          <div className={styles.divider} />
+          <button className={styles.resetBtn} onClick={onResetFormat}>
+            ↺ Reset Size & Alignment
+          </button>
         </Section>
 
       </div>
@@ -314,7 +452,7 @@ export default function PropertyPanel({
       {/* Footer swatches */}
       <div className={styles.footer}>
         <div className={styles.swatches}>
-          {['bg','accent','textPrimary'].map(k => (
+          {['bg', 'accent', 'textPrimary'].map(k => (
             <span key={k} className={styles.swatch}
               style={{ background: themeOverrides?.[k] ?? template.theme[k] }}
               title={k} />

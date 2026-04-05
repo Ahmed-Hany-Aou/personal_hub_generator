@@ -1,0 +1,31 @@
+{
+  "id": "template-prism-split",
+  "name": "Prism Split",
+  "category": "professional",
+  "tags": ["diagonal", "split", "architectural", "high-contrast", "monochrome"],
+  "description": "Bold diagonal split layout – identity on the left, contact & social on the right. Perfect for executives and creatives who want a strong visual statement.",
+  "theme": {
+    "bg": "#0a0a0a",
+    "cardBg": "linear-gradient(135deg, #0a0a0a 35%, #111111 35%)",
+    "accent": "#c0c0c0",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#94a3b8",
+    "glassBackground": "rgba(255, 255, 255, 0.03)",
+    "glassBorder": "rgba(255, 255, 255, 0.08)",
+    "fontHeading": "Poppins",
+    "fontBody": "Inter",
+    "accentBar": false
+  },
+  "placeholders": {
+    "defaults": {
+      "userName": "Jordan Lee",
+      "userTitle": "Creative Director",
+      "companyName": "PRISM STUDIO",
+      "userEmail": "jordan@prism.studio",
+      "userPhone": "+1 (555) 789-0123",
+      "githubHandle": "jordanlee",
+      "linkedinHandle": "jordan-lee",
+      "profileUrl": "https://prism.studio/jordan"
+    }
+  }
+}

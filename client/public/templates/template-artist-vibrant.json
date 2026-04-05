@@ -1,6 +1,7 @@
 {
   "id": "template-artist-vibrant",
-  "name": "Vibrant Artist Canvas",
+  "name": "The Stack",
+  "layout": "stack",
   "category": "creative",
   "tags": [
     "vibrant",

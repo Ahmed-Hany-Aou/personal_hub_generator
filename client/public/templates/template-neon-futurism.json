@@ -1,22 +1,25 @@
 {
   "id": "template-neon-futurism",
-  "name": "Neon Futurism",
+  "name": "Left Strike",
+  "layout": "strike",
   "category": "creative",
   "tags": ["neon", "cyberpunk", "bold", "vibrant"],
-  "description": "A high-energy cyberpunk design with glowing neon gradients and sharp typography.",
+  "description": "A high-energy cyberpunk design with glowing neon accents and sharp industrial typography.",
   "theme": {
-    "bg": "#0a0a0c",
+    "bg": "#060d14",
     "cardBg": "linear-gradient(135deg, #bc13fe 0%, #7e0fff 100%)",
     "accent": "#00f3ff",
     "textPrimary": "#ffffff",
-    "textSecondary": "#e0e0e0",
-    "glassBackground": "rgba(0, 0, 0, 0.4)",
+    "textSecondary": "#a5b4fc",
+    "glassBackground": "rgba(6, 13, 20, 0.6)",
+    "glassBorder": "rgba(0, 243, 255, 0.4)",
     "fontHeading": "Orbitron",
-    "fontBody": "Exo 2"
+    "fontBody": "Exo 2",
+    "glow": "0 0 15px rgba(0, 243, 255, 0.6)"
   },
   "placeholders": {
     "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["companyName", "whatsAppNumber", "cvUrl", "profileUrl", "githubHandle"],
+    "optional": ["companyName", "whatsAppNumber", "profileUrl", "githubHandle"],
     "defaults": {
       "userName": "Kaelen Voss",
       "userTitle": "Lead Cyber Security Architect",

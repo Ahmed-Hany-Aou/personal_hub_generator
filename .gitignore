@@ -1,7 +1,11 @@
 node_modules/
 .env
 *.log
-# We might want to keep the generated files for the user to see, OR ignore them. 
-# Usually for a generator, we ignore the output.
-# I will ignore the specific output files of the generator to keep the repo clean of personal data.
-
+dist/
+dev-dist/
+.agents/
+skills-lock.json
+audit_report.md
+normalize_templates.cjs
+.DS_Store
+Thumbs.db

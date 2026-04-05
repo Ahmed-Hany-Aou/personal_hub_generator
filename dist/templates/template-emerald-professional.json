@@ -2,7 +2,13 @@
   "id": "template-emerald-professional",
   "name": "Emerald Professional",
   "category": "business",
-  "tags": ["emerald", "green", "professional", "minimal", "clean"],
+  "tags": [
+    "emerald",
+    "green",
+    "professional",
+    "minimal",
+    "clean"
+  ],
   "description": "A sophisticated white-and-emerald design perfect for corporate and consulting roles.",
   "theme": {
     "bg": "#f9fafb",
@@ -15,8 +21,29 @@
     "fontBody": "Inter"
   },
   "placeholders": {
-    "required": ["userName", "userTitle", "userEmail", "userPhone"],
-    "optional": ["userAvatar", "companyLogo", "avatarInitials", "githubHandle", "linkedinHandle", "xHandle", "facebookHandle", "instagramHandle", "snapchatHandle", "youtubeHandle", "threadsHandle", "profileUrl"],
+    "required": [
+      "userName",
+      "userTitle",
+      "userEmail",
+      "userPhone"
+    ],
+    "optional": [
+      "userAvatar",
+      "companyLogo",
+      "avatarInitials",
+      "githubHandle",
+      "linkedinHandle",
+      "xHandle",
+      "facebookHandle",
+      "instagramHandle",
+      "snapchatHandle",
+      "youtubeHandle",
+      "threadsHandle",
+      "profileUrl",
+      "whatsAppNumber",
+      "cvUrl",
+      "companyName"
+    ],
     "defaults": {
       "userName": "Omar Ahmed",
       "userTitle": "Managing Director",

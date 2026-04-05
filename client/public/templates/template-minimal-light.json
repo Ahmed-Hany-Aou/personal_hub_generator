@@ -1,6 +1,7 @@
 {
   "id": "template-minimal-light",
   "name": "Minimal Light",
+  "layout": "centered",
   "category": "professional",
   "tags": [
     "light",
