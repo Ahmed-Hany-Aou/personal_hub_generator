@@ -528,3 +528,74 @@
     margin: 0 !important;
   }
 }
+
+/* 🧩 Bento Layout – grid of info cards */
+.card[data-layout="bento"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 2rem;
+  align-items: stretch;
+}
+
+.card[data-layout="bento"] .pane {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid var(--glass-border);
+  transition: transform 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card[data-layout="bento"] .pane:hover {
+  transform: translateY(-2px);
+}
+
+.card[data-layout="bento"] .profilePane {
+  grid-column: 1;
+  text-align: left;
+}
+
+.card[data-layout="bento"] .ctaPane {
+  grid-column: 2;
+  align-items: center;
+}
+
+/* 🎯 Radial Layout – central profile, info around */
+.card[data-layout="radial"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
+  position: relative;
+}
+
+.card[data-layout="radial"] .profilePane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card[data-layout="radial"] .contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card[data-layout="radial"] .contactRow {
+  background: var(--glass-bg);
+  backdrop-filter: blur(4px);
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--glass-border);
+  margin: 0;
+}

@@ -210,7 +210,7 @@ export default function PropertyPanel({
       <div className={styles.scroll}>
 
         {/* ── PWA Install Banner ─────────────────────────────────────── */}
-        {!isStandalone && (canInstall || isInstalled) && (
+        {!isStandalone && (
           <div className={styles.installBanner}>
             <div className={styles.installInfo}>
               <span className={styles.installIcon}>📲</span>
@@ -244,6 +244,8 @@ export default function PropertyPanel({
               { id: 'template-artist-vibrant', name: 'Stack', icon: '🎨' },
               { id: 'template-circuit-dark', name: 'Blueprint', icon: '💾' },
               { id: 'template-gemini-dark', name: 'Float', icon: '♊' },
+              { id: 'bento', name: 'Bento Grid', icon: '🧩' },
+              { id: 'radial', name: 'Radial', icon: '🎯' },
             ].map(t => (
               <button
                 key={t.id}
@@ -274,6 +276,8 @@ export default function PropertyPanel({
               { id: 'neon', name: 'Neon', icon: '⚡', theme: { bg: '#060d14', cardBg: 'linear-gradient(135deg, #bc13fe 0%, #7e0fff 100%)', accent: '#00f3ff', textPrimary: '#ffffff', textSecondary: '#a5b4fc', glassBackground: 'rgba(6, 13, 20, 0.6)', glassBorder: 'rgba(0, 243, 255, 0.4)', glow: '0 0 15px rgba(0, 243, 255, 0.6)' } },
               { id: 'noir', name: 'Noir', icon: '🌑', theme: { bg: '#0a0a0a', cardBg: '#0a0a0a', accent: '#ffffff', textPrimary: '#ffffff', textSecondary: '#888888', glassBackground: 'rgba(255,255,255,0.02)', glassBorder: 'rgba(255,255,255,0.05)' } },
               { id: 'emerald', name: 'Emerald', icon: '🌿', theme: { bg: '#062016', cardBg: '#062016', accent: '#10b981', textPrimary: '#ecfdf5', textSecondary: '#6ee7b7' } },
+              { id: 'midnight', name: 'Midnight', icon: '🌙', theme: { bg: '#0a0f1a', cardBg: 'linear-gradient(145deg, #0a0f1a 0%, #0d1425 100%)', accent: '#00f0ff', textPrimary: '#ffffff', textSecondary: '#b0c4de' } },
+              { id: 'sunset', name: 'Sunset', icon: '🌅', theme: { bg: '#1a0b14', cardBg: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)', accent: '#ffb347', textPrimary: '#ffffff', textSecondary: '#ffe0cc' } },
             ].map(s => (
               <button
                 key={s.id}

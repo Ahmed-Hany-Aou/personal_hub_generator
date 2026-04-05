@@ -1,0 +1,28 @@
+{
+  "id": "template-midnight-tech",
+  "name": "Midnight Tech",
+  "category": "technology",
+  "tags": ["dark", "neon", "cyber", "tech"],
+  "description": "Deep midnight background with electric blue neon accents. Perfect for developers and tech brands.",
+  "theme": {
+    "bg": "#0a0f1a",
+    "cardBg": "linear-gradient(145deg, #0a0f1a 0%, #0d1425 100%)",
+    "accent": "#00f0ff",
+    "textPrimary": "#ffffff",
+    "textSecondary": "#b0c4de",
+    "glassBackground": "rgba(0, 240, 255, 0.1)",
+    "glassBorder": "rgba(0, 240, 255, 0.3)"
+  },
+  "placeholders": {
+    "defaults": {
+      "userName": "Alex Chen",
+      "userTitle": "Lead Architect",
+      "companyName": "Neural Dynamics",
+      "userEmail": "alex@neural.dev",
+      "userPhone": "+1 (555) 789-0123",
+      "githubHandle": "alexchen",
+      "linkedinHandle": "alex-chen",
+      "profileUrl": "https://alexchen.dev"
+    }
+  }
+}

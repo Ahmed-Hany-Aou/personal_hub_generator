@@ -105,7 +105,10 @@ export default function Editor() {
   }, []);
 
   const handleInstallClick = useCallback(async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      alert("Installation requires a secure connection (HTTPS) or localhost. Please ensure you are using a supported browser like Chrome or Edge.");
+      return;
+    }
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
     if (outcome === 'accepted') {
@@ -196,8 +199,10 @@ export default function Editor() {
         let presetId = null;
         if (data.id.includes('neon') || data.id.includes('vibrant')) presetId = 'neon';
         else if (data.id.includes('solaris')) presetId = 'solaris';
-        else if (data.id.includes('midnight') || data.id.includes('noir') || data.id.includes('prism') || data.id.includes('gemini') || data.id.includes('minimal')) presetId = 'noir';
+        else if (data.id.includes('midnight-gold') || data.id.includes('noir') || data.id.includes('prism') || data.id.includes('gemini') || data.id.includes('minimal')) presetId = 'noir';
         else if (data.id.includes('emerald')) presetId = 'emerald';
+        else if (data.id.includes('midnight-tech')) presetId = 'midnight';
+        else if (data.id.includes('sunset')) presetId = 'sunset';
 
         setConfigs({
           card: { template: data, isFreeform: false, layoutState: {}, themeOverrides: lockedTheme, selectedStyleId: presetId, isStyleLocked: true },

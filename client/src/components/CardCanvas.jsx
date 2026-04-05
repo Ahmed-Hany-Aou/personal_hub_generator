@@ -62,7 +62,11 @@ export default function CardCanvas({
 
   const getLayout = () => {
     if (isFreeform) return 'custom';
-    const curLayout = layout || (templateId?.includes('prism') ? 'prism' : null);
+    const curLayout = layout || (
+      templateId?.includes('midnight') ? 'bento' :
+      templateId?.includes('sunset') ? 'radial' :
+      templateId?.includes('prism') ? 'prism' : null
+    );
     if (curLayout === 'prism') return 'prism';
     if (curLayout === 'centered') return 'centered';
     if (curLayout === 'strike') return 'strike';
@@ -71,6 +75,8 @@ export default function CardCanvas({
     if (curLayout === 'stack') return 'stack';
     if (curLayout === 'blueprint') return 'blueprint';
     if (curLayout === 'float') return 'float';
+    if (curLayout === 'bento') return 'bento';
+    if (curLayout === 'radial') return 'radial';
 
     const ratio = width / height;
     if (ratio >= 0.95 && ratio <= 1.05) return 'square';

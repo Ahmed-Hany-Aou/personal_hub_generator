@@ -44,9 +44,11 @@ export default defineConfig({
   ],
   root: 'client',
   server: {
-    host: '0.0.0.0',
+    host: true,
     port: 5000,
-    allowedHosts: true,
+    strictPort: true,
+    cors: true,
+    allowedHosts: ['.loca.lt', '.serveousercontent.com', 'd4f7d5441fd5b20e-197-58-157-176.serveousercontent.com'],
   },
   build: {
     outDir: '../dist',
