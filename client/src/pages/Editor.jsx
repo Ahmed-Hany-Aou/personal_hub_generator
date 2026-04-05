@@ -39,25 +39,39 @@ export default function Editor() {
   const location = useLocation();
 
   // ── Template & form state ────────────────────────────────────────────────
-  const [template, setTemplate] = useState(null);
   const [values, setValues] = useState({});
   const [activeTab, setActiveTab] = useState('card');
   const [landingView, setLandingView] = useState('mobile');
   const [cardFormat, setCardFormat] = useState('standard');
   const [customDims, setCustomDims] = useState({ width: 90, height: 50 });
 
-  // ── Freeform / drag engine state  ────────────────────────────────────────
-  const [isFreeform, setIsFreeform] = useState(false);
-  const [layoutState, setLayoutState] = useState({});
+  // ── Workspace State Engine ───────────────────────────────────────────────
+  const initialWorkspaceConfig = {
+    template: null,
+    isFreeform: false,
+    layoutState: {},
+    themeOverrides: {},
+    selectedStyleId: null,
+    isStyleLocked: false
+  };
 
-  // ── Style toolbar state ──────────────────────────────────────────────────
+  const [configs, setConfigs] = useState({
+    card: initialWorkspaceConfig,
+    landing: initialWorkspaceConfig
+  });
+
+  const activeConfig = configs[activeTab] || initialWorkspaceConfig;
+
+  const updateActiveTabConfig = useCallback((updater) => {
+    setConfigs(prev => ({
+      ...prev,
+      [activeTab]: updater(prev[activeTab])
+    }));
+  }, [activeTab]);
+
+  // ── Shared UI State ──────────────────────────────────────────────────────
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [toolbarPos, setToolbarPos] = useState(null);
-
-  // ── Per-key theme overrides ──────────────────────────────────────────────
-  const [themeOverrides, setThemeOverrides] = useState({});
-  const [selectedStyleId, setSelectedStyleId] = useState(null);
-  const [isStyleLocked, setIsStyleLocked] = useState(false);
 
   // ── Mobile sidebar open/close ────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -95,11 +109,55 @@ export default function Editor() {
   // ─────────────────────────────────────────────────────────────────────────
   // Load template
   // ─────────────────────────────────────────────────────────────────────────
+  const fetchTemplateForTab = useCallback((tid, targetTab) => {
+    fetch(`/templates/${tid}.json`)
+      .then(async r => {
+        if (!r.ok) throw new Error(`${r.status}: Template not found`);
+        return r.json();
+      })
+      .then(data => {
+        setConfigs(prev => {
+          const tabConf = prev[targetTab];
+          let overrides = tabConf.isStyleLocked ? tabConf.themeOverrides : {};
+          return {
+            ...prev,
+            [targetTab]: {
+               ...tabConf,
+               template: data,
+               themeOverrides: overrides,
+               isFreeform: false,
+               layoutState: {}
+            }
+          };
+        });
+        setValues(prev => ({ ...data.placeholders.defaults, ...prev }));
+      })
+      .catch(err => {
+         console.warn("Template fetch failed for tab", targetTab, err);
+         const virtual = {
+           id: tid,
+           name: tid.replace('template-', '').split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
+           layout: tid.includes('horizon') ? 'horizon' : 'minimal',
+           theme: { bg: '#0a0a0a', cardBg: '#0a0a0a', accent: '#ffffff', textPrimary: '#ffffff', textSecondary: '#888888' },
+           placeholders: { required: ['userName', 'userTitle'], optional: ['companyName', 'profileUrl'], defaults: { userName: 'Demo User', userTitle: 'Creative Director' } }
+         };
+         setConfigs(prev => ({
+            ...prev,
+            [targetTab]: {
+               ...prev[targetTab],
+               template: virtual,
+               themeOverrides: prev[targetTab].isStyleLocked ? prev[targetTab].themeOverrides : {},
+               isFreeform: false,
+               layoutState: {}
+            }
+         }));
+      });
+  }, []);
+
   useEffect(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
-    
     let active = true;
 
     fetch(`/templates/${templateId}.json`, { signal: controller.signal })
@@ -109,56 +167,34 @@ export default function Editor() {
       })
       .then(data => {
         if (!active) return;
-        setTemplate(data);
         
-        if (!template || location.state?.resetStyle) {
-          // BMAD Sticky Theme Mapper: Lock the initial vibe immediately on entry
-          const lockedTheme = {
-            bg: data.theme.bg,
-            cardBg: data.theme.cardBg || data.theme.bg,
-            accent: data.theme.accent,
-            textPrimary: data.theme.textPrimary,
-            textSecondary: data.theme.textSecondary,
-            glassBackground: data.theme.glassBackground,
-            glassBorder: data.theme.glassBorder,
-            glow: data.theme.glow
-          };
-          
-          Object.keys(lockedTheme).forEach(k => lockedTheme[k] === undefined && delete lockedTheme[k]);
-          
-          let presetId = null;
-          if (data.id.includes('neon') || data.id.includes('vibrant')) presetId = 'neon';
-          else if (data.id.includes('solaris')) presetId = 'solaris';
-          else if (data.id.includes('midnight') || data.id.includes('noir') || data.id.includes('prism') || data.id.includes('gemini') || data.id.includes('minimal')) presetId = 'noir';
-          else if (data.id.includes('emerald')) presetId = 'emerald';
+        const lockedTheme = {
+          bg: data.theme.bg,
+          cardBg: data.theme.cardBg || data.theme.bg,
+          accent: data.theme.accent,
+          textPrimary: data.theme.textPrimary,
+          textSecondary: data.theme.textSecondary,
+          glassBackground: data.theme.glassBackground,
+          glassBorder: data.theme.glassBorder,
+          glow: data.theme.glow
+        };
+        Object.keys(lockedTheme).forEach(k => lockedTheme[k] === undefined && delete lockedTheme[k]);
+        
+        let presetId = null;
+        if (data.id.includes('neon') || data.id.includes('vibrant')) presetId = 'neon';
+        else if (data.id.includes('solaris')) presetId = 'solaris';
+        else if (data.id.includes('midnight') || data.id.includes('noir') || data.id.includes('prism') || data.id.includes('gemini') || data.id.includes('minimal')) presetId = 'noir';
+        else if (data.id.includes('emerald')) presetId = 'emerald';
 
-          setThemeOverrides(lockedTheme);
-          setSelectedStyleId(presetId);
-          setIsStyleLocked(true);
-          
-          // CRITICAL: We changed this to just use prev instead of previous 'setValues(prev => ...)' 
-          // wait, setValues takes a function if we need the previous state
-          setValues(data.placeholders.defaults || {});
-        } else {
-          setValues(prevValues => ({ ...data.placeholders.defaults, ...prevValues }));
-        }
-        
-        setLayoutState({});
-        setSelectedNodeId(null);
+        setConfigs({
+          card: { template: data, isFreeform: false, layoutState: {}, themeOverrides: lockedTheme, selectedStyleId: presetId, isStyleLocked: true },
+          landing: { template: data, isFreeform: false, layoutState: {}, themeOverrides: lockedTheme, selectedStyleId: presetId, isStyleLocked: true }
+        });
+        setValues(prev => ({ ...data.placeholders.defaults, ...prev }));
       })
       .catch(err => {
         if (err.name === 'AbortError' || !active) return;
-        console.warn("Template fetch failed, using fallback:", err);
-        
-        // Virtual template fallback based on ID
-        const virtual = {
-          id: templateId,
-          name: templateId.replace('template-', '').split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-          layout: templateId.includes('horizon') ? 'horizon' : 'minimal',
-          theme: { bg: '#0a0a0a', cardBg: '#0a0a0a', accent: '#ffffff', textPrimary: '#ffffff', textSecondary: '#888888' },
-          placeholders: { required: ['userName', 'userTitle'], optional: ['companyName', 'profileUrl'], defaults: { userName: 'Demo User', userTitle: 'Creative Director' } }
-        };
-        setTemplate(virtual);
+        console.error("Critical template Hydration failed:", err);
       });
 
     return () => { active = false; controller.abort(); };
@@ -169,68 +205,65 @@ export default function Editor() {
   }, []);
 
   const handleFullTemplateSelect = useCallback((newTemplateId) => {
-    // Force exit Freeform mode and clear custom positions when choosing a new template
-    setIsFreeform(false);
-    setLayoutState({});
     setSelectedNodeId(null);
-    
     navigate(`/editor/${newTemplateId}`, { replace: true, state: { resetStyle: true } });
   }, [navigate]);
 
   const handleStructuralLayoutSwap = useCallback((newTemplateId) => {
-    // Force exit Freeform mode and clear custom positions when swapping structure
-    setIsFreeform(false);
-    setLayoutState({});
     setSelectedNodeId(null);
-    
-    navigate(`/editor/${newTemplateId}`, { replace: true });
-  }, [navigate]);
+    fetchTemplateForTab(newTemplateId, activeTab);
+  }, [activeTab, fetchTemplateForTab]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Theme overrides
   // ─────────────────────────────────────────────────────────────────────────
   const handleThemeOverride = useCallback((key, value, styleId = null) => {
-    if (key === null) {
-      setThemeOverrides({});
-      setSelectedStyleId(null);
-      setIsStyleLocked(false);
-    } else {
-      // If passing an object of styles or a specific color, we "Lock" the choice.
-      if (typeof key === 'object') {
-         setThemeOverrides(prev => ({ ...prev, ...key }));
-         if (value) setSelectedStyleId(value); // styleId passed as 2nd arg here
-         setIsStyleLocked(true);
-      } else {
-         setThemeOverrides(prev => ({ ...prev, [key]: value }));
-         if (styleId) {
-           setSelectedStyleId(styleId);
-           setIsStyleLocked(true);
-         } else if (key) {
-           // Manual color picker also locks the style
-           setIsStyleLocked(true);
-         }
+    updateActiveTabConfig(tabConfig => {
+      if (key === null) {
+        return { ...tabConfig, themeOverrides: {}, selectedStyleId: null, isStyleLocked: false };
       }
-    }
-  }, []);
+      
+      let newOverrides = { ...tabConfig.themeOverrides };
+      let newStyleId = tabConfig.selectedStyleId;
+      
+      if (typeof key === 'object') {
+        newOverrides = { ...newOverrides, ...key };
+        if (value) newStyleId = value;
+      } else {
+        newOverrides[key] = value;
+        if (styleId) newStyleId = styleId;
+      }
+
+      return {
+        ...tabConfig,
+        themeOverrides: newOverrides,
+        selectedStyleId: newStyleId,
+        isStyleLocked: true
+      };
+    });
+  }, [updateActiveTabConfig]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Layout change / node select
   // ─────────────────────────────────────────────────────────────────────────
   const handleLayoutChange = useCallback((id, newStyles) => {
-    setLayoutState(prev => ({ ...prev, [id]: newStyles }));
-  }, []);
+    updateActiveTabConfig(tabConfig => ({
+      ...tabConfig,
+      layoutState: { ...tabConfig.layoutState, [id]: newStyles }
+    }));
+  }, [updateActiveTabConfig]);
 
   // ── Specialized Section Resets ───────────────────────────────────────────
   const handleResetIdentity = useCallback(() => {
+    const placeholders = activeConfig.template?.placeholders || {};
     setValues(prev => {
-      const { required = [], optional = [] } = template.placeholders;
-      const allKeys = [...required, ...optional];
+      const allKeys = [...(placeholders.required || []), ...(placeholders.optional || [])];
       const identityKeys = allKeys.filter(k => !SOCIAL_KEYS.includes(k) && k !== 'userBio');
       const reset = {};
-      identityKeys.forEach(k => reset[k] = template.placeholders.defaults[k] || '');
+      identityKeys.forEach(k => reset[k] = placeholders.defaults?.[k] || '');
       return { ...prev, ...reset };
     });
-  }, [template]);
+  }, [activeConfig.template]);
 
   const handleResetSocial = useCallback(() => {
     setValues(prev => {
@@ -246,9 +279,8 @@ export default function Editor() {
 
   const handleResetFormat = useCallback(() => {
     setCardFormat('standard');
-    setIsFreeform(false);
-    setLayoutState({});
-  }, []);
+    updateActiveTabConfig(cfg => ({ ...cfg, isFreeform: false, layoutState: {} }));
+  }, [updateActiveTabConfig]);
 
   const handleResetToInitial = useCallback(() => {
     handleFullTemplateSelect(initialTemplateId);
@@ -305,22 +337,22 @@ export default function Editor() {
     toggleQueue.current = nextPromise;
 
     try {
-      if (!isFreeform) {
-        // CAPTURE NOW: while still in structured layout to get the perfect snapshot
-        const initialPositions = seedPositionsFromLayout();
-        setLayoutState(initialPositions);
-        setIsFreeform(true);
-      } else {
-        // EXITING: reset
-        setLayoutState({});
-        setSelectedNodeId(null);
-        setToolbarPos(null);
-        setIsFreeform(false);
-      }
+      updateActiveTabConfig(tabConfig => {
+        if (!tabConfig.isFreeform) {
+          // CAPTURE NOW: while still in structured layout to get the perfect snapshot
+          const initialPositions = seedPositionsFromLayout();
+          return { ...tabConfig, layoutState: initialPositions, isFreeform: true };
+        } else {
+          // EXITING: reset
+          setSelectedNodeId(null);
+          setToolbarPos(null);
+          return { ...tabConfig, layoutState: {}, isFreeform: false };
+        }
+      });
     } finally {
       setTimeout(resolve, 50);
     }
-  }, [isFreeform, seedPositionsFromLayout]);
+  }, [seedPositionsFromLayout, updateActiveTabConfig]);
 
   const FORMAT_LABELS = {
     standard: '3.5" × 2" US Standard',
@@ -333,7 +365,7 @@ export default function Editor() {
     custom:   `Custom ${customDims.width} × ${customDims.height} mm`,
   };
 
-  if (!template) {
+  if (!configs.card.template || !configs.landing.template) {
     return (
       <div className={styles.loading}>
         <span style={{ color: 'var(--accent)', marginRight: 12, fontSize: '1.5rem' }}>⏳</span>
@@ -342,7 +374,9 @@ export default function Editor() {
     );
   }
 
-  const effectiveTheme = { ...template.theme, ...themeOverrides };
+  const effectiveCardTheme = { ...configs.card.template.theme, ...configs.card.themeOverrides };
+  const effectiveLandingTheme = { ...configs.landing.template.theme, ...configs.landing.themeOverrides };
+  const effectiveActiveTheme = activeTab === 'card' ? effectiveCardTheme : effectiveLandingTheme;
 
   return (
     <div className={styles.layout}>
@@ -356,19 +390,19 @@ export default function Editor() {
           <span className={styles.logo}>
             <span className={styles.logoAccent}>Creative</span> Studio
           </span>
-          <span className={styles.templateName}>{template.name}</span>
+          <span className={styles.templateName}>{activeConfig.template.name}</span>
         </div>
 
         <ExportButton
           values={values}
-          template={{ ...template, theme: effectiveTheme }}
           activeDims={activeDims}
+          cardTemplate={{ ...configs.card.template, theme: effectiveCardTheme }}
+          landingTemplate={{ ...configs.landing.template, theme: effectiveLandingTheme }}
         />
       </header>
 
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
-
         {/* Mobile overlay backdrop */}
         {sidebarOpen && (
           <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
@@ -376,7 +410,7 @@ export default function Editor() {
 
         {/* Property panel — always rendered; CSS handles mobile slide-in/out */}
         <PropertyPanel
-          template={template}
+          template={activeConfig.template}
           values={values}
           onChange={handleChange}
           onTemplateChange={handleStructuralLayoutSwap}
@@ -392,12 +426,12 @@ export default function Editor() {
           onFormatChange={setCardFormat}
           customDims={customDims}
           onCustomDimsChange={setCustomDims}
-          isFreeform={isFreeform}
+          isFreeform={activeConfig.isFreeform}
           onToggleFreeform={toggleFreeform}
-          themeOverrides={themeOverrides}
+          themeOverrides={activeConfig.themeOverrides}
           onThemeOverride={handleThemeOverride}
-          isStyleLocked={isStyleLocked}
-          selectedStyleId={selectedStyleId}
+          isStyleLocked={activeConfig.isStyleLocked}
+          selectedStyleId={activeConfig.selectedStyleId}
           open={sidebarOpen}
           showGrid={showGrid}
           onToggleGrid={setShowGrid}
@@ -426,9 +460,9 @@ export default function Editor() {
             {/* ── Style Toolbar — docked inside canvas, no overlap with element ── */}
             <StyleToolbar
               nodeId={selectedNodeId}
-              nodeStyles={layoutState[selectedNodeId] || {}}
+              nodeStyles={activeConfig.layoutState[selectedNodeId] || {}}
               onStyleChange={handleLayoutChange}
-              bgColor={effectiveTheme.bg}
+              bgColor={effectiveActiveTheme.bg}
               onBgChange={v => handleThemeOverride('bg', v)}
               onClose={closeToolbar}
               position={toolbarPos}
@@ -440,18 +474,18 @@ export default function Editor() {
                 <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
                 <div id="card-canvas">
                   <CardCanvas
-                    theme={effectiveTheme}
+                    theme={effectiveCardTheme}
                     values={values}
                     width={activeDims.width}
                     height={activeDims.height}
-                    isFreeform={isFreeform}
-                    layoutState={layoutState}
+                    isFreeform={configs.card.isFreeform}
+                    layoutState={configs.card.layoutState}
                     onLayoutChange={handleLayoutChange}
                     onSelectNode={handleNodeSelect}
                     canvasRef={cardCanvasRef}
                     showGrid={showGrid}
-                    templateId={template.id}
-                    layout={template.layout}
+                    templateId={configs.card.template.id}
+                    layout={configs.card.template.layout}
                   />
                 </div>
               </div>
@@ -481,10 +515,10 @@ export default function Editor() {
                   }>
                     <div className={styles.phoneMockInner} id="landing-canvas" ref={landingCanvasRef}>
                       <LandingPreview
-                        theme={effectiveTheme}
+                        theme={effectiveLandingTheme}
                         values={values}
-                        isFreeform={isFreeform}
-                        layoutState={layoutState}
+                        isFreeform={configs.landing.isFreeform}
+                        layoutState={configs.landing.layoutState}
                         onLayoutChange={handleLayoutChange}
                         onSelectNode={handleNodeSelect}
                         canvasRef={landingCanvasRef}

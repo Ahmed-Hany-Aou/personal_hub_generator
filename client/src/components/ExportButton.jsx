@@ -106,7 +106,7 @@ function generateLandingHTML(theme, values) {
 </html>`;
 }
 
-export default function ExportButton({ values, template, activeDims }) {
+export default function ExportButton({ values, cardTemplate, landingTemplate, activeDims }) {
   const [state, setState] = useState('idle');
 
   const handleExport = async () => {
@@ -132,7 +132,7 @@ export default function ExportButton({ values, template, activeDims }) {
             scale: 2,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: template.theme.bg,
+            backgroundColor: cardTemplate.theme.bg,
             logging: false,
             width: dims.width,
             height: dims.height,
@@ -149,14 +149,14 @@ export default function ExportButton({ values, template, activeDims }) {
         width: 400,
         margin: 2,
         color: {
-          dark: template.theme.accent,
-          light: template.theme.bg,
+          dark: cardTemplate.theme.accent,
+          light: cardTemplate.theme.bg,
         },
       });
       const qrBase64 = qrDataUrl.split(',')[1];
       zip.file('qr-code.png', qrBase64, { base64: true });
 
-      const landingHTML = generateLandingHTML(template.theme, values);
+      const landingHTML = generateLandingHTML(landingTemplate.theme, values);
       zip.file('index.html', landingHTML);
 
       const vcf = generateVCard(values);
