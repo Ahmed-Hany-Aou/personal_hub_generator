@@ -58,8 +58,8 @@ const frontendDistPath = path.join(__dirname, '../dist');
 if (fs.existsSync(frontendDistPath)) {
   app.use(express.static(frontendDistPath));
   
-  // Catch-all route for frontend routing (React Router)
-  app.get('*', (req, res) => {
+  // Catch-all middleware for frontend routing (React Router)
+  app.use((req, res) => {
     res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
 }
