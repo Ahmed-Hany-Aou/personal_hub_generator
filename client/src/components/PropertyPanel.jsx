@@ -230,9 +230,9 @@ export default function PropertyPanel({
               { id: 'template-minimal-light', name: 'Wide', icon: '⬜' },
               { id: 'template-prism-split', name: 'Split', icon: '💠' },
               { id: 'template-horizon-split', name: 'Horizon', icon: '〰️' },
-              { id: 'artist-vibrant', name: 'Stack', icon: '🎨' },
-              { id: 'circuit-dark', name: 'Blueprint', icon: '💾' },
-              { id: 'gemini-dark', name: 'Float', icon: '♊' },
+              { id: 'template-artist-vibrant', name: 'Stack', icon: '🎨' },
+              { id: 'template-circuit-dark', name: 'Blueprint', icon: '💾' },
+              { id: 'template-gemini-dark', name: 'Float', icon: '♊' },
             ].map(t => (
               <button
                 key={t.id}

@@ -109,20 +109,38 @@ export default function Editor() {
       })
       .then(data => {
         if (!active) return;
-        setTemplate(prev => {
-          if (prev && !location.state?.resetStyle) {
-            return { ...data, theme: prev.theme };
-          }
-          return data;
-        });
+        setTemplate(data);
         
-        if (location.state?.resetStyle) {
-          setThemeOverrides({});
-          setSelectedStyleId(null);
-          setIsStyleLocked(false);
+        if (!template || location.state?.resetStyle) {
+          // BMAD Sticky Theme Mapper: Lock the initial vibe immediately on entry
+          const lockedTheme = {
+            bg: data.theme.bg,
+            cardBg: data.theme.cardBg || data.theme.bg,
+            accent: data.theme.accent,
+            textPrimary: data.theme.textPrimary,
+            textSecondary: data.theme.textSecondary,
+            glassBackground: data.theme.glassBackground,
+            glassBorder: data.theme.glassBorder,
+            glow: data.theme.glow
+          };
+          
+          Object.keys(lockedTheme).forEach(k => lockedTheme[k] === undefined && delete lockedTheme[k]);
+          
+          let presetId = null;
+          if (data.id.includes('neon') || data.id.includes('vibrant')) presetId = 'neon';
+          else if (data.id.includes('solaris')) presetId = 'solaris';
+          else if (data.id.includes('midnight') || data.id.includes('noir') || data.id.includes('prism') || data.id.includes('gemini') || data.id.includes('minimal')) presetId = 'noir';
+          else if (data.id.includes('emerald')) presetId = 'emerald';
+
+          setThemeOverrides(lockedTheme);
+          setSelectedStyleId(presetId);
+          setIsStyleLocked(true);
+          
+          // CRITICAL: We changed this to just use prev instead of previous 'setValues(prev => ...)' 
+          // wait, setValues takes a function if we need the previous state
           setValues(data.placeholders.defaults || {});
         } else {
-          setValues(prev => ({ ...data.placeholders.defaults, ...prev }));
+          setValues(prevValues => ({ ...data.placeholders.defaults, ...prevValues }));
         }
         
         setLayoutState({});
