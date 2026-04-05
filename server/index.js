@@ -53,6 +53,17 @@ app.post('/api/qr', (req, res) => {
   }
 });
 
+// Serve frontend static files in production
+const frontendDistPath = path.join(__dirname, '../dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  
+  // Catch-all route for frontend routing (React Router)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`API server running on port ${PORT}`);
 });
