@@ -105,8 +105,17 @@ export default function Editor() {
   }, []);
 
   const handleInstallClick = useCallback(async () => {
+    if (isInstalled) {
+      alert("Creative Studio is already installed on your device!");
+      return;
+    }
     if (!installPrompt) {
-      alert("Installation requires a secure connection (HTTPS) or localhost. Please ensure you are using a supported browser like Chrome or Edge.");
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        alert("💡 To install on iOS:\n1. Tap the Share button below\n2. Select 'Add to Home Screen'");
+      } else {
+        alert("💡 App is ready to install!\n\nPlease click the 'Install' icon located in your browser's URL address bar, or find it in your browser's menu.");
+      }
       return;
     }
     installPrompt.prompt();
@@ -115,7 +124,7 @@ export default function Editor() {
       setInstallPrompt(null);
       setIsInstalled(true);
     }
-  }, [installPrompt]);
+  }, [installPrompt, isInstalled]);
 
   // ── Canvas refs ──────────────────────────────────────────────────────────
   const cardCanvasRef    = useRef(null);
