@@ -7,7 +7,7 @@ import qr from 'qr-image';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -53,6 +53,6 @@ app.post('/api/qr', (req, res) => {
   }
 });
 
-app.listen(PORT, 'localhost', () => {
-  console.log(`API server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API server running on port ${PORT}`);
 });
