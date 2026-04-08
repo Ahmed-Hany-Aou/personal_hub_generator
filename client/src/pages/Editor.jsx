@@ -430,12 +430,7 @@ export default function Editor() {
 
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
-        {/* Mobile overlay backdrop */}
-        {sidebarOpen && (
-          <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
-        )}
-
-        {/* Property panel — always rendered; CSS handles mobile slide-in/out */}
+        {/* Property panel — CSS handles mobile stacking vs desktop side-by-side */}
         <PropertyPanel
           template={activeConfig.template}
           values={values}
@@ -559,16 +554,6 @@ export default function Editor() {
           </div>
         </main>
       </div>
-
-      {/* ── Mobile FAB to open/close panel ─────────────────────────── */}
-      <button
-        className={styles.sidebarToggle}
-        onClick={() => setSidebarOpen(o => !o)}
-        title={sidebarOpen ? 'Close panel' : 'Edit properties'}
-        aria-label="Toggle panel"
-      >
-        {sidebarOpen ? '✕' : '✏'}
-      </button>
     </div>
   );
 }

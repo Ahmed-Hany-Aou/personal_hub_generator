@@ -12,21 +12,43 @@
   box-shadow: 1px 0 20px rgba(0,0,0,0.2);
 }
 
-/* Mobile — panel slides in from left as a drawer */
+/* Mobile — panel flows after the sticky canvas */
 @media (max-width: 768px) {
   .panel {
-    position: fixed;
-    left: 0;
-    top: 52px;
-    bottom: 0;
-    z-index: 450;
-    width: min(300px, 90vw);
-    box-shadow: 8px 0 40px rgba(0,0,0,0.5);
-    border-right: 1px solid var(--border);
+    position: relative;
+    top: 0;
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    z-index: 50;
+    box-shadow: none;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    flex: 1;
+    background: transparent; /* Use container background */
+    padding-top: 12px;
   }
 
   .panelHidden {
-    transform: translateX(-105%);
+    /* Always visible in stacked mobile mode */
+  }
+
+  .section {
+    margin: 8px 12px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  .sectionHeader {
+    padding: 16px;
+  }
+
+  .sectionBody {
+    padding: 4px 16px 20px;
+    gap: 16px; /* More spacing for touch targets */
   }
 }
 

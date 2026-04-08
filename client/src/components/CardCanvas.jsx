@@ -57,9 +57,9 @@ export default function CardCanvas({
   const PREVIEW_HEIGHT = 570;
 
   // Container-aware scaling: check window width for mobile adaptability
-  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth - 48 : PREVIEW_WIDTH;
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth - (window.innerWidth < 768 ? 32 : 48) : PREVIEW_WIDTH;
   const targetWidth = Math.min(PREVIEW_WIDTH, viewportWidth);
-  const scale = Math.min(targetWidth / width, PREVIEW_HEIGHT / height, 0.88);
+  const scale = Math.min(targetWidth / width, PREVIEW_HEIGHT / height, window.innerWidth < 768 ? 0.95 : 0.88);
 
   const getLayout = () => {
     if (isFreeform) return 'custom';

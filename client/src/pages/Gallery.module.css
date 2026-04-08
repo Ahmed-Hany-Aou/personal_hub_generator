@@ -150,3 +150,18 @@
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+@media (max-width: 768px) {
+  .header {
+    padding: 40px 16px 30px;
+  }
+  .logo {
+    font-size: 1.8rem;
+  }
+  .main {
+    padding: 32px 16px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

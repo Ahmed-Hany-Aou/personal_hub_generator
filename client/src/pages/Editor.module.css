@@ -306,39 +306,93 @@
 /* ─── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .header {
-    padding: 0 16px;
+    padding: 0 12px;
     height: 52px;
     min-height: 52px;
+    gap: 8px;
   }
 
-  .back span { display: none; }
+  .back {
+    padding: 6px 10px;
+  }
+  .back span:last-child { display: none; }
+
+  .logo {
+    font-size: 0.9rem;
+  }
+
+  .templateName {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    max-width: 120px;
+  }
+
+  .tabs {
+    padding: 0 12px;
+    border-bottom: none;
+    background: transparent;
+  }
+  .tab {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
 
   .workspace {
-    position: relative;
-  }
-
-  .sidebarToggle {
     display: flex;
+    flex-direction: column-reverse; /* Canvas on top, Panel on bottom */
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    position: relative;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    background: #000; /* Cinema background behind sticky preview */
   }
 
-  .sidebarOverlay {
-    display: block;
+  .canvas {
+    position: sticky;
+    top: 0;
+    height: 42vh;
+    min-height: 280px;
+    z-index: 200;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.8);
+    border-bottom: 1px solid var(--border);
+    flex: none;
+    background: var(--bg);
+    overflow: hidden;
   }
 
   .previewArea {
-    padding: 16px;
+    padding: 32px 16px; /* High breathing room for centering */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(circle at center, rgba(34,211,238,0.05) 0%, transparent 70%);
   }
 
   .phoneMock {
-    width: 320px;
-    min-width: 320px;
-    height: 580px;
+    width: 100%;
+    min-width: unset;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
 
   .tabletMock, .desktopMock {
     width: 100%;
     min-width: unset;
-    height: 600px;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Cleanup unused mobile drawer leftovers */
+  .sidebarToggle, .sidebarOverlay {
+    display: none !important;
   }
 }
 

@@ -530,6 +530,13 @@
   .card[data-layout="prism"] .ctaPane {
     margin: 0 !important;
   }
+
+  .name {
+    font-size: min(42px, 12cqh, 10cqw) !important;
+  }
+  .title {
+    font-size: min(15px, 6cqh, 5cqw) !important;
+  }
 }
 
 /* 🧩 Bento Layout – grid of info cards */
