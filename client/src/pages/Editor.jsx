@@ -73,8 +73,8 @@ export default function Editor() {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [toolbarPos, setToolbarPos] = useState(null);
 
-  // ── Mobile sidebar open/close ────────────────────────────────────────────
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ── Mobile tab navigation: 'preview' | 'edit' ──────────────────────────
+  const [mobileTab, setMobileTab] = useState('preview');
 
   // ── Grid persistence ─────────────────────────────────────────────────────
   const [showGrid, setShowGrid] = useState(true);
@@ -430,44 +430,41 @@ export default function Editor() {
 
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
-        {/* Mobile: background overlay when sidebar is open */}
-        {sidebarOpen && (
-          <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
-        )}
 
-        {/* Property panel — fixed bottom sheet on mobile, sidebar on desktop */}
-        <PropertyPanel
-          template={activeConfig.template}
-          values={values}
-          onChange={handleChange}
-          onTemplateChange={handleStructuralLayoutSwap}
-          onFullTemplateSelect={handleFullTemplateSelect}
-          onResetToInitial={handleResetToInitial}
-          onResetIdentity={handleResetIdentity}
-          onResetSocial={handleResetSocial}
-          onResetBio={handleResetBio}
-          onResetFormat={handleResetFormat}
-          onInstall={handleInstallClick}
-          canInstall={!!installPrompt}
-          isInstalled={isInstalled}
-          cardFormat={cardFormat}
-          onFormatChange={setCardFormat}
-          customDims={customDims}
-          onCustomDimsChange={setCustomDims}
-          isFreeform={activeConfig.isFreeform}
-          onToggleFreeform={toggleFreeform}
-          themeOverrides={activeConfig.themeOverrides}
-          onThemeOverride={handleThemeOverride}
-          isStyleLocked={activeConfig.isStyleLocked}
-          selectedStyleId={activeConfig.selectedStyleId}
-          open={sidebarOpen}
-          onPanelHeaderClick={() => setSidebarOpen(v => !v)}
-          showGrid={showGrid}
-          onToggleGrid={setShowGrid}
-        />
+        {/* Property panel: sidebar on desktop, full-screen on mobile edit tab */}
+        <div className={`${styles.panelSlot} ${mobileTab !== 'edit' ? styles.mobileHidden : ''}`}>
+          <PropertyPanel
+            template={activeConfig.template}
+            values={values}
+            onChange={handleChange}
+            onTemplateChange={handleStructuralLayoutSwap}
+            onFullTemplateSelect={handleFullTemplateSelect}
+            onResetToInitial={handleResetToInitial}
+            onResetIdentity={handleResetIdentity}
+            onResetSocial={handleResetSocial}
+            onResetBio={handleResetBio}
+            onResetFormat={handleResetFormat}
+            onInstall={handleInstallClick}
+            canInstall={!!installPrompt}
+            isInstalled={isInstalled}
+            cardFormat={cardFormat}
+            onFormatChange={setCardFormat}
+            customDims={customDims}
+            onCustomDimsChange={setCustomDims}
+            isFreeform={activeConfig.isFreeform}
+            onToggleFreeform={toggleFreeform}
+            themeOverrides={activeConfig.themeOverrides}
+            onThemeOverride={handleThemeOverride}
+            isStyleLocked={activeConfig.isStyleLocked}
+            selectedStyleId={activeConfig.selectedStyleId}
+            open={true}
+            showGrid={showGrid}
+            onToggleGrid={setShowGrid}
+          />
+        </div>
 
-        {/* ── Canvas ─────────────────────────────────────────────────── */}
-        <main className={styles.canvas} onPointerDown={handleCanvasPointerDown}>
+        {/* ── Canvas: hidden on mobile when edit tab is active ──────── */}
+        <main className={`${styles.canvas} ${mobileTab === 'edit' ? styles.mobileHidden : ''}`} onPointerDown={handleCanvasPointerDown}>
           {/* Tab switcher */}
           <div className={styles.tabs}>
             <button
@@ -561,14 +558,23 @@ export default function Editor() {
         </main>
       </div>
 
-      {/* ── Mobile FAB: open / close the property panel ───────────── */}
-      <button
-        className={styles.sidebarToggle}
-        onClick={() => setSidebarOpen(v => !v)}
-        aria-label={sidebarOpen ? 'Close panel' : 'Edit properties'}
-      >
-        {sidebarOpen ? '✕' : '✏'}
-      </button>
+      {/* ── Mobile bottom navigation ──────────────────────────────── */}
+      <nav className={styles.mobileNav} aria-label="Mobile navigation">
+        <button
+          className={`${styles.mobileNavBtn} ${mobileTab === 'preview' ? styles.mobileNavActive : ''}`}
+          onClick={() => setMobileTab('preview')}
+        >
+          <span className={styles.mobileNavIcon}>👁</span>
+          <span className={styles.mobileNavLabel}>Preview</span>
+        </button>
+        <button
+          className={`${styles.mobileNavBtn} ${mobileTab === 'edit' ? styles.mobileNavActive : ''}`}
+          onClick={() => setMobileTab('edit')}
+        >
+          <span className={styles.mobileNavIcon}>✏</span>
+          <span className={styles.mobileNavLabel}>Edit</span>
+        </button>
+      </nav>
     </div>
   );
 }

@@ -12,34 +12,30 @@
   box-shadow: 1px 0 20px rgba(0,0,0,0.2);
 }
 
-/* Mobile — bottom sheet drawer */
+/* Mobile — full-screen scrollable panel (toggled by tab navigation) */
 @media (max-width: 768px) {
   .panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 84dvh;
-    max-height: 84dvh;
+    position: relative;
     width: 100%;
     min-width: unset;
-    z-index: 300;
+    height: 100%;
+    flex: 1;
     border-right: none;
-    border-top: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
-    background: var(--surface);
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
-    transform: translateY(0);
-    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    display: flex;
-    flex-direction: column;
+    border-top: none;
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+    transition: none;
     overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Peeked / closed state — show only the handle bar (64px) */
   .panelHidden {
-    transform: translateY(calc(100% - 64px));
+    display: none;
+  }
+
+  .panelHead {
+    border-radius: 0;
+    cursor: default;
   }
 
   .section {
@@ -48,18 +44,35 @@
 
   .sectionHeader {
     padding: 14px 16px;
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .sectionBody {
-    padding: 4px 16px 18px;
+    padding: 6px 16px 20px;
     gap: 14px;
   }
 
-  /* Bigger touch targets on inputs */
+  /* Bigger tap targets for mobile */
   .input {
-    padding: 11px 12px;
-    font-size: 0.9rem;
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+
+  .galleryBtn {
+    padding: 14px 4px;
+  }
+
+  .fmtBtn {
+    padding: 12px 4px;
+  }
+
+  .resetBtn {
+    padding: 12px 14px;
+    font-size: 0.82rem;
+  }
+
+  .sectionHeader {
+    font-size: 0.88rem;
   }
 }
 
