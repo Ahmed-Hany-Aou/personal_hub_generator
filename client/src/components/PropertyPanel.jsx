@@ -164,6 +164,7 @@ export default function PropertyPanel({
   isStyleLocked,
   selectedStyleId,
   open = true,
+  onPanelHeaderClick,
   showGrid = true,
   onToggleGrid,
   onTemplateChange,
@@ -200,8 +201,9 @@ export default function PropertyPanel({
 
   return (
     <aside className={`${styles.panel} ${!open ? styles.panelHidden : ''}`}>
-      {/* Brand header */}
-      <div className={styles.panelHead}>
+      {/* Brand header — tap on mobile to toggle panel open/close */}
+      <div className={styles.panelHead} onClick={onPanelHeaderClick}>
+        <div className={styles.dragHandle} />
         <span className={styles.brandName}><span className={styles.brandAccent}>Creative</span> Studio</span>
         <span className={styles.brandSub}>Digital identity editor</span>
       </div>

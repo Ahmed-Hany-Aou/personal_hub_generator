@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'qrcode';
 import styles from './CardCanvas.module.css';
 import DraggableNode from './DraggableNode.jsx';
@@ -35,6 +35,8 @@ export default function CardCanvas({
   const cardBackground = theme.cardBg || theme.bg;
   const isGradient = cardBackground?.includes('gradient');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const containerRef = useRef(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const url = values.profileUrl || 'https://yourpage.com';
@@ -45,7 +47,6 @@ export default function CardCanvas({
     }).then(setQrCodeUrl).catch(console.error);
   }, [values.profileUrl, theme.accent, theme.bg]);
 
-  // Visual feedback on layout change
   useEffect(() => {
     if (!templateId) return;
     setLayoutPulse(true);
@@ -53,13 +54,24 @@ export default function CardCanvas({
     return () => clearTimeout(timer);
   }, [templateId]);
 
-  const PREVIEW_WIDTH = 920;
-  const PREVIEW_HEIGHT = 570;
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setContainerSize({ width, height });
+      }
+    });
+    ro.observe(el);
+    setContainerSize({ width: el.clientWidth, height: el.clientHeight });
+    return () => ro.disconnect();
+  }, []);
 
-  // Container-aware scaling: check window width for mobile adaptability
-  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth - (window.innerWidth < 768 ? 32 : 48) : PREVIEW_WIDTH;
-  const targetWidth = Math.min(PREVIEW_WIDTH, viewportWidth);
-  const scale = Math.min(targetWidth / width, PREVIEW_HEIGHT / height, window.innerWidth < 768 ? 0.88 : 0.88);
+  const PADDING = 24;
+  const availW = containerSize.width > 0 ? containerSize.width - PADDING * 2 : 800;
+  const availH = containerSize.height > 0 ? containerSize.height - PADDING * 2 : 500;
+  const scale = Math.min(availW / width, availH / height, 1);
 
   const getLayout = () => {
     if (isFreeform) return 'custom';
@@ -96,11 +108,6 @@ export default function CardCanvas({
     canvasRef,
   });
 
-  /**
-   * Build inline styles for inner content divs by merging base (theme) styles
-   * with per-node overrides from layoutState. This lets fontSize, fontFamily,
-   * color, etc. override the CSS class values directly on the element.
-   */
   const ns = (id, base = {}) => {
     const s = layoutState?.[id] || {};
     return {
@@ -118,140 +125,139 @@ export default function CardCanvas({
   };
 
   return (
-    <div className={styles.scaleWrapper} style={{ width: width * scale, height: height * scale }}>
-      <div
-        id="card-export-target"
-        ref={canvasRef}
-        className={`${styles.card} ${layoutPulse ? styles.layoutPulse : ''}`}
-        data-layout={currentLayout}
-        data-mode={isFreeform ? 'freeform' : 'structured'}
-        style={{
-          width,
-          height,
-          transform: `scale(${scale})`,
-          background: cardBackground,
-          backgroundColor: !isGradient ? cardBackground : undefined,
-          '--accent': theme.accent,
-          '--font-heading': theme.fontHeading || 'Poppins',
-          '--font-body': theme.fontBody || 'Inter',
-          '--prism-left-bg': theme.glassBackground || 'rgba(0,0,0,0.1)',
-          '--glass-bg': theme.glassBackground || 'rgba(255, 255, 255, 0.03)',
-          '--glass-border': theme.glassBorder || 'rgba(255, 255, 255, 0.1)',
-          '--card-glow': theme.glow || 'none',
-          '--grid-color': theme.glassBorder || 'rgba(255, 255, 255, 0.05)',
-          position: 'relative',
-        }}
-      >
-        {/* Structural Overlays */}
-        {currentLayout === 'prism' && <div className={styles.prismBg} />}
-        {currentLayout === 'blueprint' && <div className={styles.blueprintCrosshair} />}
-        {theme.accentBar && <div className={styles.accentBar} style={{ background: theme.accent }} />}
-        {showGrid && <div className={styles.grid} />}
-        <div className={styles.glow} />
+    <div ref={containerRef} className={styles.canvasContainer}>
+      <div className={styles.scaleWrapper} style={{ width: width * scale, height: height * scale }}>
+        <div
+          id="card-export-target"
+          ref={canvasRef}
+          className={`${styles.card} ${layoutPulse ? styles.layoutPulse : ''}`}
+          data-layout={currentLayout}
+          data-mode={isFreeform ? 'freeform' : 'structured'}
+          style={{
+            width,
+            height,
+            transform: `scale(${scale})`,
+            background: cardBackground,
+            backgroundColor: !isGradient ? cardBackground : undefined,
+            '--accent': theme.accent,
+            '--font-heading': theme.fontHeading || 'Poppins',
+            '--font-body': theme.fontBody || 'Inter',
+            '--prism-left-bg': theme.glassBackground || 'rgba(0,0,0,0.1)',
+            '--glass-bg': theme.glassBackground || 'rgba(255, 255, 255, 0.03)',
+            '--glass-border': theme.glassBorder || 'rgba(255, 255, 255, 0.1)',
+            '--card-glow': theme.glow || 'none',
+            '--grid-color': theme.glassBorder || 'rgba(255, 255, 255, 0.05)',
+            position: 'relative',
+          }}
+        >
+          {currentLayout === 'prism' && <div className={styles.prismBg} />}
+          {currentLayout === 'blueprint' && <div className={styles.blueprintCrosshair} />}
+          {theme.accentBar && <div className={styles.accentBar} style={{ background: theme.accent }} />}
+          {showGrid && <div className={styles.grid} />}
+          <div className={styles.glow} />
 
-        {/* 1. Left Pane (Profile / Body) */}
-        <div className={`${styles.body} ${styles.pane} ${styles.profilePane}`}>
-          <DraggableNode {...dn('userName')}>
-            <div
-              className={styles.name}
-              style={ns('userName', {
-                color: theme.textPrimary,
-                fontFamily: theme.fontHeading || 'Poppins, sans-serif',
-              })}
-            >
-              {(values.userName || '').toUpperCase()}
-            </div>
-          </DraggableNode>
-
-          <DraggableNode {...dn('userTitle')}>
-            <div
-              className={styles.title}
-              style={ns('userTitle', {
-                color: theme.textSecondary || theme.textPrimary,
-                fontFamily: theme.fontBody || 'Inter, sans-serif',
-              })}
-            >
-              {(values.userTitle || '').toUpperCase()}
-            </div>
-          </DraggableNode>
-
-          {values.companyName && (
-            <DraggableNode {...dn('companyName')}>
+          <div className={`${styles.body} ${styles.pane} ${styles.profilePane}`}>
+            <DraggableNode {...dn('userName')}>
               <div
-                className={styles.company}
-                style={ns('companyName', {
-                  color: theme.accent,
+                className={styles.name}
+                style={ns('userName', {
+                  color: theme.textPrimary,
                   fontFamily: theme.fontHeading || 'Poppins, sans-serif',
                 })}
               >
-                {values.companyName}
+                {(values.userName || '').toUpperCase()}
               </div>
             </DraggableNode>
-          )}
 
-          <DraggableNode {...dn('divider')}>
-            <div
-              className={styles.divider}
-              style={{
-                ...ns('divider', { opacity: 0.3 }),
-                background: layoutState?.divider?.color || theme.accent,
-                '--divider-width': layoutState?.divider?.fontSize ? `${layoutState.divider.fontSize * 7}px` : '320px',
-                '--divider-height': layoutState?.divider?.letterSpacing ? `${Math.max(1, layoutState.divider.letterSpacing)}px` : '2px'
-              }}
-            />
-          </DraggableNode>
-
-          <div className={styles.contacts}>
-            {CONTACT_MAP.map(({ id, icon, label }) => {
-              const text = label(values);
-              if (!text) return null;
-              return (
-                <DraggableNode key={id} {...dn(id)}>
-                  <div
-                    className={styles.contactRow}
-                    style={ns(id, {
-                      color: theme.textSecondary || theme.textPrimary,
-                      fontFamily: theme.fontBody || 'Inter, sans-serif',
-                    })}
-                  >
-                    <span className={styles.icon}>{icon}</span>
-                    {text}
-                  </div>
-                </DraggableNode>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 2. Right Pane (QR / Call to Action) */}
-        <div className={`${styles.qrArea} ${styles.pane} ${styles.ctaPane}`}>
-          <DraggableNode {...dn('qrArea')}>
-            <div className={styles.qrAreaInner}>
+            <DraggableNode {...dn('userTitle')}>
               <div
-                className={styles.qrBox}
+                className={styles.title}
+                style={ns('userTitle', {
+                  color: theme.textSecondary || theme.textPrimary,
+                  fontFamily: theme.fontBody || 'Inter, sans-serif',
+                })}
+              >
+                {(values.userTitle || '').toUpperCase()}
+              </div>
+            </DraggableNode>
+
+            {values.companyName && (
+              <DraggableNode {...dn('companyName')}>
+                <div
+                  className={styles.company}
+                  style={ns('companyName', {
+                    color: theme.accent,
+                    fontFamily: theme.fontHeading || 'Poppins, sans-serif',
+                  })}
+                >
+                  {values.companyName}
+                </div>
+              </DraggableNode>
+            )}
+
+            <DraggableNode {...dn('divider')}>
+              <div
+                className={styles.divider}
                 style={{
-                  borderColor: theme.accent,
-                  width: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
-                  height: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
+                  ...ns('divider', { opacity: 0.3 }),
+                  background: layoutState?.divider?.color || theme.accent,
+                  '--divider-width': layoutState?.divider?.fontSize ? `${layoutState.divider.fontSize * 7}px` : '320px',
+                  '--divider-height': layoutState?.divider?.letterSpacing ? `${Math.max(1, layoutState.divider.letterSpacing)}px` : '2px'
                 }}
-              >
-                {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
-                ) : (
-                  <div className={styles.qrInner} style={{ color: theme.accent }}>
-                    <div className={styles.qrLabel}>SCAN</div>
-                    <div className={styles.qrDots} />
-                  </div>
-                )}
-              </div>
-              <div
-                className={styles.qrCaption}
-                style={ns('qrArea', { color: theme.textSecondary || theme.textPrimary })}
-              >
-                {values.profileUrl || 'your-hub.link'}
-              </div>
+              />
+            </DraggableNode>
+
+            <div className={styles.contacts}>
+              {CONTACT_MAP.map(({ id, icon, label }) => {
+                const text = label(values);
+                if (!text) return null;
+                return (
+                  <DraggableNode key={id} {...dn(id)}>
+                    <div
+                      className={styles.contactRow}
+                      style={ns(id, {
+                        color: theme.textSecondary || theme.textPrimary,
+                        fontFamily: theme.fontBody || 'Inter, sans-serif',
+                      })}
+                    >
+                      <span className={styles.icon}>{icon}</span>
+                      {text}
+                    </div>
+                  </DraggableNode>
+                );
+              })}
             </div>
-          </DraggableNode>
+          </div>
+
+          <div className={`${styles.qrArea} ${styles.pane} ${styles.ctaPane}`}>
+            <DraggableNode {...dn('qrArea')}>
+              <div className={styles.qrAreaInner}>
+                <div
+                  className={styles.qrBox}
+                  style={{
+                    borderColor: theme.accent,
+                    width: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
+                    height: layoutState?.qrArea?.fontSize ? (layoutState.qrArea.fontSize / 16) * 130 : 130,
+                  }}
+                >
+                  {qrCodeUrl ? (
+                    <img src={qrCodeUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
+                  ) : (
+                    <div className={styles.qrInner} style={{ color: theme.accent }}>
+                      <div className={styles.qrLabel}>SCAN</div>
+                      <div className={styles.qrDots} />
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={styles.qrCaption}
+                  style={ns('qrArea', { color: theme.textSecondary || theme.textPrimary })}
+                >
+                  {values.profileUrl || 'your-hub.link'}
+                </div>
+              </div>
+            </DraggableNode>
+          </div>
         </div>
       </div>
     </div>

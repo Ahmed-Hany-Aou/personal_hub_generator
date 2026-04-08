@@ -12,46 +12,54 @@
   box-shadow: 1px 0 20px rgba(0,0,0,0.2);
 }
 
-/* Mobile — panel flows after the sticky canvas */
+/* Mobile — bottom sheet drawer */
 @media (max-width: 768px) {
   .panel {
-    position: relative;
-    top: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 84dvh;
+    max-height: 84dvh;
     width: 100%;
     min-width: unset;
-    height: auto; /* Height will be determined by flex:1 in workspace */
-    z-index: 50;
-    box-shadow: none;
+    z-index: 300;
     border-right: none;
     border-top: 1px solid var(--border);
-    flex: 1;
-    background: transparent; /* Use container background */
-    padding-top: 12px;
+    border-radius: 20px 20px 0 0;
+    background: var(--surface);
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Lock shell, let .scroll handle internal overflow */
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Peeked / closed state — show only the handle bar (64px) */
   .panelHidden {
-    /* Always visible in stacked mobile mode */
+    transform: translateY(calc(100% - 64px));
   }
 
   .section {
-    margin: 8px 12px;
-    background: var(--surface);
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    border-bottom: 1px solid var(--border);
   }
 
   .sectionHeader {
-    padding: 16px;
+    padding: 14px 16px;
+    min-height: 48px;
   }
 
   .sectionBody {
-    padding: 4px 16px 20px;
-    gap: 16px; /* More spacing for touch targets */
+    padding: 4px 16px 18px;
+    gap: 14px;
+  }
+
+  /* Bigger touch targets on inputs */
+  .input {
+    padding: 11px 12px;
+    font-size: 0.9rem;
   }
 }
 
@@ -629,4 +637,39 @@ input:checked + .slider:before {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ─── Panel footer extras ───────────────────────────────────────────── */
+.panelFooter {
+  padding: 0;
+}
+
+.footerNote {
+  padding: 6px 16px 10px;
+  font-size: 0.67rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  text-align: center;
+}
+
+/* ─── Drag handle (mobile only) ─────────────────────────────────────── */
+.dragHandle {
+  display: none;
+  width: 36px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin: 0 auto 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .dragHandle {
+    display: block;
+  }
+
+  .panelHead {
+    padding-top: 10px;
+    cursor: pointer;
+  }
 }

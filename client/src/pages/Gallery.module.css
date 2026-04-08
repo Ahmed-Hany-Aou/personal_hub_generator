@@ -152,16 +152,55 @@
 }
 @media (max-width: 768px) {
   .header {
-    padding: 40px 16px 30px;
+    padding: 40px 16px 28px;
   }
   .logo {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
+  }
+  .tagline {
+    font-size: 0.9rem;
   }
   .main {
-    padding: 32px 16px;
+    padding: 28px 14px;
+  }
+  .sectionTitle {
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
   }
   .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .cardPreview {
+    height: 160px;
+  }
+  .cardInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px 6px;
+  }
+  .cardName {
+    font-size: 0.9rem;
+  }
+  .cardTags {
+    padding: 0 14px 10px;
+    gap: 4px;
+  }
+  .useBtn {
+    margin: 0 14px 14px;
+    padding: 10px 0;
+    font-size: 0.8rem;
+  }
+  .card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
   }
 }

@@ -430,7 +430,12 @@ export default function Editor() {
 
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
-        {/* Property panel — CSS handles mobile stacking vs desktop side-by-side */}
+        {/* Mobile: background overlay when sidebar is open */}
+        {sidebarOpen && (
+          <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
+        )}
+
+        {/* Property panel — fixed bottom sheet on mobile, sidebar on desktop */}
         <PropertyPanel
           template={activeConfig.template}
           values={values}
@@ -456,6 +461,7 @@ export default function Editor() {
           isStyleLocked={activeConfig.isStyleLocked}
           selectedStyleId={activeConfig.selectedStyleId}
           open={sidebarOpen}
+          onPanelHeaderClick={() => setSidebarOpen(v => !v)}
           showGrid={showGrid}
           onToggleGrid={setShowGrid}
         />
@@ -495,7 +501,7 @@ export default function Editor() {
             {activeTab === 'card' ? (
               <div className={styles.cardWrapper}>
                 <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
-                <div id="card-canvas">
+                <div id="card-canvas" style={{ flex: 1, minHeight: 0, width: '100%' }}>
                   <CardCanvas
                     theme={effectiveCardTheme}
                     values={values}
@@ -554,6 +560,15 @@ export default function Editor() {
           </div>
         </main>
       </div>
+
+      {/* ── Mobile FAB: open / close the property panel ───────────── */}
+      <button
+        className={styles.sidebarToggle}
+        onClick={() => setSidebarOpen(v => !v)}
+        aria-label={sidebarOpen ? 'Close panel' : 'Edit properties'}
+      >
+        {sidebarOpen ? '✕' : '✏'}
+      </button>
     </div>
   );
 }

@@ -1,16 +1,15 @@
+.canvasContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .scaleWrapper {
-  width: 682.5px;
-  height: 390px;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-}
-
-@media (max-width: 1100px) {
-  .scaleWrapper {
-    width: 525px;
-    height: 300px;
-  }
 }
 
 .card {
@@ -88,11 +87,6 @@
   height: 100%;
 }
 
-@media (max-width: 1100px) {
-  .card {
-    transform: scale(0.5);
-  }
-}
 
 .grid {
   position: absolute;
