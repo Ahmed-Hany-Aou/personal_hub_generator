@@ -384,7 +384,8 @@ export default function PropertyPanel({
         {/* ── Theme ─────────────────────────────────────────────────── */}
         <Section id="theme" icon="🎨" title="Colors & Theme" open={sections.theme} onToggle={toggle}>
           {[
-            { key: 'bg', label: 'Background' },
+            { key: 'bg', label: 'Workspace' },
+            { key: 'cardBg', label: 'Card Color' },
             { key: 'accent', label: 'Accent' },
             { key: 'textPrimary', label: 'Primary Text' },
             { key: 'textSecondary', label: 'Secondary Text' },

@@ -98,10 +98,11 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(color-mix(in srgb, var(--accent), transparent 94%) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent), transparent 94%) 1px, transparent 1px);
+    linear-gradient(var(--accent) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent) 1px, transparent 1px);
   background-size: 30px 30px;
   pointer-events: none;
+  opacity: 0.06;
 }
 
 .glow {
@@ -111,8 +112,9 @@
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent), transparent 92%), transparent 70%);
+  background: radial-gradient(circle, var(--accent), transparent 70%);
   pointer-events: none;
+  opacity: 0.08;
 }
 
 .body {
@@ -291,7 +293,8 @@
   height: 100%;
   left: 0;
   top: 0;
-  background: color-mix(in srgb, var(--accent), transparent 90%) !important;
+  background: var(--accent) !important;
+  opacity: 0.1;
   border-right: 1px solid var(--accent);
   border-radius: 0;
 }

@@ -32,7 +32,8 @@ export default function CardCanvas({
   layout,
 }) {
   const [layoutPulse, setLayoutPulse] = useState(false);
-  const isGradient = (theme.cardBg || theme.bg).includes('gradient');
+  const cardBackground = theme.cardBg || theme.bg;
+  const isGradient = cardBackground?.includes('gradient');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   useEffect(() => {
@@ -128,8 +129,8 @@ export default function CardCanvas({
           width,
           height,
           transform: `scale(${scale})`,
-          background: isGradient ? theme.cardBg : theme.bg,
-          backgroundColor: !isGradient ? theme.bg : undefined,
+          background: cardBackground,
+          backgroundColor: !isGradient ? cardBackground : undefined,
           '--accent': theme.accent,
           '--font-heading': theme.fontHeading || 'Poppins',
           '--font-body': theme.fontBody || 'Inter',
