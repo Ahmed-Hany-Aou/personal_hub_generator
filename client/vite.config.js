@@ -44,11 +44,17 @@ export default defineConfig({
   ],
   root: 'client',
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 5000,
     strictPort: true,
     cors: true,
-    allowedHosts: ['.loca.lt', '.serveousercontent.com', 'd4f7d5441fd5b20e-197-58-157-176.serveousercontent.com'],
+    allowedHosts: 'all',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      }
+    }
   },
   build: {
     outDir: '../dist',
