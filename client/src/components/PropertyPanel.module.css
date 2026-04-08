@@ -19,7 +19,7 @@
     top: 0;
     width: 100%;
     min-width: unset;
-    height: auto;
+    height: auto; /* Height will be determined by flex:1 in workspace */
     z-index: 50;
     box-shadow: none;
     border-right: none;
@@ -27,6 +27,9 @@
     flex: 1;
     background: transparent; /* Use container background */
     padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Lock shell, let .scroll handle internal overflow */
   }
 
   .panelHidden {

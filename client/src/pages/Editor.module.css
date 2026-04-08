@@ -340,37 +340,37 @@
   .workspace {
     display: flex;
     flex-direction: column-reverse; /* Canvas on top, Panel on bottom */
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
+    height: calc(100% - 52px); /* Calculate remaining space minus header */
+    width: 100%;
+    overflow: hidden; /* Lock the outer workspace */
     position: relative;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    background: #000; /* Cinema background behind sticky preview */
+    background: #000;
   }
 
   .canvas {
-    position: sticky;
-    top: 0;
-    height: 42vh;
-    min-height: 280px;
-    z-index: 200;
+    height: 28vh; /* Reduced height for better space management */
+    min-height: 200px;
+    width: 100%;
+    flex: none; /* Fixed height segment */
     box-shadow: 0 4px 30px rgba(0,0,0,0.8);
     border-bottom: 1px solid var(--border);
-    flex: none;
-    background: var(--bg);
+    z-index: 200;
     overflow: hidden;
+    background: var(--bg);
   }
 
   .previewArea {
-    padding: 32px 16px; /* High breathing room for centering */
+    padding: 20px 10px; /* Compact cinema view */
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: radial-gradient(circle at center, rgba(34,211,238,0.05) 0%, transparent 70%);
   }
+
+  /* Property Panel becomes the scroller */
+  .workspace > :global(.PropertyPanel_panel_12345) { /* Placeholder for panel selector if needed */
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
 
   .phoneMock {
     width: 100%;

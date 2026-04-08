@@ -209,28 +209,6 @@ export default function PropertyPanel({
       {/* Scrollable content */}
       <div className={styles.scroll}>
 
-        {/* ── PWA Install Banner ─────────────────────────────────────── */}
-        {!isStandalone && (
-          <div className={styles.installBanner}>
-            <div className={styles.installInfo}>
-              <span className={styles.installIcon}>📲</span>
-              <div>
-                <div className={styles.installTitle}>{isInstalled ? 'Creative Studio App' : 'Install Creative Studio'}</div>
-                <div className={styles.installSub}>{isInstalled ? 'Installed on your device' : 'Quick access from home screen'}</div>
-              </div>
-            </div>
-            {isInstalled ? (
-              <button className={styles.installBtn} onClick={() => window.open(window.location.href, '_self')} style={{ background: 'var(--glass-border)', color: 'var(--text-primary)' }}>
-                Open App
-              </button>
-            ) : (
-              <button className={styles.installBtn} onClick={onInstall}>
-                Install App
-              </button>
-            )}
-          </div>
-        )}
-
         {/* ── Templates (Layouts) ────────────────────────────────────── */}
         <Section id="templates" icon="📐" title="Change Layout" open={sections.templates} onToggle={toggle}>
           <div className={styles.galleryGrid}>
@@ -475,6 +453,27 @@ export default function PropertyPanel({
           ))}
         </div>
         <span className={styles.footerLabel}>{template.name}</span>
+        {/* ── Help / Info ────────────────────────────────────────── */}
+        <div className={styles.panelFooter}>
+          {!isStandalone && (
+            <div className={styles.installBanner}>
+              <div className={styles.installInfo}>
+                <span className={styles.installIcon}>📲</span>
+                <div>
+                  <div className={styles.installTitle}>{isInstalled ? 'Creative Studio App' : 'Install Creative Studio'}</div>
+                  <div className={styles.installSub}>{isInstalled ? 'Quick access from home screen' : 'Save as app on your device'}</div>
+                </div>
+              </div>
+              <button 
+                className={styles.installBtn} 
+                onClick={isInstalled ? () => window.open(window.location.href, '_self') : onInstall}
+              >
+                {isInstalled ? 'Open' : 'Install'}
+              </button>
+            </div>
+          )}
+          <div className={styles.footerNote}>Creative Studio v1.2</div>
+        </div>
       </div>
     </aside>
   );
