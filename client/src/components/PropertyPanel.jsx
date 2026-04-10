@@ -179,7 +179,10 @@ export default function PropertyPanel({
   onFullTemplateSelect,
 }) {
   const navigate = useNavigate();
-  const { required = [], optional = [] } = template.placeholders;
+  const rawReq = template.placeholders?.required || [];
+  const rawOpt = template.placeholders?.optional || [];
+  const required = rawReq.length > 0 ? rawReq : ['userName', 'userTitle', 'userEmail'];
+  const optional = rawOpt.length > 0 ? rawOpt : ['userPhone', 'companyName', 'userAvatar', 'companyLogo', 'avatarInitials', 'githubHandle', 'linkedinHandle', 'xHandle', 'instagramHandle', 'facebookHandle', 'snapchatHandle', 'threadsHandle', 'youtubeHandle', 'profileUrl', 'whatsAppNumber', 'cvUrl'];
   const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false });
 
   const toggle = useCallback((id) => {
