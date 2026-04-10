@@ -303,6 +303,25 @@
     gap: 8px;
   }
 
+  /* ── Stack vertically instead of side-by-side ── */
+  .workspace {
+    flex-direction: column;
+  }
+
+  /* ── Canvas area gets top half ── */
+  .canvas {
+    width: 100%;
+    flex: 0 0 45%; 
+    max-height: 45%;
+  }
+
+  /* ── Panel area gets bottom half ── */
+  .panelSlot {
+    width: 100%;
+    flex: 1;
+    border-top: 1px solid var(--border);
+  }
+
   .back {
     padding: 6px 10px;
     font-size: 0;        /* hide text, keep icon */
@@ -313,8 +332,6 @@
 
   .logo { font-size: 0.88rem; }
   .templateName { max-width: 110px; font-size: 0.58rem; }
-
-  /* Stacked logic is now global, no modifications needed here */
 
   /* ── Tabs smaller ── */
   .tabs { padding: 0 12px; }
@@ -346,38 +363,6 @@
   /* ── Bottom navigation ── */
   .mobileNav {
     display: none !important;
-  }
-
-  .mobileNavBtn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: color 0.18s, background 0.18s;
-    border-radius: 0;
-    padding: 4px 0 6px;
-  }
-  .mobileNavBtn:hover { background: rgba(34,211,238,0.05); }
-
-  .mobileNavActive {
-    color: var(--accent);
-    background: rgba(34,211,238,0.06);
-    border-top: 2px solid var(--accent);
-  }
-
-  .mobileNavIcon { font-size: 1.1rem; line-height: 1; }
-
-  .mobileNavLabel {
-    font-size: 0.65rem;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.3px;
   }
 }
 
