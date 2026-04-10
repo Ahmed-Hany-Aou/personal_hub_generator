@@ -493,45 +493,7 @@
   align-items: center;
 }
 
-/* Mobile responsive – global adjustments */
-@media (max-width: 600px) {
-  .card[data-layout] {
-    flex-direction: column !important;
-    padding: 30px !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 30px !important;
-    overflow-y: auto;
-  }
-
-  .prismBg,
-  .blueprintCrosshair,
-  .accentBar {
-    display: none;
-  }
-
-  .pane {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    transform: none !important;
-    align-items: center !important;
-    text-align: center !important;
-    border: none !important;
-    background: none !important;
-  }
-
-  .card[data-layout="prism"] .ctaPane {
-    margin: 0 !important;
-  }
-
-  .name {
-    font-size: min(42px, 12cqh, 10cqw) !important;
-  }
-  .title {
-    font-size: min(15px, 6cqh, 5cqw) !important;
-  }
-}
+/* Removed mobile responsive global adjustments as they break the scaled canvas */
 
 /* 🧩 Bento Layout – grid of info cards */
 .card[data-layout="bento"] {

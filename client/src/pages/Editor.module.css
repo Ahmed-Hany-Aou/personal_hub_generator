@@ -305,7 +305,7 @@
 
   /* ── Stack vertically instead of side-by-side ── */
   .workspace {
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 
   /* ── Canvas area gets top half ── */
