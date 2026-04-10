@@ -428,8 +428,8 @@ export default function Editor() {
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
 
-        {/* Property panel: sidebar on desktop, full-screen on mobile edit tab */}
-        <div className={`${styles.panelSlot} ${mobileTab !== 'edit' ? styles.mobileHidden : ''}`}>
+        {/* Property panel: bottom half on mobile desktop side-by-side */}
+        <div className={styles.panelSlot}>
           <PropertyPanel
             template={activeConfig.template}
             values={values}
@@ -465,8 +465,8 @@ export default function Editor() {
           />
         </div>
 
-        {/* ── Canvas: hidden on mobile when edit tab is active ──────── */}
-        <main className={`${styles.canvas} ${mobileTab === 'edit' ? styles.mobileHidden : ''}`} onPointerDown={handleCanvasPointerDown}>
+        {/* ── Canvas: top half on mobile ──────── */}
+        <main className={styles.canvas} onPointerDown={handleCanvasPointerDown}>
           {/* Tab switcher */}
           <div className={styles.tabs}>
             <button
