@@ -546,7 +546,7 @@ export default function Editor() {
             onActiveThemeBgChange={v => handleThemeOverride('bg', v)}
           />
         </div>
-
+      </div>
 
       {/* ── Mobile bottom navigation ──────────────────────────────── */}
       <nav className={styles.mobileNav} aria-label="Mobile navigation">
