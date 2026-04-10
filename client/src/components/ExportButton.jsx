@@ -288,7 +288,7 @@ function generateLandingHTML(theme, values) {
         const rotateX = ((y - centerY) / centerY) * -6;
         const rotateY = ((x - centerX) / centerX) * 6;
         
-        card.style.transform = \`perspective(1000px) rotateX(\${rotateX}deg) rotateY(\${rotateY}deg) translateY(-2px)\`;
+        card.style.transform = 'perspective(1000px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-2px)';
       });
       
       wrapper.addEventListener('mouseleave', () => {
