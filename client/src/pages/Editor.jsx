@@ -5,7 +5,6 @@ import CardCanvas from '../components/CardCanvas.jsx';
 import LandingPreview from '../components/LandingPreview.jsx';
 import PropertyPanel from '../components/PropertyPanel.jsx';
 import ExportButton from '../components/ExportButton.jsx';
-import StyleToolbar from '../components/StyleToolbar.jsx';
 
 // BMAD Sticky Theme Mapper: Maps specific templates to their visual "Moods" 
 // so the layout becomes separate from the vibe immediately on entry.
@@ -71,7 +70,6 @@ export default function Editor() {
 
   // ── Shared UI State ──────────────────────────────────────────────────────
   const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [toolbarPos, setToolbarPos] = useState(null);
 
   // ── Mobile tab navigation: 'preview' | 'edit' ──────────────────────────
   const [mobileTab, setMobileTab] = useState('preview');
@@ -372,7 +370,6 @@ export default function Editor() {
         } else {
           // EXITING: reset
           setSelectedNodeId(null);
-          setToolbarPos(null);
           return { ...tabConfig, layoutState: {}, isFreeform: false };
         }
       });
@@ -460,6 +457,11 @@ export default function Editor() {
             open={true}
             showGrid={showGrid}
             onToggleGrid={setShowGrid}
+            selectedNodeId={selectedNodeId}
+            nodeStyles={activeConfig.layoutState[selectedNodeId] || {}}
+            onStyleChange={handleLayoutChange}
+            activeThemeBg={effectiveActiveTheme.bg}
+            onActiveThemeBgChange={v => handleThemeOverride('bg', v)}
           />
         </div>
 
@@ -483,18 +485,6 @@ export default function Editor() {
 
           {/* Preview — position:relative so toolbar positions absolute inside */}
           <div className={styles.previewArea} ref={previewAreaRef}>
-            {/* ── Style Toolbar — docked inside canvas, no overlap with element ── */}
-            <StyleToolbar
-              nodeId={selectedNodeId}
-              nodeStyles={activeConfig.layoutState[selectedNodeId] || {}}
-              onStyleChange={handleLayoutChange}
-              bgColor={effectiveActiveTheme.bg}
-              onBgChange={v => handleThemeOverride('bg', v)}
-              onClose={closeToolbar}
-              position={toolbarPos}
-              onPositionChange={setToolbarPos}
-            />
-
             {activeTab === 'card' ? (
               <div className={styles.cardWrapper}>
                 <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './StyleToolbar.module.css';
 
 const FONTS = [
@@ -11,7 +11,6 @@ const FONTS = [
   { label: 'Courier',  value: "'Courier New', monospace" },
 ];
 
-/** Sync a hex text input with a color picker, and call onChange(#RRGGBB) */
 function HexColorPair({ value, onChange, label, title }) {
   const [hex, setHex] = useState((value || '#ffffff').replace('#', ''));
 
@@ -55,81 +54,18 @@ export default function StyleToolbar({
   onStyleChange,
   bgColor,
   onBgChange,
-  onClose,
-  position,
-  onPositionChange,
 }) {
-  const ref = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMove = (e) => {
-      // Find the preview area bounding box to keep the toolbar within it if possible
-      const x = e.clientX - dragOffset.x;
-      const y = e.clientY - dragOffset.y;
-      onPositionChange?.({ x, y });
-    };
-
-    const handleUp = () => {
-      setIsDragging(false);
-    };
-
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
-    return () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
-    };
-  }, [isDragging, dragOffset, onPositionChange]);
-
   const patch = (key, val) => onStyleChange?.(nodeId, { ...nodeStyles, [key]: val });
   const toggle = (key, on, off) => patch(key, nodeStyles[key] === on ? off : on);
 
-  const startDrag = (e) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-    setIsDragging(true);
-  };
-
-  if (!nodeId) return null;
-
-  const style = position ? {
-    position: 'fixed',
-    left: position.x,
-    top: position.y,
-    transform: 'none',
-    bottom: 'auto',
-    '--toolbar-anim': 'none',
-  } : {};
+  if (!nodeId) return <div className={styles.emptyState}>Select an element on the canvas to edit its styles.</div>;
 
   return (
-    <div
-      ref={ref}
-      style={style}
-      className={`${styles.toolbar} ${isDragging ? styles.dragging : ''}`}
-      onPointerDown={e => e.stopPropagation()}
-    >
-      {/* ── Drag Handle + Node label ──────────────────────────────────── */}
-      <div className={styles.dragHandle} onPointerDown={startDrag} title="Drag to move">
-        <span style={{ fontSize: '0.8rem', marginRight: 4, opacity: 0.5 }}>⠿</span>
-        <span className={styles.nodeLabel}>{nodeId.replace(/-/g,' ')}</span>
+    <div className={styles.toolbar}>
+      <div className={styles.nodeIdentifier}>
+        Editing element: <span className={styles.nodeLabel}>{nodeId.replace(/-/g,' ')}</span>
       </div>
-      <span className={styles.sep} />
 
-      {/* ── Font family ─────────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Font</span>
         <select
@@ -145,9 +81,6 @@ export default function StyleToolbar({
         </select>
       </div>
 
-      <span className={styles.sep} />
-
-      {/* ── Font size ───────────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Size</span>
         <input
@@ -166,66 +99,56 @@ export default function StyleToolbar({
         />
       </div>
 
-      <span className={styles.sep} />
-
-      {/* ── Format buttons ──────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Format</span>
-        <button
-          className={`${styles.fmtBtn} ${nodeStyles.fontWeight === 'bold' ? styles.fmtActive : ''}`}
-          onClick={() => toggle('fontWeight', 'bold', 'normal')}
-          title="Bold"
-        ><b>B</b></button>
-        <button
-          className={`${styles.fmtBtn} ${nodeStyles.fontStyle === 'italic' ? styles.fmtActive : ''}`}
-          onClick={() => toggle('fontStyle', 'italic', 'normal')}
-          title="Italic"
-        ><i>I</i></button>
-        <button
-          className={`${styles.fmtBtn} ${nodeStyles.textDecoration === 'underline' ? styles.fmtActive : ''}`}
-          onClick={() => toggle('textDecoration', 'underline', 'none')}
-          title="Underline"
-        ><u>U</u></button>
+        <div style={{display:'flex', gap:'4px'}}>
+          <button
+            className={`${styles.fmtBtn} ${nodeStyles.fontWeight === 'bold' ? styles.fmtActive : ''}`}
+            onClick={() => toggle('fontWeight', 'bold', 'normal')}
+            title="Bold"
+          ><b>B</b></button>
+          <button
+            className={`${styles.fmtBtn} ${nodeStyles.fontStyle === 'italic' ? styles.fmtActive : ''}`}
+            onClick={() => toggle('fontStyle', 'italic', 'normal')}
+            title="Italic"
+          ><i>I</i></button>
+          <button
+            className={`${styles.fmtBtn} ${nodeStyles.textDecoration === 'underline' ? styles.fmtActive : ''}`}
+            onClick={() => toggle('textDecoration', 'underline', 'none')}
+            title="Underline"
+          ><u>U</u></button>
+        </div>
       </div>
 
-      <span className={styles.sep} />
-
-      {/* ── Text align ──────────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Align</span>
-        {['left','center','right'].map(a => (
-          <button
-            key={a}
-            className={`${styles.fmtBtn} ${nodeStyles.textAlign === a ? styles.fmtActive : ''}`}
-            onClick={() => patch('textAlign', a)}
-            title={`Align ${a}`}
-          >{a === 'left' ? '⬅' : a === 'center' ? '☰' : '➡'}</button>
-        ))}
+        <div style={{display:'flex', gap:'4px'}}>
+          {['left','center','right'].map(a => (
+            <button
+              key={a}
+              className={`${styles.fmtBtn} ${nodeStyles.textAlign === a ? styles.fmtActive : ''}`}
+              onClick={() => patch('textAlign', a)}
+              title={`Align ${a}`}
+            >{a === 'left' ? '⬅' : a === 'center' ? '☰' : '➡'}</button>
+          ))}
+        </div>
       </div>
 
-      <span className={styles.sep} />
+      <div className={styles.group}>
+        <HexColorPair
+          label="Text"
+          title="Text / element color"
+          value={nodeStyles.color || '#ffffff'}
+          onChange={v => patch('color', v)}
+        />
+        <HexColorPair
+          label="BG"
+          title="Card / page background"
+          value={bgColor || '#0a0f16'}
+          onChange={v => onBgChange?.(v)}
+        />
+      </div>
 
-      {/* ── Text color + hex ────────────────────────────────────────── */}
-      <HexColorPair
-        label="Text"
-        title="Text / element color"
-        value={nodeStyles.color || '#ffffff'}
-        onChange={v => patch('color', v)}
-      />
-
-      <span className={styles.sep} />
-
-      {/* ── Background / page color + hex ───────────────────────────── */}
-      <HexColorPair
-        label="BG"
-        title="Card / page background"
-        value={bgColor || '#0a0f16'}
-        onChange={v => onBgChange?.(v)}
-      />
-
-      <span className={styles.sep} />
-
-      {/* ── Opacity ─────────────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Opacity</span>
         <input
@@ -238,9 +161,6 @@ export default function StyleToolbar({
         <span className={styles.numDisplay}>{Math.round((nodeStyles.opacity ?? 1) * 100)}%</span>
       </div>
 
-      <span className={styles.sep} />
-
-      {/* ── Letter spacing ──────────────────────────────────────────── */}
       <div className={styles.group}>
         <span className={styles.groupLabel}>Spacing</span>
         <input
@@ -252,9 +172,6 @@ export default function StyleToolbar({
         />
         <span className={styles.numDisplay}>{nodeStyles.letterSpacing ?? 0}px</span>
       </div>
-
-      {/* ── Close ───────────────────────────────────────────────────── */}
-      <button className={styles.closeBtn} onClick={onClose} title="Close (Esc)">✕</button>
     </div>
   );
 }

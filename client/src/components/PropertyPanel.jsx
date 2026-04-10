@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './PropertyPanel.module.css';
 import RichTextEditor from './RichTextEditor.jsx';
+import StyleToolbar from './StyleToolbar.jsx';
 
 const FIELD_LABELS = {
   userName: 'Full Name',
@@ -177,18 +178,29 @@ export default function PropertyPanel({
   canInstall,
   isInstalled,
   onFullTemplateSelect,
+  selectedNodeId,
+  nodeStyles,
+  onStyleChange,
+  activeThemeBg,
+  onActiveThemeBgChange,
 }) {
   const navigate = useNavigate();
   const rawReq = template.placeholders?.required || [];
   const rawOpt = template.placeholders?.optional || [];
   const required = rawReq.length > 0 ? rawReq : ['userName', 'userTitle', 'userEmail'];
   const optional = rawOpt.length > 0 ? rawOpt : ['userPhone', 'companyName', 'userAvatar', 'companyLogo', 'avatarInitials', 'githubHandle', 'linkedinHandle', 'xHandle', 'instagramHandle', 'facebookHandle', 'snapchatHandle', 'threadsHandle', 'youtubeHandle', 'profileUrl', 'whatsAppNumber', 'cvUrl'];
-  const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false });
+  const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false, editorOptions: true });
 
   const toggle = useCallback((id) => {
     setSections(prev => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
+  // Auto-expand Element Style section when a node is selected
+  useEffect(() => {
+    if (selectedNodeId) {
+      setSections(prev => ({ ...prev, editorOptions: true }));
+    }
+  }, [selectedNodeId]);
   const handleExploreMore = () => {
     // We navigate home, where selecting any template will perform a full load
     navigate('/');
@@ -446,18 +458,31 @@ export default function PropertyPanel({
           </button>
         </Section>
 
+        {/* ── Editor Options ────────────────────────────────────────── */}
+        <Section id="editorOptions" icon="✏️" title="Element Styles" open={sections.editorOptions} onToggle={toggle}>
+          <StyleToolbar
+            nodeId={selectedNodeId}
+            nodeStyles={nodeStyles}
+            onStyleChange={onStyleChange}
+            bgColor={activeThemeBg}
+            onBgChange={onActiveThemeBgChange}
+          />
+        </Section>
+
       </div>
 
       {/* Footer swatches */}
       <div className={styles.footer}>
-        <div className={styles.swatches}>
-          {['bg', 'accent', 'textPrimary'].map(k => (
-            <span key={k} className={styles.swatch}
-              style={{ background: themeOverrides?.[k] ?? template.theme[k] }}
-              title={k} />
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className={styles.swatches}>
+            {['bg', 'accent', 'textPrimary'].map(k => (
+              <span key={k} className={styles.swatch}
+                style={{ background: themeOverrides?.[k] ?? template.theme[k] }}
+                title={k} />
+            ))}
+          </div>
+          <span className={styles.footerLabel}>{template.name}</span>
         </div>
-        <span className={styles.footerLabel}>{template.name}</span>
         {/* ── Help / Info ────────────────────────────────────────── */}
         <div className={styles.panelFooter}>
           {!isStandalone && (
