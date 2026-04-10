@@ -493,7 +493,7 @@
   align-items: center;
 }
 
-/* Removed mobile responsive global adjustments as they break the scaled canvas */
+/* Removed mobile responsive global adjustments as they break the scaled canvas and lock dynamic styles */
 
 /* 🧩 Bento Layout – grid of info cards */
 .card[data-layout="bento"] {

@@ -30,7 +30,20 @@ export default function DraggableNode({
     if (isFreeform && !hasPosition && nodeRef.current && canvasRef?.current) {
       const nodeRect   = nodeRef.current.getBoundingClientRect();
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      onLayoutChange(id, { ...current, x: nodeRect.left - canvasRect.left, y: nodeRect.top - canvasRect.top });
+      
+      // Calculate scale to decouple screen pixels from canvas pixels
+      let scale = 1;
+      const transform = window.getComputedStyle(canvasRef.current).transform;
+      if (transform && transform !== 'none') {
+        const matrix = transform.match(/^matrix\((.+)\)$/);
+        if (matrix) scale = parseFloat(matrix[1].split(', ')[0]);
+      }
+      
+      onLayoutChange(id, { 
+        ...current, 
+        x: (nodeRect.left - canvasRect.left) / scale, 
+        y: (nodeRect.top - canvasRect.top) / scale 
+      });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFreeform]);
@@ -126,6 +139,7 @@ export default function DraggableNode({
     style.borderRadius  = '3px';
   } else if (!isFreeform) {
     style.cursor        = 'pointer';
+    style.position      = 'static';
     style.outline       = '1px solid transparent';
     style.outlineOffset = '4px';
     style.borderRadius  = '4px';
