@@ -220,6 +220,7 @@
   width: 100%;
   overflow: auto;
   min-height: 0;
+  zoom: calc(1 / var(--app-zoom, 1));
 }
 
 .phoneMock {
