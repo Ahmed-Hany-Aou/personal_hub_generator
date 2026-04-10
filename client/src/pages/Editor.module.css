@@ -3,7 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100dvh;
+  height: calc(100vh / var(--app-zoom, 1));
+  height: calc(100dvh / var(--app-zoom, 1));
   color: var(--text-muted);
   font-size: 1rem;
 }
@@ -12,7 +13,8 @@
 .layout {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: calc(100vh / var(--app-zoom, 1));
+  height: calc(100dvh / var(--app-zoom, 1));
   overflow: hidden;
   background: var(--bg);
 }
