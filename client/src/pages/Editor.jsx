@@ -428,43 +428,6 @@ export default function Editor() {
       {/* ── Workspace ────────────────────────────────────────────────── */}
       <div className={styles.workspace}>
 
-        {/* Property panel: bottom half on mobile desktop side-by-side */}
-        <div className={styles.panelSlot}>
-          <PropertyPanel
-            template={activeConfig.template}
-            values={values}
-            onChange={handleChange}
-            onTemplateChange={handleStructuralLayoutSwap}
-            onFullTemplateSelect={handleFullTemplateSelect}
-            onResetToInitial={handleResetToInitial}
-            onResetIdentity={handleResetIdentity}
-            onResetSocial={handleResetSocial}
-            onResetBio={handleResetBio}
-            onResetFormat={handleResetFormat}
-            onInstall={handleInstallClick}
-            canInstall={!!installPrompt}
-            isInstalled={isInstalled}
-            cardFormat={cardFormat}
-            onFormatChange={setCardFormat}
-            customDims={customDims}
-            onCustomDimsChange={setCustomDims}
-            isFreeform={activeConfig.isFreeform}
-            onToggleFreeform={toggleFreeform}
-            themeOverrides={activeConfig.themeOverrides}
-            onThemeOverride={handleThemeOverride}
-            isStyleLocked={activeConfig.isStyleLocked}
-            selectedStyleId={activeConfig.selectedStyleId}
-            open={true}
-            showGrid={showGrid}
-            onToggleGrid={setShowGrid}
-            selectedNodeId={selectedNodeId}
-            nodeStyles={activeConfig.layoutState[selectedNodeId] || {}}
-            onStyleChange={handleLayoutChange}
-            activeThemeBg={effectiveActiveTheme.bg}
-            onActiveThemeBgChange={v => handleThemeOverride('bg', v)}
-          />
-        </div>
-
         {/* ── Canvas: top half on mobile ──────── */}
         <main className={styles.canvas} onPointerDown={handleCanvasPointerDown}>
           {/* Tab switcher */}
@@ -546,7 +509,44 @@ export default function Editor() {
             )}
           </div>
         </main>
-      </div>
+
+        {/* Property panel: bottom half on mobile desktop side-by-side */}
+        <div className={styles.panelSlot}>
+          <PropertyPanel
+            template={activeConfig.template}
+            values={values}
+            onChange={handleChange}
+            onTemplateChange={handleStructuralLayoutSwap}
+            onFullTemplateSelect={handleFullTemplateSelect}
+            onResetToInitial={handleResetToInitial}
+            onResetIdentity={handleResetIdentity}
+            onResetSocial={handleResetSocial}
+            onResetBio={handleResetBio}
+            onResetFormat={handleResetFormat}
+            onInstall={handleInstallClick}
+            canInstall={!!installPrompt}
+            isInstalled={isInstalled}
+            cardFormat={cardFormat}
+            onFormatChange={setCardFormat}
+            customDims={customDims}
+            onCustomDimsChange={setCustomDims}
+            isFreeform={activeConfig.isFreeform}
+            onToggleFreeform={toggleFreeform}
+            themeOverrides={activeConfig.themeOverrides}
+            onThemeOverride={handleThemeOverride}
+            isStyleLocked={activeConfig.isStyleLocked}
+            selectedStyleId={activeConfig.selectedStyleId}
+            open={true}
+            showGrid={showGrid}
+            onToggleGrid={setShowGrid}
+            selectedNodeId={selectedNodeId}
+            nodeStyles={activeConfig.layoutState[selectedNodeId] || {}}
+            onStyleChange={handleLayoutChange}
+            activeThemeBg={effectiveActiveTheme.bg}
+            onActiveThemeBgChange={v => handleThemeOverride('bg', v)}
+          />
+        </div>
+
 
       {/* ── Mobile bottom navigation ──────────────────────────────── */}
       <nav className={styles.mobileNav} aria-label="Mobile navigation">
