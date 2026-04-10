@@ -2,7 +2,7 @@
 .panel {
   width: 320px;
   min-width: 320px;
-  flex: 1;
+  align-self: stretch;
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;

@@ -90,10 +90,8 @@
 /* ─── Panel slot (wraps PropertyPanel) ───────────────────────────── */
 .panelSlot {
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  align-self: stretch;
   flex-shrink: 0;
-  min-height: 0;
 }
 
 /* ─── Canvas area ─────────────────────────────────────────────────── */
@@ -289,6 +287,7 @@
 /* ─── Utility: hidden on mobile ───────────────────────────────────── */
 .mobileHidden {
   /* only has effect inside the mobile media query below */
+  visibility: visible;
 }
 
 /* ─── Responsive ──────────────────────────────────────────────────── */
