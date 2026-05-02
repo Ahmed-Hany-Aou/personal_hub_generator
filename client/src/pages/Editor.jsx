@@ -353,6 +353,38 @@ export default function Editor() {
     });
   }, [updateActiveTabConfig]);
 
+  const handleAddCustomImage = useCallback(({ src, name }) => {
+    const id = `img-${Date.now()}`;
+    updateActiveTabConfig(tabConfig => {
+      const existing = tabConfig.layoutState.__customImageIds || [];
+      const w = activeDims.width;
+      const h = activeDims.height;
+      return {
+        ...tabConfig,
+        layoutState: {
+          ...tabConfig.layoutState,
+          __customImageIds: [...existing, id],
+          [id]: { src, name: name || 'Image', width: 80, x: w / 2 - 40, y: h / 2 - 40 },
+        }
+      };
+    });
+  }, [updateActiveTabConfig, activeDims]);
+
+  const handleRemoveCustomImage = useCallback((id) => {
+    updateActiveTabConfig(tabConfig => {
+      const existing = tabConfig.layoutState.__customImageIds || [];
+      const newState = { ...tabConfig.layoutState };
+      delete newState[id];
+      return {
+        ...tabConfig,
+        layoutState: {
+          ...newState,
+          __customImageIds: existing.filter(iid => iid !== id),
+        }
+      };
+    });
+  }, [updateActiveTabConfig]);
+
   const closeToolbar = useCallback(() => {
     setSelectedNodeId(null);
   }, []);
@@ -585,6 +617,12 @@ export default function Editor() {
               ...activeConfig.layoutState[id],
             }))}
             accentColor={effectiveActiveTheme.accent}
+            onAddCustomImage={handleAddCustomImage}
+            onRemoveCustomImage={handleRemoveCustomImage}
+            customImages={(activeConfig.layoutState.__customImageIds || []).map(id => ({
+              id,
+              ...activeConfig.layoutState[id],
+            }))}
           />
         </div>
       </div>

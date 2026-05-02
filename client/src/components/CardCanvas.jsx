@@ -286,6 +286,40 @@ export default function CardCanvas({
             </DraggableNode>
           )}
 
+          {/* Custom image nodes — always draggable */}
+          {(layoutState?.__customImageIds || []).map(imgId => {
+            const img = layoutState[imgId];
+            if (!img?.src) return null;
+            const imgW = img.fontSize || img.width || 80;
+            return (
+              <DraggableNode
+                key={imgId}
+                id={imgId}
+                isFreeform={isFreeform}
+                alwaysDraggable
+                layoutState={layoutState}
+                onLayoutChange={onLayoutChange}
+                onSelect={onSelectNode}
+                canvasRef={canvasRef}
+              >
+                <img
+                  src={img.src}
+                  alt="custom"
+                  style={{
+                    width: imgW,
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'block',
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                    opacity: img.opacity != null ? img.opacity : 1,
+                    borderRadius: 4,
+                  }}
+                />
+              </DraggableNode>
+            );
+          })}
+
           {/* Custom icon nodes — always draggable, seeded via layoutState */}
           {(layoutState?.__customIconIds || []).map(cid => {
             const ci = layoutState[cid];
@@ -303,8 +337,8 @@ export default function CardCanvas({
               >
                 <IconMark
                   type={ci.iconKey}
-                  size={ci.size || 32}
-                  color={ci.color || theme.accent}
+                  size={ci.fontSize || ci.size || 32}
+                  color={ci.color || (layoutState?.[cid]?.color) || theme.accent}
                 />
               </DraggableNode>
             );

@@ -4,6 +4,7 @@ import styles from './PropertyPanel.module.css';
 import RichTextEditor from './RichTextEditor.jsx';
 import StyleToolbar from './StyleToolbar.jsx';
 import IconPicker from './IconPicker.jsx';
+import { getIconPath } from '../lib/iconLibrary.js';
 
 const FIELD_LABELS = {
   userName: 'Full Name',
@@ -188,6 +189,9 @@ export default function PropertyPanel({
   onRemoveCustomIcon,
   customIcons,
   accentColor,
+  onAddCustomImage,
+  onRemoveCustomImage,
+  customImages,
 }) {
   const navigate = useNavigate();
   const rawReq = template.placeholders?.required || [];
@@ -482,31 +486,35 @@ export default function PropertyPanel({
           </button>
           {customIcons && customIcons.length > 0 && (
             <div className={styles.iconList}>
-              {customIcons.map(ci => (
-                <div key={ci.id} className={styles.iconListItem}>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke={ci.color || accentColor || '#22d3ee'}
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ flexShrink: 0 }}
-                  >
-                    {String(ci.iconKey || '').split(' M ').map((seg, i) => (
-                      <path key={i} d={i === 0 ? seg : 'M ' + seg} />
-                    ))}
-                  </svg>
-                  <span className={styles.iconListLabel}>{ci.iconKey}</span>
-                  <button
-                    className={styles.iconRemoveBtn}
-                    onClick={() => onRemoveCustomIcon?.(ci.id)}
-                    title="Remove icon"
-                  >✕</button>
-                </div>
-              ))}
+              {customIcons.map(ci => {
+                const iconPath = getIconPath(ci.iconKey);
+                const segs = iconPath ? iconPath.split(' M ') : [];
+                return (
+                  <div key={ci.id} className={styles.iconListItem}>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="20"
+                      height="20"
+                      fill="none"
+                      stroke={ci.color || accentColor || '#22d3ee'}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ flexShrink: 0 }}
+                    >
+                      {segs.map((seg, i) => (
+                        <path key={i} d={i === 0 ? seg : 'M ' + seg} />
+                      ))}
+                    </svg>
+                    <span className={styles.iconListLabel}>{ci.iconKey}</span>
+                    <button
+                      className={styles.iconRemoveBtn}
+                      onClick={() => onRemoveCustomIcon?.(ci.id)}
+                      title="Remove icon"
+                    >✕</button>
+                  </div>
+                );
+              })}
             </div>
           )}
           {showIconPicker && (
@@ -518,6 +526,47 @@ export default function PropertyPanel({
               onClose={() => setShowIconPicker(false)}
               accentColor={accentColor}
             />
+          )}
+
+          <div className={styles.divider} />
+
+          {/* Image / logo upload */}
+          <p className={styles.hint} style={{ marginBottom: 8 }}>Upload an image or logo from your device and drag it anywhere.</p>
+          <label className={styles.addIconBtn} style={{ display: 'block', textAlign: 'center', cursor: 'pointer' }}>
+            ↑ Upload Image / Logo
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onloadend = () => onAddCustomImage?.({ src: reader.result, name: file.name });
+                reader.readAsDataURL(file);
+                e.target.value = '';
+              }}
+            />
+          </label>
+
+          {customImages && customImages.length > 0 && (
+            <div className={styles.iconList} style={{ marginTop: 10 }}>
+              {customImages.map(img => (
+                <div key={img.id} className={styles.iconListItem}>
+                  <img
+                    src={img.src}
+                    alt={img.name || 'uploaded'}
+                    style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 3, flexShrink: 0 }}
+                  />
+                  <span className={styles.iconListLabel}>{img.name || 'Image'}</span>
+                  <button
+                    className={styles.iconRemoveBtn}
+                    onClick={() => onRemoveCustomImage?.(img.id)}
+                    title="Remove image"
+                  >✕</button>
+                </div>
+              ))}
+            </div>
           )}
         </Section>
 
