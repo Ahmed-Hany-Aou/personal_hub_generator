@@ -420,6 +420,7 @@ export default function Editor() {
         <ExportButton
           values={values}
           activeDims={activeDims}
+          cardFormat={cardFormat}
           cardTemplate={{ ...configs.card.template, theme: effectiveCardTheme }}
           landingTemplate={{ ...configs.landing.template, theme: effectiveLandingTheme }}
         />

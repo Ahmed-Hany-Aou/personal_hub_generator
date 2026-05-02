@@ -2,7 +2,19 @@ import { useState } from 'react';
 import html2canvas from 'html2canvas';
 import JSZip from 'jszip';
 import QRCode from 'qrcode';
+import { jsPDF } from 'jspdf';
 import styles from './ExportButton.module.css';
+
+// Physical card dimensions in millimetres, keyed by the cardFormat string
+const CARD_DIMS_MM = {
+  standard: { w: 88.9,  h: 50.8  },
+  m90x50:   { w: 90,    h: 50    },
+  uk:       { w: 85,    h: 55    },
+  japan:    { w: 91,    h: 55    },
+  credit:   { w: 85.6,  h: 54    },
+  vertical: { w: 50.8,  h: 88.9  },
+  square:   { w: 63.5,  h: 63.5  },
+};
 
 function generateVCard(values) {
   return [
@@ -216,153 +228,157 @@ function generateLandingHTML(theme, values) {
 }
 
 
-export default function ExportButton({ values, cardTemplate, landingTemplate, activeDims }) {
+export default function ExportButton({ values, cardTemplate, landingTemplate, activeDims, cardFormat }) {
   const [state, setState] = useState('idle');
 
+  // ── Shared iframe sandbox renderer ──────────────────────────────────────
+  // Returns an html2canvas Canvas rendered at `scale` inside an isolated iframe.
+  // The caller is responsible for removing the iframe via the returned cleanup fn.
+  async function renderCardCanvas(cardEl, bgColor, renderW, renderH, scale) {
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = `position:fixed;left:-9999px;top:0;width:${renderW}px;height:${renderH}px;border:none;visibility:hidden;`;
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    // Freeze viewport
+    const meta = iframeDoc.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = `width=${renderW}, initial-scale=1`;
+    iframeDoc.head.appendChild(meta);
+
+    // Clone stylesheets
+    Array.from(document.styleSheets).forEach(sheet => {
+      try {
+        if (sheet.href) {
+          const link = iframeDoc.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = sheet.href;
+          iframeDoc.head.appendChild(link);
+        } else if (sheet.cssRules) {
+          const style = iframeDoc.createElement('style');
+          Array.from(sheet.cssRules).forEach(r => style.appendChild(iframeDoc.createTextNode(r.cssText)));
+          iframeDoc.head.appendChild(style);
+        }
+      } catch (e) {}
+    });
+
+    // Sync CSS custom properties (theme tokens)
+    const rootStyles = getComputedStyle(document.documentElement);
+    let cssVars = ':root {';
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      try {
+        const rules = document.styleSheets[i].cssRules || document.styleSheets[i].rules;
+        if (!rules) continue;
+        for (let j = 0; j < rules.length; j++) {
+          const rule = rules[j];
+          if (rule.selectorText === ':root' || rule.selectorText === 'html') {
+            const s = rule.style;
+            for (let k = 0; k < s.length; k++) {
+              if (s[k].startsWith('--')) cssVars += `${s[k]}:${rootStyles.getPropertyValue(s[k])};`;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+    cssVars += '}';
+    const varStyle = iframeDoc.createElement('style');
+    varStyle.textContent = cssVars;
+    iframeDoc.head.appendChild(varStyle);
+
+    // Inject card clone
+    const clone = cardEl.cloneNode(true);
+    Object.assign(iframeDoc.body.style, { margin: '0', padding: '0', width: `${renderW}px`, height: `${renderH}px`, backgroundColor: bgColor });
+    Object.assign(clone.style, { width: `${renderW}px`, height: `${renderH}px`, transform: 'none', position: 'relative', left: '0', top: '0' });
+    iframeDoc.body.appendChild(clone);
+
+    // Let fonts + layout settle
+    await new Promise(r => setTimeout(r, 500));
+
+    const canvas = await html2canvas(iframeDoc.body, {
+      scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: bgColor,
+      logging: false,
+      width: renderW,
+      height: renderH,
+      windowWidth: renderW,
+      windowHeight: renderH,
+    });
+
+    document.body.removeChild(iframe);
+    return canvas;
+  }
+
+  // ── Main export handler ─────────────────────────────────────────────────
   const handleExport = async () => {
     setState('loading');
     try {
       const zip = new JSZip();
-      
       const cardEl = document.getElementById('card-export-target');
+
       if (cardEl) {
-        // --- Perfect Iframe Sandbox Start ---
-        // Create an Iframe to isolate the rendering from the main document's responsive quirks
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.left = '-9999px'; // Hidden from view
-        iframe.style.top = '0';
-        iframe.style.width = '1050px'; // Forced desktop scale
-        iframe.style.height = '600px';
-        iframe.style.border = 'none';
-        iframe.style.visibility = 'hidden';
-        document.body.appendChild(iframe);
+        const renderW = activeDims?.width  || 1050;
+        const renderH = activeDims?.height || 600;
+        const bgColor = cardTemplate.theme.bg;
 
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        
-        // 1. Inject Viewport Meta to freeze scale and prevent mobile auto-scaling
-        const meta = iframeDoc.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=1050, initial-scale=1';
-        iframeDoc.head.appendChild(meta);
+        // Render once at scale 3 → ~900 DPI equivalent for a standard 3.5"×2" card
+        const hiResCanvas = await renderCardCanvas(cardEl, bgColor, renderW, renderH, 3);
 
-        // 2. Clone all stylesheets for visual parity
-        Array.from(document.styleSheets).forEach(sheet => {
-          try {
-            if (sheet.href) {
-              const link = iframeDoc.createElement('link');
-              link.rel = 'stylesheet';
-              link.href = sheet.href;
-              iframeDoc.head.appendChild(link);
-            } else if (sheet.cssRules) {
-              const style = iframeDoc.createElement('style');
-              Array.from(sheet.cssRules).forEach(rule => {
-                style.appendChild(iframeDoc.createTextNode(rule.cssText));
-              });
-              iframeDoc.head.appendChild(style);
-            }
-          } catch (e) {
-            console.warn('Could not clone stylesheet:', e);
-          }
+        // ── PNG export ──
+        const pngBlob = await new Promise(res => hiResCanvas.toBlob(res, 'image/png'));
+        zip.file('business-card.png', pngBlob);
+
+        // ── PDF export (print-quality, exact physical dimensions) ──
+        const dims = CARD_DIMS_MM[cardFormat] || CARD_DIMS_MM.standard;
+        const mmW = dims.w;
+        const mmH = dims.h;
+        const isLandscape = mmW >= mmH;
+
+        const pdf = new jsPDF({
+          orientation: isLandscape ? 'landscape' : 'portrait',
+          unit: 'mm',
+          format: [mmW, mmH],
+          compress: false,
         });
 
-        // 3. Sync CSS Variables (Crucial for themes like Emerald/Sunset)
-        const rootStyles = getComputedStyle(document.documentElement);
-        let cssVars = ':root {';
-        // Extract all -- custom properties to ensure theme colors are preserved
-        for (let i = 0; i < document.styleSheets.length; i++) {
-          try {
-            const sheet = document.styleSheets[i];
-            const rules = sheet.cssRules || sheet.rules;
-            if (!rules) continue;
-            for (let j = 0; j < rules.length; j++) {
-              const rule = rules[j];
-              if (rule.selectorText === ':root' || rule.selectorText === 'html') {
-                const style = rule.style;
-                for (let k = 0; k < style.length; k++) {
-                  const prop = style[k];
-                  if (prop.startsWith('--')) {
-                    cssVars += `${prop}: ${rootStyles.getPropertyValue(prop)};`;
-                  }
-                }
-              }
-            }
-          } catch (e) {}
-        }
-        cssVars += '}';
-        const varStyle = iframeDoc.createElement('style');
-        varStyle.textContent = cssVars;
-        iframeDoc.head.appendChild(varStyle);
+        const dataUrl = hiResCanvas.toDataURL('image/png');
+        // Fill the entire PDF page with the card image — no margins, bleed-ready
+        pdf.addImage(dataUrl, 'PNG', 0, 0, mmW, mmH, undefined, 'NONE');
 
-        // 4. Inject Cloned Card into the Sandbox
-        const clone = cardEl.cloneNode(true);
-        iframeDoc.body.style.margin = '0';
-        iframeDoc.body.style.padding = '0';
-        iframeDoc.body.style.width = '1050px';
-        iframeDoc.body.style.height = '600px';
-        iframeDoc.body.style.backgroundColor = cardTemplate.theme.bg;
-        iframeDoc.body.appendChild(clone);
-
-        // Force strict desktop dims on the card within the sandbox
-        clone.style.width = '1050px';
-        clone.style.height = '600px';
-        clone.style.transform = 'none';
-        clone.style.position = 'relative';
-        clone.style.left = '0';
-        clone.style.top = '0';
-
-        // 5. Wait for layout stabilization & asset loading
-        await new Promise(r => setTimeout(r, 400));
-
-        try {
-          const canvas = await html2canvas(iframeDoc.body, {
-            scale: 2, // High DPI export
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: cardTemplate.theme.bg,
-            logging: false,
-            width: 1050,
-            height: 600,
-            windowWidth: 1050,
-            windowHeight: 600,
-          });
-          const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-          zip.file('business-card.png', blob);
-        } finally {
-          document.body.removeChild(iframe);
-        }
-        // --- Perfect Iframe Sandbox End ---
+        const pdfBlob = pdf.output('blob');
+        zip.file('business-card.pdf', pdfBlob);
       }
 
-      const profileUrl = values.profileUrl || `mailto:${values.userEmail}` || 'https://yourpage.com';
+      // ── QR code ──
+      const profileUrl = values.profileUrl || (values.userEmail ? `mailto:${values.userEmail}` : 'https://yourpage.com');
       const qrDataUrl = await QRCode.toDataURL(profileUrl, {
         width: 400,
         margin: 2,
-        color: {
-          dark: cardTemplate.theme.accent,
-          light: cardTemplate.theme.bg,
-        },
+        color: { dark: cardTemplate.theme.accent, light: cardTemplate.theme.bg },
       });
-      const qrBase64 = qrDataUrl.split(',')[1];
-      zip.file('qr-code.png', qrBase64, { base64: true });
+      zip.file('qr-code.png', qrDataUrl.split(',')[1], { base64: true });
 
-      const landingHTML = generateLandingHTML(landingTemplate.theme, values);
-      zip.file('index.html', landingHTML);
+      // ── Landing page ──
+      zip.file('index.html', generateLandingHTML(landingTemplate.theme, values));
 
-      const vcf = generateVCard(values);
-      zip.file('contact.vcf', vcf);
+      // ── vCard ──
+      zip.file('contact.vcf', generateVCard(values));
 
+      // ── README ──
       zip.file('README.txt', [
         `Digital Card for ${values.userName || 'User'}`,
         '========================',
         '',
         'Files included:',
-        '  business-card.png  - High-resolution business card image',
-        '  index.html         - Mobile landing page (open in browser)',
+        '  business-card.pdf  - Print-quality PDF  (send to printer, exact physical size)',
+        '  business-card.png  - High-resolution PNG (for digital sharing)',
+        '  index.html         - Mobile landing page (open in any browser)',
         '  contact.vcf        - Contact file (tap to save to phone)',
         '  qr-code.png        - QR code linking to your profile',
         '',
-        `Generated by Creative Studio`,
+        'Generated by Creative Studio',
       ].join('\n'));
 
       const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -372,6 +388,7 @@ export default function ExportButton({ values, cardTemplate, landingTemplate, ac
       a.download = `${(values.userName || 'card').replace(/\s+/g, '-').toLowerCase()}-digital-card.zip`;
       a.click();
       URL.revokeObjectURL(url);
+
       setState('done');
       setTimeout(() => setState('idle'), 3000);
     } catch (err) {
