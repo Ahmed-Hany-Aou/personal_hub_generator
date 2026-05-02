@@ -12,12 +12,15 @@ import styles from './DraggableNode.module.css';
 export default function DraggableNode({
   id,
   isFreeform,
+  alwaysDraggable,
   layoutState,
   onLayoutChange,
   onSelect,
   canvasRef,
   children,
 }) {
+  // alwaysDraggable: treat as freeform even when isFreeform=false (for custom icon nodes)
+  const effectiveFreeform = isFreeform || alwaysDraggable;
   const nodeRef  = useRef(null);
   const dragRef  = useRef({ active: false, moved: false, mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -27,7 +30,7 @@ export default function DraggableNode({
 
   // When freeform mode first activates, seed position from DOM
   useEffect(() => {
-    if (isFreeform && !hasPosition && nodeRef.current && canvasRef?.current) {
+    if (effectiveFreeform && !hasPosition && nodeRef.current && canvasRef?.current) {
       const nodeRect   = nodeRef.current.getBoundingClientRect();
       const canvasRect = canvasRef.current.getBoundingClientRect();
       
@@ -46,13 +49,13 @@ export default function DraggableNode({
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFreeform]);
+  }, [effectiveFreeform]);
 
   const handlePointerDown = useCallback((e) => {
     e.stopPropagation();
     onSelect?.(id, e.currentTarget);
 
-    if (!isFreeform) return;
+    if (!effectiveFreeform) return;
 
     // To handle scale transforms correctly during dragging
     let scale = 1;
@@ -74,7 +77,7 @@ export default function DraggableNode({
       scale,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
-  }, [isFreeform, id, onSelect, current.x, current.y]);
+  }, [effectiveFreeform, id, onSelect, current.x, current.y]);
 
   const handlePointerMove = useCallback((e) => {
     if (!dragRef.current.active) return;
@@ -127,7 +130,7 @@ export default function DraggableNode({
 
   // Build styles
   const style = {};
-  if (isFreeform && hasPosition) {
+  if (effectiveFreeform && hasPosition) {
     style.position   = 'absolute';
     style.left       = `${current.x}px`;
     style.top        = `${current.y}px`;
@@ -137,7 +140,7 @@ export default function DraggableNode({
     style.outline    = isDragging ? '2px dashed rgba(255,255,255,0.7)' : '1px solid transparent';
     style.outlineOffset = '3px';
     style.borderRadius  = '3px';
-  } else if (!isFreeform) {
+  } else if (!effectiveFreeform) {
     style.cursor        = 'pointer';
     style.position      = 'static';
     style.outline       = '1px solid transparent';
@@ -160,7 +163,7 @@ export default function DraggableNode({
   return (
     <div
       ref={nodeRef}
-      className={isFreeform ? styles.nodeFreeform : styles.node}
+      className={effectiveFreeform ? styles.nodeFreeform : styles.node}
       style={style}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

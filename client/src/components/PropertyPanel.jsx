@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './PropertyPanel.module.css';
 import RichTextEditor from './RichTextEditor.jsx';
 import StyleToolbar from './StyleToolbar.jsx';
+import IconPicker from './IconPicker.jsx';
 
 const FIELD_LABELS = {
   userName: 'Full Name',
@@ -183,13 +184,18 @@ export default function PropertyPanel({
   onStyleChange,
   activeThemeBg,
   onActiveThemeBgChange,
+  onAddCustomIcon,
+  onRemoveCustomIcon,
+  customIcons,
+  accentColor,
 }) {
   const navigate = useNavigate();
   const rawReq = template.placeholders?.required || [];
   const rawOpt = template.placeholders?.optional || [];
   const required = rawReq.length > 0 ? rawReq : ['userName', 'userTitle', 'userEmail'];
   const optional = rawOpt.length > 0 ? rawOpt : ['userPhone', 'companyName', 'userAvatar', 'companyLogo', 'avatarInitials', 'githubHandle', 'linkedinHandle', 'xHandle', 'instagramHandle', 'facebookHandle', 'snapchatHandle', 'threadsHandle', 'youtubeHandle', 'profileUrl', 'whatsAppNumber', 'cvUrl'];
-  const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false, editorOptions: true });
+  const [sections, setSections] = useState({ pwa: true, templates: true, styles: true, identity: true, social: false, bio: false, media: false, theme: false, format: false, editorOptions: true, icons: false });
+  const [showIconPicker, setShowIconPicker] = useState(false);
 
   const toggle = useCallback((id) => {
     setSections(prev => ({ ...prev, [id]: !prev[id] }));
@@ -456,6 +462,63 @@ export default function PropertyPanel({
           <button className={styles.resetBtn} onClick={onResetFormat}>
             ↺ Reset Size & Alignment
           </button>
+        </Section>
+
+        {/* ── Icons & Decorations ───────────────────────────────────── */}
+        <Section
+          id="icons"
+          icon="✦"
+          title="Icons & Decorations"
+          badge={customIcons?.length || 0}
+          open={sections.icons}
+          onToggle={toggle}
+        >
+          <p className={styles.hint}>Place decorative icons anywhere on the card. They can always be dragged freely.</p>
+          <button
+            className={styles.addIconBtn}
+            onClick={() => setShowIconPicker(true)}
+          >
+            + Add Icon
+          </button>
+          {customIcons && customIcons.length > 0 && (
+            <div className={styles.iconList}>
+              {customIcons.map(ci => (
+                <div key={ci.id} className={styles.iconListItem}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke={ci.color || accentColor || '#22d3ee'}
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ flexShrink: 0 }}
+                  >
+                    {String(ci.iconKey || '').split(' M ').map((seg, i) => (
+                      <path key={i} d={i === 0 ? seg : 'M ' + seg} />
+                    ))}
+                  </svg>
+                  <span className={styles.iconListLabel}>{ci.iconKey}</span>
+                  <button
+                    className={styles.iconRemoveBtn}
+                    onClick={() => onRemoveCustomIcon?.(ci.id)}
+                    title="Remove icon"
+                  >✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+          {showIconPicker && (
+            <IconPicker
+              onAdd={({ iconKey, color, size }) => {
+                onAddCustomIcon?.({ iconKey, color, size });
+                setShowIconPicker(false);
+              }}
+              onClose={() => setShowIconPicker(false)}
+              accentColor={accentColor}
+            />
+          )}
         </Section>
 
         {/* ── Editor Options ────────────────────────────────────────── */}

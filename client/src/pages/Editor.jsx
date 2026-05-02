@@ -315,6 +315,44 @@ export default function Editor() {
     setSelectedNodeId(id);
   }, []);
 
+  // ── Dimensions (declared here so icon handlers can reference it) ─────────
+  const activeDims = cardFormat === 'custom'
+    ? { width: Math.round(customDims.width * 11.81), height: Math.round(customDims.height * 11.81) }
+    : (PRESET_DIMS[cardFormat] || PRESET_DIMS.standard);
+
+  // ── Custom icon add / remove ─────────────────────────────────────────────
+  const handleAddCustomIcon = useCallback(({ iconKey, color, size }) => {
+    const id = `ci-${Date.now()}`;
+    updateActiveTabConfig(tabConfig => {
+      const existing = tabConfig.layoutState.__customIconIds || [];
+      const w = activeDims.width;
+      const h = activeDims.height;
+      return {
+        ...tabConfig,
+        layoutState: {
+          ...tabConfig.layoutState,
+          __customIconIds: [...existing, id],
+          [id]: { iconKey, color, size, x: w / 2 - size / 2, y: h / 2 - size / 2 },
+        }
+      };
+    });
+  }, [updateActiveTabConfig, activeDims]);
+
+  const handleRemoveCustomIcon = useCallback((id) => {
+    updateActiveTabConfig(tabConfig => {
+      const existing = tabConfig.layoutState.__customIconIds || [];
+      const newState = { ...tabConfig.layoutState };
+      delete newState[id];
+      return {
+        ...tabConfig,
+        layoutState: {
+          ...newState,
+          __customIconIds: existing.filter(cid => cid !== id),
+        }
+      };
+    });
+  }, [updateActiveTabConfig]);
+
   const closeToolbar = useCallback(() => {
     setSelectedNodeId(null);
   }, []);
@@ -322,11 +360,6 @@ export default function Editor() {
   const handleCanvasPointerDown = useCallback((e) => {
     if (!e.target.closest('[data-node-id]')) closeToolbar();
   }, [closeToolbar]);
-
-  // ── Seeding & Toggle ───────────────────────────────────────────────────
-  const activeDims = cardFormat === 'custom'
-    ? { width: Math.round(customDims.width * 11.81), height: Math.round(customDims.height * 11.81) }
-    : (PRESET_DIMS[cardFormat] || PRESET_DIMS.standard);
 
   const seedPositionsFromLayout = useCallback(() => {
     const cardEl = document.getElementById('card-export-target');
@@ -545,6 +578,13 @@ export default function Editor() {
             onStyleChange={handleLayoutChange}
             activeThemeBg={effectiveActiveTheme.bg}
             onActiveThemeBgChange={v => handleThemeOverride('bg', v)}
+            onAddCustomIcon={handleAddCustomIcon}
+            onRemoveCustomIcon={handleRemoveCustomIcon}
+            customIcons={(activeConfig.layoutState.__customIconIds || []).map(id => ({
+              id,
+              ...activeConfig.layoutState[id],
+            }))}
+            accentColor={effectiveActiveTheme.accent}
           />
         </div>
       </div>
