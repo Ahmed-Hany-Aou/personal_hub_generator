@@ -20,7 +20,7 @@
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding: min(50px, 10cqh) min(60px, 8cqw);
+  padding: min(42px, 8cqh) min(48px, 6cqw);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--glass-border);
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -115,20 +115,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: min(10px, 2cqh);
+  gap: min(8px, 1.5cqh);
   z-index: 1;
 }
 
 .name {
-  font-size: min(52px, 12cqh, 8cqw);
+  font-size: min(48px, 10cqh, 7cqw);
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   line-height: 1.1;
 }
 
 .title {
-  font-size: min(18px, 6cqh, 4cqw);
-  letter-spacing: 2px;
+  font-size: min(16px, 5cqh, 3.5cqw);
+  letter-spacing: 1.8px;
   font-weight: 500;
   opacity: 0.85;
 }
@@ -141,13 +141,13 @@
 }
 
 .company {
-  font-size: min(22px, 7cqh, 5cqw);
+  font-size: min(20px, 6cqh, 4.5cqw);
   font-weight: 600;
   letter-spacing: 1px;
 }
 
 .divider {
-  width: var(--divider-width, min(320px, 60cqw));
+  width: var(--divider-width, min(280px, 54cqw));
   height: var(--divider-height, 1px);
   margin: min(10px, 2cqh) 0;
 }
@@ -156,7 +156,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  column-gap: 16px;
+  column-gap: 14px;
   row-gap: 8px;
   max-width: 100%;
 }
@@ -164,8 +164,8 @@
 .contactRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: min(15px, 5cqh, 3.5cqw);
+  gap: 6px;
+  font-size: min(13px, 4.2cqh, 3cqw);
   opacity: 0.9;
 }
 
@@ -173,26 +173,36 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.25em;
-  height: 1.25em;
+  width: 1.1em;
+  height: 1.1em;
   font-size: 1em;
   line-height: 1;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .qrArea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   z-index: 1;
 }
 
 .qrBox {
-  width: 130px;
-  height: 130px;
+  width: 118px;
+  height: 118px;
   border: 2px solid var(--glass-border);
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,10 +236,10 @@
 }
 
 .qrCaption {
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.5px;
   text-align: center;
-  max-width: 130px;
+  max-width: 118px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

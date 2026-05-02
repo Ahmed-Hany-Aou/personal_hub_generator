@@ -3,18 +3,56 @@ import QRCode from 'qrcode';
 import styles from './CardCanvas.module.css';
 import DraggableNode from './DraggableNode.jsx';
 
+const ICONS = {
+  email: 'email',
+  phone: 'phone',
+  whatsapp: 'chat',
+  github: 'github',
+  linkedin: 'linkedin',
+  x: 'x',
+  facebook: 'facebook',
+  instagram: 'instagram',
+  youtube: 'youtube',
+  snapchat: 'snapchat',
+  threads: 'threads',
+};
+
+const ICON_PATHS = {
+  email: 'M4 6h16v12H4z M4 6l8 6 8-6',
+  phone: 'M6 5h4l2 5-3 2c1.5 3 3.5 5 6 6l2-3 5 2v4c0 1-1 2-2 2C11 21 3 13 3 7c0-1 1-2 2-2z',
+  whatsapp: 'M20 11.5a8 8 0 1 1-3-6.3L21 4l-1.2 4.2A7.9 7.9 0 0 1 20 11.5z M9 9c0 3 3 6 6 6',
+  github: 'M12 2a10 10 0 0 0-3.2 19.4c.5.1.7-.2.7-.5v-1.8c-2.9.6-3.5-1.2-3.5-1.2-.4-1-.9-1.3-.9-1.3-.7-.5 0-.5 0-.5.8.1 1.2.8 1.2.8.7 1.2 1.9.8 2.4.6.1-.5.3-.8.6-1-2.3-.2-4.7-1.1-4.7-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.9-.3 3 1a10.4 10.4 0 0 1 5.5 0c2.1-1.3 3-.9 3-.9.4 1 .2 1.9.1 2.7a3.9 3.9 0 0 1 1 2.6c0 4-2.4 4.8-4.7 5 .4.4.7.9.7 1.8v2.7c0 .3.2.7.7.5A10 10 0 0 0 12 2z',
+  linkedin: 'M6 9H2v13h4zm-2-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6 2h4v2c.6-1.1 2-2.3 4.2-2.3C22 8.7 22 12 22 16v6h-4v-5.5c0-2.1 0-4.7-2.8-4.7-2.8 0-3.2 2.2-3.2 4.6V22h-4V9z',
+  x: 'M4 4l7.8 9.2L4.5 20H7l6.1-6.9L19 20h5l-8.2-9.7L23 4h-2.5l-5.7 6.4L10 4z',
+  facebook: 'M14 8h3V4h-3c-3 0-5 2-5 5v3H6v4h3v8h4v-8h3.2l.8-4H13V9c0-.6.4-1 1-1z',
+  instagram: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z',
+  youtube: 'M21.6 8s-.2-1.5-.8-2.1c-.8-.8-1.7-.8-2.1-.9C16 4.8 12 4.8 12 4.8s-4 0-6.7.2c-.4 0-1.3.1-2.1.9C2.6 6.5 2.4 8 2.4 8S2 9.8 2 11.6v.8c0 1.8.4 3.6.4 3.6s.2 1.5.8 2.1c.8.8 1.9.8 2.4.9 1.8.2 6.4.2 6.4.2s4 0 6.7-.2c.4 0 1.3-.1 2.1-.9.6-.6.8-2.1.8-2.1s.4-1.8.4-3.6v-.8c0-1.8-.4-3.6-.4-3.6z M10 9.5l5 2.1-5 2.1v-4.2z',
+  snapchat: 'M12 3c-2.8 0-4.2 2.2-4.2 4.1 0 1-.3 1.6-.9 2.1-.4.3-1 .6-1.5.8-.6.2-1.2.5-1.2 1.1 0 .6.7.9 1.4 1 .7.2 1.3.4 1.7.8.4.4.5 1 .2 1.5-.2.4-.7.7-1.1 1-.4.2-.9.5-.9 1 0 .6.6.9 1.2.9.9 0 1.5.5 1.8 1.1.3.6.8 1.4 2.4 1.4s2.1-.8 2.4-1.4c.3-.6.9-1.1 1.8-1.1.6 0 1.2-.3 1.2-.9 0-.5-.5-.8-.9-1-.4-.3-.9-.6-1.1-1-.3-.5-.2-1.1.2-1.5.4-.4 1-.6 1.7-.8.7-.1 1.4-.4 1.4-1 0-.6-.6-.9-1.2-1.1-.5-.2-1.1-.5-1.5-.8-.6-.5-.9-1.1-.9-2.1C16.2 5.2 14.8 3 12 3z',
+  threads: 'M13 4c-4.4 0-8 3.1-8 7s3.6 7 8 7c1.8 0 3.4-.4 4.7-1.2.6-.3 1.2-.1 1.6.4l1.1 1.5c.4.5 1 .4 1.1-.2.2-.9.4-1.9.4-2.9 0-4.7-4-8.6-8.9-8.6H13zm0 4.2c2.4 0 4.4 1.5 4.4 3.3 0 1.8-2 3.3-4.4 3.3-2.4 0-4.4-1.5-4.4-3.3 0-1.8 2-3.3 4.4-3.3z',
+};
+
+function IconMark({ type }) {
+  const d = ICON_PATHS[type];
+  if (!d) return null;
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={d} />
+    </svg>
+  );
+}
+
 const CONTACT_MAP = [
-  { id: 'card-email', icon: '✉️', label: v => v.userEmail || null },
-  { id: 'card-phone', icon: '📞', label: v => (v.userPhone && v.whatsAppNumber === v.userPhone) ? `${v.userPhone} 📱` : (v.userPhone || null) },
-  { id: 'card-whatsapp', icon: '💬', label: v => (v.whatsAppNumber && v.whatsAppNumber !== v.userPhone) ? v.whatsAppNumber : null },
-  { id: 'card-github', icon: '⌥', label: v => v.githubHandle ? `github.com/${v.githubHandle}` : null },
-  { id: 'card-linkedin', icon: '🔗', label: v => v.linkedinHandle ? `in/${v.linkedinHandle}` : null },
-  { id: 'card-x', icon: '𝕏', label: v => v.xHandle ? `@${v.xHandle}` : null },
-  { id: 'card-facebook', icon: '📘', label: v => v.facebookHandle ? `fb.com/${v.facebookHandle}` : null },
-  { id: 'card-instagram', icon: '📸', label: v => v.instagramHandle ? `@${v.instagramHandle}` : null },
-  { id: 'card-youtube', icon: '▶️', label: v => v.youtubeHandle || null },
-  { id: 'card-snapchat', icon: '👻', label: v => v.snapchatHandle || null },
-  { id: 'card-threads', icon: '🧵', label: v => v.threadsHandle ? `@${v.threadsHandle}` : null },
+  { id: 'card-email', icon: 'email', label: v => v.userEmail || null },
+  { id: 'card-phone', icon: 'phone', label: v => (v.userPhone && v.whatsAppNumber === v.userPhone) ? `${v.userPhone} • WhatsApp` : (v.userPhone || null) },
+  { id: 'card-whatsapp', icon: 'whatsapp', label: v => (v.whatsAppNumber && v.whatsAppNumber !== v.userPhone) ? v.whatsAppNumber : null },
+  { id: 'card-github', icon: 'github', label: v => v.githubHandle ? `github.com/${v.githubHandle}` : null },
+  { id: 'card-linkedin', icon: 'linkedin', label: v => v.linkedinHandle ? `in/${v.linkedinHandle}` : null },
+  { id: 'card-x', icon: 'x', label: v => v.xHandle ? `@${v.xHandle}` : null },
+  { id: 'card-facebook', icon: 'facebook', label: v => v.facebookHandle ? `fb.com/${v.facebookHandle}` : null },
+  { id: 'card-instagram', icon: 'instagram', label: v => v.instagramHandle ? `@${v.instagramHandle}` : null },
+  { id: 'card-youtube', icon: 'youtube', label: v => v.youtubeHandle || null },
+  { id: 'card-snapchat', icon: 'snapchat', label: v => v.snapchatHandle || null },
+  { id: 'card-threads', icon: 'threads', label: v => v.threadsHandle ? `@${v.threadsHandle}` : null },
 ];
 
 export default function CardCanvas({
