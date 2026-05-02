@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Editor.module.css';
 import CardCanvas from '../components/CardCanvas.jsx';
+import CardBackCanvas from '../components/CardBackCanvas.jsx';
 import LandingPreview from '../components/LandingPreview.jsx';
 import PropertyPanel from '../components/PropertyPanel.jsx';
 import ExportButton from '../components/ExportButton.jsx';
@@ -124,10 +125,14 @@ export default function Editor() {
     }
   }, [installPrompt, isInstalled]);
 
+  // ── Card front/back flip ─────────────────────────────────────────────────
+  const [showCardBack, setShowCardBack] = useState(false);
+
   // ── Canvas refs ──────────────────────────────────────────────────────────
-  const cardCanvasRef    = useRef(null);
-  const landingCanvasRef = useRef(null);
-  const previewAreaRef   = useRef(null);
+  const cardCanvasRef     = useRef(null);
+  const cardBackCanvasRef = useRef(null);
+  const landingCanvasRef  = useRef(null);
+  const previewAreaRef    = useRef(null);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load template
@@ -488,6 +493,7 @@ export default function Editor() {
           cardFormat={cardFormat}
           cardTemplate={{ ...configs.card.template, theme: effectiveCardTheme }}
           landingTemplate={{ ...configs.landing.template, theme: effectiveLandingTheme }}
+          cardBackRef={cardBackCanvasRef}
         />
       </header>
 
@@ -516,8 +522,30 @@ export default function Editor() {
           <div className={styles.previewArea} ref={previewAreaRef}>
             {activeTab === 'card' ? (
               <div className={styles.cardWrapper}>
-                <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
-                <div id="card-canvas" style={{ flex: 1, minHeight: 0, width: '100%' }}>
+                {/* Top bar: size label + front/back toggle */}
+                <div className={styles.cardTopBar}>
+                  <div className={styles.cardSizeLabel}>{FORMAT_LABELS[cardFormat]}</div>
+                  <div className={styles.flipToggle}>
+                    <button
+                      className={`${styles.flipBtn} ${!showCardBack ? styles.flipBtnActive : ''}`}
+                      onClick={() => setShowCardBack(false)}
+                    >
+                      ◼ Front
+                    </button>
+                    <button
+                      className={`${styles.flipBtn} ${showCardBack ? styles.flipBtnActive : ''}`}
+                      onClick={() => setShowCardBack(true)}
+                    >
+                      ◻ Back
+                    </button>
+                  </div>
+                </div>
+
+                {/* Front side */}
+                <div
+                  id="card-canvas"
+                  style={{ flex: showCardBack ? 0 : 1, minHeight: 0, width: '100%', display: showCardBack ? 'none' : undefined }}
+                >
                   <CardCanvas
                     theme={effectiveCardTheme}
                     values={values}
@@ -531,6 +559,20 @@ export default function Editor() {
                     showGrid={showGrid}
                     templateId={configs.card.template.id}
                     layout={configs.card.template.layout}
+                  />
+                </div>
+
+                {/* Back side — always mounted (needed for export), hidden when not viewing */}
+                <div
+                  id="card-back-canvas"
+                  style={{ flex: showCardBack ? 1 : 0, minHeight: 0, width: '100%', display: showCardBack ? undefined : 'none' }}
+                >
+                  <CardBackCanvas
+                    theme={effectiveCardTheme}
+                    values={values}
+                    width={activeDims.width}
+                    height={activeDims.height}
+                    canvasRef={cardBackCanvasRef}
                   />
                 </div>
               </div>

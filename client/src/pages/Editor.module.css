@@ -160,6 +160,15 @@
   min-height: 0;
 }
 
+.cardTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .cardSizeLabel {
   font-size: 0.68rem;
   color: var(--text-muted);
@@ -170,6 +179,38 @@
   border-radius: 20px;
   border: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+/* ─── Front / Back flip toggle ────────────────────────────────────── */
+.flipToggle {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.flipBtn {
+  background: transparent;
+  border: none;
+  padding: 4px 14px;
+  border-radius: 18px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.flipBtn:hover { color: var(--text); }
+.flipBtnActive {
+  background: var(--accent);
+  color: #0a0f16;
+  font-weight: 600;
 }
 
 /* ─── Landing view ────────────────────────────────────────────────── */

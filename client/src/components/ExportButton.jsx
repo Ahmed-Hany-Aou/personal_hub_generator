@@ -228,7 +228,7 @@ function generateLandingHTML(theme, values) {
 }
 
 
-export default function ExportButton({ values, cardTemplate, landingTemplate, activeDims, cardFormat }) {
+export default function ExportButton({ values, cardTemplate, landingTemplate, activeDims, cardFormat, cardBackRef }) {
   const [state, setState] = useState('idle');
 
   // ── Shared iframe sandbox renderer ──────────────────────────────────────
@@ -343,9 +343,18 @@ export default function ExportButton({ values, cardTemplate, landingTemplate, ac
           compress: false,
         });
 
+        // Page 1 — front
         const dataUrl = hiResCanvas.toDataURL('image/png');
-        // Fill the entire PDF page with the card image — no margins, bleed-ready
         pdf.addImage(dataUrl, 'PNG', 0, 0, mmW, mmH, undefined, 'NONE');
+
+        // Page 2 — back (if the back canvas element is mounted)
+        const backEl = cardBackRef?.current;
+        if (backEl) {
+          const backCanvas = await renderCardCanvas(backEl, bgColor, renderW, renderH, 3);
+          const backDataUrl = backCanvas.toDataURL('image/png');
+          pdf.addPage([mmW, mmH], isLandscape ? 'landscape' : 'portrait');
+          pdf.addImage(backDataUrl, 'PNG', 0, 0, mmW, mmH, undefined, 'NONE');
+        }
 
         const pdfBlob = pdf.output('blob');
         zip.file('business-card.pdf', pdfBlob);

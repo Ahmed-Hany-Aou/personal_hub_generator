@@ -1,0 +1,146 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scaleWrapper {
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  transform-origin: top left;
+}
+
+/* Decorative corner marks */
+.cornerTL,
+.cornerBR {
+  position: absolute;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+}
+
+.cornerTL {
+  top: 18px;
+  left: 18px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  border-top-color: inherit;
+  border-left-color: inherit;
+  border-radius: 3px 0 0 0;
+}
+
+.cornerBR {
+  bottom: 18px;
+  right: 18px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+  border-bottom-color: inherit;
+  border-right-color: inherit;
+  border-radius: 0 0 3px 0;
+}
+
+/* Subtle grid overlay */
+.grid {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Top accent bar */
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+/* Bottom accent bar */
+.bottomBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+/* Center content block */
+.center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.company {
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.18em;
+}
+
+/* QR code container */
+.qrBox {
+  border-radius: 10px;
+  border: 1px solid;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qrBox img {
+  border-radius: 4px;
+  display: block;
+}
+
+.scanLabel {
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.url {
+  font-weight: 400;
+  text-align: center;
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bottom name watermark */
+.bottomName {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-size: 10px;
+  pointer-events: none;
+  user-select: none;
+}
